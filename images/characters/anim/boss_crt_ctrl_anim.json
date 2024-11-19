@@ -1,0 +1,18 @@
+{
+    "idle":{
+        "frames":[
+            0,1,2,3,4,5,6,7
+        ],
+        "FPS":12, 
+        "loop":0, 
+        "return_to":"idle"
+        },
+	"hurt":{
+        "frames":[
+           8,9,10,11
+        ],
+        "FPS":30, 
+        "loop":5, 
+        "return_to":"idle"
+        }
+    }

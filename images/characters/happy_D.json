@@ -1,0 +1,24 @@
+{
+    "NAME": "./images/characters/img/happy_D",
+    "ANIM": "happy_D_anim.json",
+    "PATH": "happy_D\\",
+    "SHEET_SIZE": [
+        400,
+        50
+    ],
+    "TILE_SIZE": [
+        50,
+        50
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        8
+    ],
+    "colorkey": [
+        0,
+        255,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {}
+}

@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/ui/img/ui_gohere",
+    "ANIM": "ui_gohere_anim.json",
+    "SHEET_SIZE": [
+        450,
+        75
+    ],
+    "TILE_SIZE": [
+        150,
+        75
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        3
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {}
+}

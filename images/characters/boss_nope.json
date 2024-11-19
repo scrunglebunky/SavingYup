@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/boss_nope",
+    "ANIM": "boss_nope_anim.json",
+    "SHEET_SIZE": [
+        9600,
+        300
+    ],
+    "TILE_SIZE": [
+        300,
+        300
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        32
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 1,
+    "anim": {}
+}

@@ -1,0 +1,8 @@
+{
+    "world_name":"FINAL",
+    "ui_type":"default",
+    "bg":"ufos.png",
+    "bg_size":[600,800],
+    "bg_speed":[0,0]
+
+}

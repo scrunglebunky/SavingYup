@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/boss_crt_arm",
+    "ANIM": "boss_crt_arm_anim.json",
+    "SHEET_SIZE": [
+        10800,
+        150
+    ],
+    "TILE_SIZE": [
+        450,
+        150
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        24
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 1.5,
+    "anim": {}
+}

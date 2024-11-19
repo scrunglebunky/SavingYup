@@ -1,0 +1,27 @@
+{
+    "NAME": "./images/characters/img/YUP",
+    "ANIM": "default.json",
+    "SHEET_SIZE": [
+        1,
+        1
+    ],
+    "TILE_SIZE": [
+        1,
+        1
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        1
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 1.0,
+    "flipx":false,
+    "flipy":false,
+    "anim": {},
+    "alpha":null,
+    "rotate":null
+}

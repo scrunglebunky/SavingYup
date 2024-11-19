@@ -1,0 +1,22 @@
+{
+    "NAME": "./images/ui/img/boss_sun_sign",
+    "ANIM": "boss_sun_sign_anim.json",
+    "SHEET_SIZE": [
+        800,
+        100
+    ],
+    "TILE_SIZE": [
+        200,
+        100
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        4
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 1.5,
+    "alpha":192}

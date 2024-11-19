@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/boss_ufo_succ",
+    "ANIM": "boss_ufo_succ_anim.json",
+    "SHEET_SIZE": [
+        600,
+        200
+    ],
+    "TILE_SIZE": [
+        200,
+        200
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        3
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 2.0,
+    "anim": {}
+}

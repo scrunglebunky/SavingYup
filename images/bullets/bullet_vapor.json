@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/bullets/img/bullet_vapor",
+    "ANIM": "bullet_vapor.json",
+    "SHEET_SIZE": [
+        570,
+        30
+    ],
+    "TILE_SIZE": [
+        30,
+        30
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        19
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {}
+}

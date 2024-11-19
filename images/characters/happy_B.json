@@ -1,0 +1,28 @@
+{
+    "NAME": "./images/characters/img/happy_B",
+    "ANIM": "happy_B_anim.json",
+    "PATH": "./happy_B/",
+    "SHEET_SIZE": [
+        50,
+        50
+    ],
+    "TILE_SIZE": [
+        50,
+        50
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        1
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {
+        "idle": [
+            0
+        ]
+    }
+}

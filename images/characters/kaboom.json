@@ -1,0 +1,33 @@
+{
+    "NAME": "./images/characters/img/kaboom",
+    "ANIM": "kaboom_anim.json",
+    "PATH": "./kaboom",
+    "SHEET_SIZE": [
+        2040,
+        200
+    ],
+    "TILE_SIZE": [
+        120,
+        200
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        17
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {
+        "idle":{
+            "frames":[
+                0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+            ],
+            "FPS":30, 
+            "loop":0, 
+            "return_to":"idle"
+            }
+    }
+}

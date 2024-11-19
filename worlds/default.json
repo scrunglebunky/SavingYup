@@ -1,0 +1,90 @@
+{
+    "world_name":"default",
+    "ui_type":"default",
+    "song":"placeholder.mp3",
+
+    "bg":"test.png",
+    "bg_size":[600,800],
+    "bg_speed":[0,0],
+    
+    "formation_img":null,
+    "floor_img":null,
+    "floor_size":[600,300],
+    "floor_move":[0,0.1],
+    "bullet_texture":"bullet_def",
+    
+    "levels":4,
+
+    "char_distance_x":35, 
+    "char_distance_y":40,
+
+    "throwdown_time":32, 
+    "throwdown_amount":1,
+    "spawn_time":10,
+    "max_char":25,
+    "dynamic_intensity":false,
+    "form_drop_speed":0.1,
+
+    "bullets":[],
+    "drop_health": 5,
+    "drop_bullet": 20, 
+    "speed":1,
+
+    "manual_formations":[
+        [
+            "DAAAACCCCCAAAAD",
+            "BBBBBBBBBBBBBBB",
+            "AAAAAAAAAAAAAAA",
+            "AAAAABBBBBAAAAA",
+            "DDDDDDDDDDDDDDD"
+        ]
+    ],
+    "random":false,
+    "manual_ordered":true,
+    "manual_order":[0],
+
+    "start_patterns":{
+        "A":{
+            "patterns":[[[0,0]]],
+            "speed":10,
+            "timer":5,
+            "shoot":[2]
+            },
+        "B":{
+            "patterns":[[[0,0]]],
+            "speed":10,
+            "timer":5,
+            "shoot":[6]
+        },
+        "C":{
+            "patterns":[[[0,0]]],
+            "speed":10,
+            "timer":5,
+            "shoot":[999]
+        },
+        "D":{
+            "patterns":[[[0,0]]],
+            "speed":10,
+            "timer":5,
+            "shoot":[2]
+        }
+    },
+
+
+    "skins":{
+        "A":null,
+        "B":null,
+        "C":null,
+        "D":null
+    },
+    "overwrite":{
+    },
+
+    "boss_levels":[4],
+    "bosses":["ufo"],
+
+
+    "events":[
+        [false,["level",2],"print('hello world!')"]
+    ]
+}

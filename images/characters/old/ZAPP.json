@@ -1,0 +1,31 @@
+{
+    "NAME": "./images/characters/ZAPP",
+    "ANIM": null,
+    "PATH": "./images/raw_characters/ZAPP/",
+    "SHEET_SIZE": [
+        432,
+        100
+    ],
+    "TILE_SIZE": [
+        108,
+        100
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        4
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {
+        "idle": [
+            0,
+            1,
+            2,
+            3
+        ]
+    }
+}

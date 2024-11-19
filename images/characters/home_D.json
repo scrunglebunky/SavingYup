@@ -1,0 +1,24 @@
+{
+    "NAME": "./images/characters/img/home_D",
+    "ANIM": null,
+    "PATH": "home_D\\",
+    "SHEET_SIZE": [
+        50,
+        50
+    ],
+    "TILE_SIZE": [
+        50,
+        50
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        1
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 0.7,
+    "anim": {}
+}

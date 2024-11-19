@@ -1,0 +1,10 @@
+{
+    "idle":{
+        "frames":[
+            0,1,2,3,4,5
+        ],
+        "FPS":32, 
+        "loop":0, 
+        "return_to":"idle"
+    }
+}

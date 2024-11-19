@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/nope_D",
+    "ANIM": "nope_D_anim.json",
+    "PATH": "nope_D\\",
+    "SHEET_SIZE": [
+        150,
+        50
+    ],
+    "TILE_SIZE": [
+        50,
+        50
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        3
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0
+}

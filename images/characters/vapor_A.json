@@ -1,0 +1,24 @@
+{
+    "NAME": "./images/characters/img/vapor_A",
+    "ANIM": "vapor_A_anim.json",
+    "PATH": "./vapor_A/",
+    "SHEET_SIZE": [
+        300,
+        50
+    ],
+    "TILE_SIZE": [
+        50,
+        50
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        6
+    ],
+    "colorkey": [
+        0,
+        255,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {}
+}

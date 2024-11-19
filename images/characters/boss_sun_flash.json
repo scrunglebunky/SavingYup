@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/boss_sun_flash",
+    "ANIM": "boss_sun_flash_anim.json",
+    "SHEET_SIZE": [
+        200,
+        67
+    ],
+    "TILE_SIZE": [
+        50,
+        67
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        4
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 8.0,
+    "anim": {}
+}

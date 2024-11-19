@@ -1,0 +1,34 @@
+{
+    "NAME": "./images/characters/FIHS",
+    "ANIM": null,
+    "PATH": "./images/raw_characters/FIHS/",
+    "SHEET_SIZE": [
+        700,
+        100
+    ],
+    "TILE_SIZE": [
+        100,
+        100
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        7
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 1.0,
+    "anim": {
+        "idle": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    }
+}

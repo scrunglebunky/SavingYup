@@ -1,0 +1,21 @@
+{
+    "songs":[
+        "cabbage.mp3",
+        "meowchill.mp3",
+        "kurosaki.mp3"
+    ],
+    "sounds":[
+        "boing0.wav","boing1.wav","boing2.wav","boing3.wav","boing4.wav",
+        "boom1.wav","boom2.wav","boom3.wav","boom4.wav","boom5.wav",
+        "bigboom1.wav","bigboom2.wav",
+        "smallboom0.wav",
+        
+        "scream.mp3", "bap.mp3","yeah.mp3","ouch.mp3","boo.wav","womp.wav",
+        "rizz.mp3",
+        
+        
+        "yippee.mp3","waah.mp3","zap.mp3",
+        "ding.wav",
+        "tada.mp3"
+    ]
+}

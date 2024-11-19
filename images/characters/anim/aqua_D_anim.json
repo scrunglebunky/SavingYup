@@ -1,0 +1,18 @@
+{
+    "idle":{
+        "frames":[
+            0,1,2,3,4,5
+        ],
+        "FPS":12, 
+        "loop":0, 
+        "return_to":"idle"
+    },
+    "attack":{
+        "frames":[
+            6,7,8,9
+        ],
+        "FPS":12, 
+        "loop":3, 
+        "return_to":"idle"
+    }
+}

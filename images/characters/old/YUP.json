@@ -1,0 +1,24 @@
+{
+    "NAME": "./images/characters/YUP",
+    "ANIM": "YUP_anim.json",
+    "PATH": "./images/raw_characters/YUP/",
+    "SHEET_SIZE": [
+        2250,
+        125
+    ],
+    "TILE_SIZE": [
+        125,
+        125
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        18
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 0.5,
+    "anim": null
+}

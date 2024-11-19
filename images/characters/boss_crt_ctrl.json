@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/boss_crt_ctrl",
+    "ANIM": "boss_crt_ctrl_anim.json",
+    "SHEET_SIZE": [
+        900,
+        125
+    ],
+    "TILE_SIZE": [
+        75,
+        125
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        12
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 1.25,
+    "anim": {}
+}

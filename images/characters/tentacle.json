@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/tentacle",
+    "ANIM": "tentacle_anim.json",
+    "SHEET_SIZE": [
+        2700,
+        450
+    ],
+    "TILE_SIZE": [
+        150,
+        450
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        18
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale": 1.0,
+    "anim": {}
+}

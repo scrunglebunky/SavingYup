@@ -1,0 +1,26 @@
+{
+    "idle":{
+        "frames":[
+            0
+        ],
+        "FPS":32, 
+        "loop":0, 
+        "return_to":"idle"
+    },
+    "squash":{
+        "frames":[
+            1,2,3,4,5,6
+        ],
+        "FPS":18, 
+        "loop":0, 
+        "return_to":"return"
+    },
+    "return":{
+        "frames":[
+            7
+        ],
+        "FPS":32, 
+        "loop":0, 
+        "return_to":"return"
+    }
+}

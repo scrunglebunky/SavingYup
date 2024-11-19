@@ -1,0 +1,41 @@
+
+{
+    "./images/":[],
+    "./images/placeholders/":["ufo.png","crt.png","crt2.png",
+                                "crust_bg.png","shell.png","crustshell.png","crustbody.png",
+                            "gun.png","bullet.png","sunblock.png"],
+    "./images/characters/":[],
+    "./images/ui/":[
+        "placeholder.bmp",
+        "a_movingto.png",
+        "logo.png","g_score.png","g_debug.png","g_lives.png","g_level.png","g_rank.png","g_shots.png","g_kills.png","g_accuracy.png","g_great.png",
+        "life.png","weapon.png","cursor.png",
+        "config_menu.png","on.png","off.png","paused.png","pauseborder.png",
+        "high_scores.png","hiscore.png","hiscore_name.png",
+        "gameover.png","gameover_score.png","gameover_return.png",
+        "levelcomplete.png","demo.png",
+        "arrow.png","enemylog.png","enemylog_hint.png"],
+    "./images/bg/":[
+        "space.png","splash.png","uibox.png","test.png","game_over_bg.png","level_complete_bg.png","tutorial_bg.png",
+        "home.bmp","nope.png","hack.png","water.png","happy.png","vaporwave.png","ufos.png","ship.png",
+        "hack_form.png","bluescreen.png",
+        "happy_floor.png","nope_floor.png","water_floor.png"],
+    "resize":[
+        ["config_menu.png",[400,150]],
+        ["logo.png",[200,150]],
+        ["life.png",[38,38]],
+        ["on.png",[50,25]],
+        ["off.png",[50,25]],
+        ["paused.png",[600,200]],
+        ["pauseborder.png",[600,800]],
+        ["high_scores.png",[400,600]],
+        ["gameover.png",[300,225]],
+        ["gameover_score.png",[200,100]],
+        ["gameover_return.png",[400,200]],
+        ["hiscore.png",[300,225]],
+        ["hiscore_name.png",[200,100]],
+        ["levelcomplete.png",[225,112]],
+        ["sunblock.png",[75,75]],
+        ["g_great.png",[200,100]]
+    ]
+}

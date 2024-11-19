@@ -1,0 +1,24 @@
+{
+    "NAME": "./images/characters/img/boss_sun",
+    "ANIM": "boss_sun_anim.json",
+    "SHEET_SIZE": [
+        5000,
+        200
+    ],
+    "TILE_SIZE": [
+        200,
+        200
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        25
+    ],
+    "colorkey": [
+        1,
+        2,
+        3
+    ],
+    "scale":2.67,
+    "flipy": false
+
+}

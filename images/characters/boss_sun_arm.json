@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/characters/img/boss_sun_arm",
+    "ANIM": "boss_sun_arm_anim.json",
+    "SHEET_SIZE": [
+        3200,
+        400
+    ],
+    "TILE_SIZE": [
+        400,
+        400
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        8
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 0.5,
+    "anim": {}
+}

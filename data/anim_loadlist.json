@@ -1,0 +1,20 @@
+
+{
+    "./":[],
+    "./images/characters/":[
+        "nope_A","nope_B","nope_C","nope_D",
+        "happy_A","happy_B","happy_C","happy_D",
+        "hack_A","hack_B","hack_C","hack_D",
+        "vapor_A","vapor_B","vapor_C","vapor_D",
+        "home_A","home_B","home_C","home_D",
+        "aqua_A","aqua_B","aqua_C","aqua_D",
+        "YUP",
+        "boss_nope","boss_ufo","boss_ufo_succ",
+		"boss_crt_ctrl","boss_crt_arm","boss_crt_armFLIP",
+		"tentacle","crust_fish","boss_sun","boss_sun_arm","boss_sun_flash",
+        "kaboom","die"
+    ],
+    "./images/ui/":["boss_sun_sign","boss_sun_yippee","ui_gohere","warning","tutorial","continue"],
+    "./images/bg/":["boss_crt_bg","boss_sun_bg"],
+    "./images/bullets/":["bullet_def","bullet_nope","bullet_hack","bullet_aqua","bullet_happy","bullet_vapor","coin"]
+}
