@@ -65,16 +65,16 @@ class Play(Template):
                  level:int = 0,
                  level_in_world:int = 0,
                  is_restart:bool = False, #so init can be rerun to reset the whole ass state
-                 is_demo:bool=False, #a way to check if the player is simulated or not
+                 #is_demo:bool=False, #a way to check if the player is simulated or not
                  ):
 
-        self.sprites = Play.sprites if not is_demo else Play.demo_sprites
+        self.sprites = Play.sprites
 
         self.next_state = None #Needed to determine if a state is complete
         self.fullwindow = window
 
         self.debug = {0:[],1:[]}
-        self.is_demo = is_demo
+        #self.is_demo = is_demo
 
 
         #resetting the sprite groups
@@ -96,7 +96,7 @@ class Play(Template):
             1, #gravity. 
             )
             
-        self.player = player.Player(bar=self.bar,sprite_groups=self.sprites,demo=self.is_demo)
+        self.player = player.Player(bar=self.bar,sprite_groups=self.sprites)
         self.sprites[1].add(self.player)
 
         #06/01/2023 - Loading in level data
@@ -108,7 +108,7 @@ class Play(Template):
 
 
         #event data - an event that plays over all else.
-        self.event = events.NewLevelEvent(level=self.level,window=self.window) if not self.is_demo else None
+        self.event = events.NewLevelEvent(level=self.level,window=self.window)
         
 
         #updating based on intensity
@@ -124,7 +124,8 @@ class Play(Template):
             level_in_world=self.level_in_world, 
             sprites=self.sprites,
             window=self.window,
-            is_demo = self.is_demo)
+            #is_demo = self.is_demo
+            )
 
         #06/03/2023 - Loading in the background
         self.background = Bg(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
@@ -225,7 +226,8 @@ class Play(Template):
                 level_in_world=self.level_in_world, 
                 sprites=self.sprites,
                 player=self.player,window=self.window,
-                is_demo = self.is_demo)
+                #is_demo = self.is_demo
+                )
 
             #resetting the level timer
             self.leveltimer = 0 
@@ -264,7 +266,7 @@ class Play(Template):
 
 
     def event_handler(self,event):
-        if self.is_demo: return
+        #if self.is_demo: return
         self.player.controls(event)
         #changing what comes next
         if event.type == pygame.KEYDOWN:
@@ -297,12 +299,11 @@ class Title(Template):
         self.next_state = None
         
 
-        self.demo_state = Play(window = self.window, world = 1, level = random.randint(0,50), is_demo = True) #this is different from the tools.demo value, as this is just to simulate a player
+        #self.demo_state = Play(window = self.window, world = 1, level = random.randint(0,50), is_demo = True) #this is different from the tools.demo value, as this is just to simulate a player
         self.hiscoresheet = score.generate_scoreboard()
 
         #basic events that will occur during the title
         self.events = [
-            "demo",
             "hiscore",
         ]
         self.event = 0
@@ -312,7 +313,7 @@ class Title(Template):
             self.resize = [600,800]
         self.image_placements = {}
             # "welcome":(pygame.display.rect.width*0.01,pygame.display.rect.height*0.01),
-        self.image_placements["demo"] = (pygame.display.rect.width*0.01,pygame.display.rect.height*0.1)
+        #self.image_placements["demo"] = (pygame.display.rect.width*0.01,pygame.display.rect.height*0.1)
         self.image_placements["score"] = (pygame.display.rect.width*0.99 - self.resize[0] ,pygame.display.rect.height*0.1)
         Title.em_continue.change_pos((winrect.centerx,winrect.centery),isCenter=True)
 
@@ -322,7 +323,7 @@ class Title(Template):
     
     def on_start(self):
         self.event = self.id = 0
-        self.demo_state.__init__(window = self.window, world = 1, level = random.randint(0,50), is_demo = True)
+        #self.demo_state.__init__(window = self.window, world = 1, level = random.randint(0,50), is_demo = True)
         self.border.emblems['logo'].add_tween_pos(cur_pos = self.border.emblems['logo'].rect.center , target_pos = (winrect.centerx,winrect.height*0.25),speed=5,started=True,isCenter=True)
         self.border.change_vis(lives=True,score=True,debug=True,weapon=True)
 
@@ -340,8 +341,8 @@ class Title(Template):
         #updating and drawing
         Title.em_continue.update()
         self.window.blit(Title.em_continue.image,Title.em_continue.rect)
-        self.demo_state.update(draw=False)
-        self.window.blit(pygame.transform.scale(self.demo_state.window,self.resize),self.image_placements['demo'])
+        #self.demo_state.update(draw=False)
+        #self.window.blit(pygame.transform.scale(self.demo_state.window,self.resize),self.image_placements['demo'])
         self.window.blit(self.hiscoresheet,self.image_placements['score'])
          ###### demo player controls
         # event = pygame.event.Event(random.choice([pygame.KEYDOWN,pygame.KEYUP]), key = random.choice([pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_z,pygame.K_x])) #create the event        
@@ -365,7 +366,7 @@ class Title(Template):
     def event_handler(self,event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_z:
-                self.next_state = "tutorial"
+                self.next_state = "play" #no longer tutorial
             if event.key == pygame.K_ESCAPE:
                 self.next_state = "quit"
 
@@ -1024,7 +1025,7 @@ class Boss(Template):
         #Due to this, there is a new set of sprite groups: player, boss, and bullet
         #Mostly everything is super simplified. 
         self.playstate = play_state
-        self.is_demo = self.playstate.is_demo
+        #self.is_demo = self.playstate.is_demo
 
         self.window = self.playstate.window
         self.fullwindow = self.playstate.fullwindow
@@ -1127,7 +1128,7 @@ class Boss(Template):
 
 
 
-
+"""
 class Tutorial(Template):
     demosprites = { #sprites are now state-specific hahaha
             0:pygame.sprite.Group(), #ALL SPRITES
@@ -1517,3 +1518,4 @@ class Tutorial(Template):
             for item in value:
                 key.on_collide(2,item)
                 item.on_collide(1,key)
+"""

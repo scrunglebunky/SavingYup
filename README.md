@@ -18,8 +18,11 @@
     - Computer: Special
     - Laser-Eye: Special
     - Jellyfish: Special
-- [ ] Remove the tutorial/end results
+- [x] Remove the tutorial
     - There will be less clutter, so they'll learn the complicated stuff themselves
+- [x] Remove the end results
+- [ ] Remove the demo code from Play State, and remove uses of it from the Title Screen
+    - It's extra bloat that isn't needed, and if it is it could be an inhereted class, not integrated
 - [ ] Simplify the Game Over.
 - [ ] Remove the changing bullets
 - [ ] Make a new campaign/world just called "arcade"

@@ -39,7 +39,7 @@ states["title"] = all_states.Title(window=window,border=border)
 states["gameover"] = all_states.GameOver(window=window,play_state=states["play"])
 states["advance"] = all_states.Advance(window=window,play_state=states["play"])
 states["boss"] = all_states.Boss(play_state=states["play"])
-states["tutorial"] = all_states.Tutorial(window=window)
+# states["tutorial"] = all_states.Tutorial(window=window) Part 2 - Removing the Tutorial
 
 #07/23/2023 - SWITCHING STATES
 # States have an issue now where, since they are all initialized at startup, some things that should only be run when the state *actually* starts still appears.
@@ -99,8 +99,8 @@ while run:
             if event.key == pygame.K_1:
                 if tools.debug: clock.FPS = 0 if clock.FPS == 60 else 60
             if event.key == pygame.K_u:
-                if tools.debug: freeze = not freeze
-                
+                #if tools.debug: freeze = not freeze
+                pass
 
         cur_state.event_handler(event=event)
  

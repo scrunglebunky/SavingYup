@@ -625,6 +625,8 @@ class Sammich(Template):
 
 
 
+
+
 class Chaser(Template):
     def __init__(self,**kwargs):
         kwargs['skin'] = "happy_B" # manually setting sprite info now
@@ -711,6 +713,9 @@ class Chaser(Template):
         Template.kill(self,reason)
         self.atk['warning'].kill()
         
+
+
+
 
 
 class Yippee(Template):
