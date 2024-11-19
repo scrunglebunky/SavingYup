@@ -72,7 +72,7 @@ class Template(pygame.sprite.Sprite):
         #extras
         self.sprites = kwargs['sprites']
         self.player = kwargs['player']
-        self.is_demo = kwargs['is_demo']
+        # self.is_demo = kwargs['is_demo']
 
     def update(self): #this should be run the same no matter what
         
@@ -137,9 +137,8 @@ class Template(pygame.sprite.Sprite):
     def kill(self,reason=None,play_sound = True) -> int:
         if reason == "health":
             #COIN CODE
-            if not self.is_demo: 
-                for i in range(1):
-                    self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1]))
+            for i in range(1):
+                self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1]))
             #UPDATING THE KILL COUNT
             wl['kills'] += 1
         else:
@@ -210,6 +209,8 @@ class Template(pygame.sprite.Sprite):
 class A(Template): #swooping
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_A" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
+
         Template.__init__(self,kwargs=kwargs)   
         
         #values created for when the opponent attacks you
@@ -309,6 +310,7 @@ class A(Template): #swooping
 class B(Template): #jumpy
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_B" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
 
         self.info['atk'] = True
@@ -424,8 +426,8 @@ class B(Template): #jumpy
 class C(Template): #turret
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_C" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
-
         self.timer = (480 - (10*self.info['difficulty'])) if (self.info['difficulty']<40) else 80
         self.time = random.randint(0,self.timer//10)
     def state_idle(self,start=False):
@@ -466,6 +468,7 @@ class Compootr(Template): #special world 3 item
     atk_max = 2
     def __init__(self,**kwargs):
         kwargs['skin'] = "hack_D" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_hack" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.info['atk'] = True
         self.atk = {
@@ -522,6 +525,7 @@ class Jelle(Template): #special jellyfish
     atk_max = 2
     def __init__(self,**kwargs):
         kwargs['skin'] = "hack_D" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.atk_move = None
         self.info['atk']=True
@@ -582,6 +586,7 @@ class Jelle(Template): #special jellyfish
 class Sammich(Template):
     def __init__(self,**kwargs):
         kwargs['skin'] = "home_D" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.info['atk'] = True
         self.atk = {
@@ -630,6 +635,7 @@ class Sammich(Template):
 class Chaser(Template):
     def __init__(self,**kwargs):
         kwargs['skin'] = "happy_B" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         
         self.atk = {}
@@ -722,6 +728,7 @@ class Yippee(Template):
     #a stupid little enemy that shits confetti at you
     def __init__(self,**kwargs):
         kwargs['skin'] = "happy_D" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
 
         self.info['atk'] = True
@@ -766,6 +773,7 @@ class Lumen(Template):
     #points at you, and shoots a laser 
     def __init__(self,**kwargs):
         kwargs['skin'] = "vapor_D" # manually setting sprite info now
+        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         
         self.info['atk'] = True

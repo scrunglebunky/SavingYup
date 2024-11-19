@@ -24,7 +24,7 @@
 - [ ] Remove the demo code from Play State, and remove uses of it from the Title Screen
     - It's extra bloat that isn't needed, and if it is it could be an inhereted class, not integrated
 - [ ] Simplify the Game Over.
-- [ ] Remove the changing bullets
+- [x] Remove the changing bullets (they can change, but they're not supposed to normally)
 - [ ] Make a new campaign/world just called "arcade"
     - There is only one enemy
     - New enemies get added every 5 levels

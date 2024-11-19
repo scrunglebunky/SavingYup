@@ -1,3 +1,4 @@
+# Program by Andrew Church
 import random,pygame,math,enemies,random
 from anim import all_loaded_images as img
 
@@ -178,11 +179,11 @@ class Formation():
                 pos=self.pos,difficulty=self.difficulty,sprites=self.sprites,player=self.player,
                 entrance_points=entrance_points[self.enter_key] if entrance_points is not None else None,
                 entrance_speed=entrance_info['speed'] if entrance_points is not None else None,
-                # skin=spawn_skin, # Part 1: Removing the changing skins, and replacing them with defaults.
+                # skin=spawn_skin, # REMOVED the changing skins, and replacing them with defaults.
                 trip=entrance_info['shoot'] if entrance_points is not None else [999],
                 formation=self,
                 window=self.window,
-                bullet_texture=self.world_data['bullet_texture'],
+                # bullet_texture=self.world_data['bullet_texture'], - REMOVED to make the game less confusing
                 # is_demo=self.is_demo
             )
             #adding enemy to groups
