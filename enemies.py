@@ -54,7 +54,7 @@ class Template(pygame.sprite.Sprite):
         
         
         #image values, including spritesheets
-        self.aimg = AImg(host=self,name = kwargs['skin'], current_anim = 'idle')
+        self.aimg = AImg(host=self,name = kwargs['skin'] if 'skin' in kwargs.keys() else None, current_anim = 'idle')
         self.rect.center = self.idle["full"]
 
 
@@ -209,10 +209,8 @@ class Template(pygame.sprite.Sprite):
 
 class A(Template): #swooping
     def __init__(self,**kwargs):
-        Template.__init__(
-            self,
-            anim = 'nope_A', #manually setting sprites now hooray!
-            kwargs=kwargs)   
+        kwargs['skin'] = "nope_A" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs)   
         
         #values created for when the opponent attacks you
         self.atk={
@@ -310,9 +308,8 @@ class A(Template): #swooping
 
 class B(Template): #jumpy
     def __init__(self,**kwargs):
-        Template.__init__(self,
-            anim = 'nope_B', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "nope_B" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
 
         self.info['atk'] = True
 
@@ -426,10 +423,9 @@ class B(Template): #jumpy
 
 class C(Template): #turret
     def __init__(self,**kwargs):
-        Template.__init__(self,
-            anim = 'nope_C', #manually setting sprites now hooray!
-            kwargs=kwargs
-            )   
+        kwargs['skin'] = "nope_C" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
+
         self.timer = (480 - (10*self.info['difficulty'])) if (self.info['difficulty']<40) else 80
         self.time = random.randint(0,self.timer//10)
     def state_idle(self,start=False):
@@ -469,9 +465,8 @@ class Compootr(Template): #special world 3 item
     atk_count = 0
     atk_max = 2
     def __init__(self,**kwargs):
-        Template.__init__(self,
-            anim = 'hack_D', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "hack_D" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
         self.info['atk'] = True
         self.atk = {
            "shots":10+(self.info["difficulty"]*2 if self.info['difficulty'] < 10 else 20),
@@ -526,10 +521,8 @@ class Jelle(Template): #special jellyfish
     atk_count = 0
     atk_max = 2
     def __init__(self,**kwargs):
-        #placeholder value
-        Template.__init__(self,
-            anim = 'aqua_D', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "hack_D" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
         self.atk_move = None
         self.info['atk']=True
         self.atk = {'return':False,'y':0,'trip':False}
@@ -588,9 +581,8 @@ class Jelle(Template): #special jellyfish
 
 class Sammich(Template):
     def __init__(self,**kwargs):
-        Template.__init__(self,
-            anim = 'home_D', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "home_D" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
         self.info['atk'] = True
         self.atk = {
             'side':0,
@@ -635,12 +627,9 @@ class Sammich(Template):
 
 class Chaser(Template):
     def __init__(self,**kwargs):
-        # FIX THIS LATER
-        # THIS CHARACTER IS NOT A NOPE ANYMORE BECAUSE ALL OF THE BASE ENEMIES ARE ALREADY NOPE
-        # RENAME IT
-        Template.__init__(self,
-            anim = 'happy_B', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "happy_B" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
+        
         self.atk = {}
         self.info['atk'] = True
         self.atk = {
@@ -727,9 +716,9 @@ class Chaser(Template):
 class Yippee(Template):
     #a stupid little enemy that shits confetti at you
     def __init__(self,**kwargs):
-        Template.__init__(self,
-            anim = 'happy_D', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "happy_D" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
+
         self.info['atk'] = True
         self.atk = {
             "points":[0,1,2],
@@ -771,9 +760,9 @@ class Yippee(Template):
 class Lumen(Template):
     #points at you, and shoots a laser 
     def __init__(self,**kwargs):
-        Template.__init__(self,
-            anim = 'vapor_D', #manually setting sprites now hooray!
-            kwargs=kwargs)
+        kwargs['skin'] = "vapor_D" # manually setting sprite info now
+        Template.__init__(self,kwargs=kwargs) 
+        
         self.info['atk'] = True
         self.atk = {
             'angle':0,

@@ -8,7 +8,7 @@
 - There shouldn't be worlds, only randomly generated levels that slowly get more chaotic as time goes on.
 ## WHAT TO DO
 - [ ] Make the only available bosses the UFO and the big Nope
-- [ ] Remove the "skins" and make the enemies only have one basic skin
+- [x] Remove the "skins" and make the enemies only have one basic skin
     - Enemy A: Nope A
     - Enemy B: Nope B
     - Enemy C: Nope C
