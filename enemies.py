@@ -829,7 +829,8 @@ loaded = {
     'lumen':Lumen,
     }
 
-
+# telling bullets what the enemy template is
+bullets.DefaultBullet.enemy_parent_class = Template
 
 
 
@@ -1003,7 +1004,7 @@ class HurtBullet(pygame.sprite.Sprite):
         self.move.update()
         self.rect.center = self.move.position
         self.aimg.update()
-        if not bullets.Bullet.on_screen(self) or self.health <= 0 or self.killonstart: 
+        if not bullets.BulletRAW.on_screen(self) or self.health <= 0 or self.killonstart: 
             self.kill()
             HurtBullet.count = HurtBullet.count - 1 if HurtBullet.count > 0 else 0 
     

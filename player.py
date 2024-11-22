@@ -55,10 +55,17 @@ class Player(pygame.sprite.Sprite):
         self.autoshoottimer = 0 
 
         #UPGRADE VALUES -- UNFINISHED
-        self.bullet_max = 4 #how many bullets can be on screen at one given time
-        self.bullet_time = 6 #shoots once every x frames
-        self.current_bullet = "def" #the current bullet being shot at the moment
+        self.bullet_max = 3 #how many bullets can be on screen at one given time
+        self.bullet_time = 16 #shoots once every x frames
+        self.current_bullet = "default" #the current bullet being shot at the moment
         self.bullet_lock = False #stop shooting 
+        self.bullet_dmg = 1
+
+        # ADDING UPGRADES NOW, HOORAY!
+        # you could shoot manually or hold down the button to autoshoot
+        # autoshooting works every x frames, and goes down as you purchase upgrades
+        # whether you autoshoot or not, there's a maximum of x bullets you can have onscreen at a time, like galaga
+
 
         self.rect.center = self.pos
 
@@ -69,27 +76,8 @@ class Player(pygame.sprite.Sprite):
         #SETTING THE IMAGE. I have no issue resetting the image every frame because it's just a callback to an object
         self.aimg.update()
 
-        #07/09/2023 - rotating the image based on movement
-        try:
-            if self.momentum != 0 and not self.movement[4]:
-                self.image = pygame.transform.rotate(self.image,self.momentum*-2)
-        except:...
-        #making the image transparent if invincible
-        if self.invincibility_counter > 0 and self.invincibility_counter % 2 == 0: 
-            self.image = anim.NONE
-        #TEMPORARY -- shrinking the image if focusing
-        if self.movement[5]:
-            self.image = pygame.transform.scale(self.image,(50,50))
-            self.mask = pygame.mask.from_surface(self.image)
-            rect = self.image.get_rect()
-            rect.center = self.rect.center[:]
-            self.rect = rect
-        else:
-            rect = self.image.get_rect()
-            rect.center = self.rect.center[:]
-            self.rect = rect
-        
-
+        # calling to transform the image based on me
+        self.image_transformations()
 
         #collision is just movement
         self.collision()
@@ -128,7 +116,7 @@ class Player(pygame.sprite.Sprite):
                 
 
             #SHOOTING
-            if (event.key == pygame.K_x or event.key == pygame.K_z) and not (self.movement[4] or self.bullet_lock):
+            if (event.key == pygame.K_x or event.key == pygame.K_z) and not (self.bullet_lock):
                 self.shoot()
                 self.autoshoottimer = 0 
                 self.autoshoot = True
@@ -153,7 +141,7 @@ class Player(pygame.sprite.Sprite):
             if event.key == pygame.K_DOWN:
                 self.crouch(False)
                 
-            if (event.key == pygame.K_x or event.key == pygame.K_z) and not self.movement[4]:
+            if (event.key == pygame.K_x or event.key == pygame.K_z):
                 self.autoshoot = False
 
             if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
@@ -257,10 +245,8 @@ class Player(pygame.sprite.Sprite):
 
 
     def shoot(self):
-        bullet=bullets.Bullet(self.pos,sprites=self.sprite_groups,max_bullets=self.bullet_max)
-        if not bullet.kill_on_spawn: 
-            self.sprite_groups[1].add(bullet)
-            self.aimg.change_anim("shoot")
+        did_shoot = bullets.LOADED[self.current_bullet].shoot(sprite_groups=self.sprite_groups,player=self)
+        if not self.movement[4] and did_shoot: self.aimg.change_anim("shoot")
             
 
     def move(self,dir:bool=True,release:bool=False):
@@ -305,6 +291,29 @@ class Player(pygame.sprite.Sprite):
             self.movement[5] = True
         else:
             self.movement[5] = False
+
+
+    def image_transformations(self):
+         #07/09/2023 - rotating the image based on movement
+        try:
+            if self.momentum != 0 and not self.movement[4]:
+                self.image = pygame.transform.rotate(self.image,self.momentum*-2)
+        except:...
+        #making the image transparent if invincible
+        if self.invincibility_counter > 0 and self.invincibility_counter % 2 == 0: 
+            self.image = anim.NONE
+        #TEMPORARY -- shrinking the image if focusing
+        if self.movement[5]:
+            self.image = pygame.transform.scale(self.image,(50,50))
+            self.mask = pygame.mask.from_surface(self.image)
+            rect = self.image.get_rect()
+            rect.center = self.rect.center[:]
+            self.rect = rect
+        else:
+            rect = self.image.get_rect()
+            rect.center = self.rect.center[:]
+            self.rect = rect
+        
 
 
 

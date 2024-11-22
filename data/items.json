@@ -1,0 +1,85 @@
+{
+    "health_up": {
+        "icon":"icon_healthup.png",
+        "type":"base_up",
+        "price_base":1000,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "HEALTH UP\nRUNNING OUT OF LIVES?\nHERE!"
+    },
+    "shootrate_up": {
+        "icon":"icon_shootrateup.png",
+        "type":"base_up",
+        "price_base":100,
+        "price_mult_purchase": 5,
+        "price_mult_level": 0,
+        "description": "SHOOTRATE UP\nSHOOT AN EXTRA FRAME FASTER!\n(don't buy more than 16 times)"
+    },
+    "maxbullet_up": {
+        "icon":"icon_maxbulletup.png",
+        "type":"base_up",
+        "price_base":500,
+        "price_mult_purchase": 3,
+        "price_mult_level": 0,
+        "description": "MAX BULLETS UP\nUPGRADES MAXIMUM AMOUNT OF BULLETS ONSCREEN!"
+    },
+    "tripleshot": {
+        "icon":"icon_tripleshot.png",
+        "type":"weapon",
+        "price_base":1000,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "TRIPLE SHOT\nWANNA LAG OUT THE GAME WITH MORE SPRITES?\nHERE YOU GO!"
+    },
+    "rocket": {
+        "icon":"icon_rocketshot.png",
+        "type":"weapon",
+        "price_base":1000,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "HOMING ROCKET\nWANNA LAG OUT THE GAME WITH POOR ENEMY INDEXING?\nHERE YOU GO!!!"
+    },
+    "wide": {
+        "icon":"icon_wideshot.png",
+        "type":"weapon",
+        "price_base":500,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "WIDE SHOT\nA SLOW-MOVING BULLET YOU CAN USE AS A FORCEFIELD!"
+    },
+    "magnet": {
+        "icon":"icon_magnetperk.png",
+        "type":"perk",
+        "price_base":500,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "COIN MAGNET\nQUITE THE GREEDY THING, YOU ARE."
+    },
+    "child": {
+        "icon":"icon_childperk.png",
+        "type":"perk",
+        "price_base":5000,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "LITTLE YUP\nLITTLE GUY WHO FOLLOWS YOU\nYOU LOSE IT IF YOU GET HURT."
+    },
+    "rocketboots": {
+        "icon":"icon_rocketbootperk.png",
+        "type":"perk",
+        "price_base":9999999999,
+        "price_mult_purchase": 2,
+        "price_mult_level": 0,
+        "description": "ROCKET BOOTS\nIM NOT PROGRAMMING THESE IN THE GAME\nTHEY WOULD BE OP"
+    },
+
+
+    "INDEX-perks":["rocketboots","child","magnet"],
+    "INDEX-up":["maxbullet_up","health_up","shootrate_up"],
+    "INDEX-weapon":["tripleshot","rocket","wide"],
+    "INDEX-welcometext":[
+        "HEY YOU LOOK POOR WANNA GET EVEN POORER??",
+        "LET'S RUIN YOUR CHANCE OF HAVING A HIGH SCORE",
+        "YOU DON'T SEE FELLOW YUPS OFTEN",
+        "I DON'T LIKE YOU."
+    ]
+}

@@ -29,7 +29,31 @@
     - New enemies get added every 5 levels
     - Each new enemy class has a randomly-assigned formation pattern that does not change for the entire game
         - [x] this pulls from a random list of **all** the start patterns
-- [] World BG/FG will change every 5 levels
+- [x] World BG/FG will change every 5 levels
+- [ ] Special events that do graphical changes for the funsies
+- [ ] Sounds.
+- [ ] A shop that sells upgrades
+    - [x] Triple Shot
+    - [x] Homing Missile
+    - Extra damage
+- [ ] Difficulty scaling
+    - Enemies get more health
+        - (health bars?)
+    - Level 1 has no coming down
+    - Level 2,3, and 4 have it ramp up
+    - Level 5 has a difficulty spike but then slows down 
+- [ ] Bosses Every 5 levels.
+    - These don't require an entire state, and are instead just a one-man rotation
+    - [ ] UFO for "YUP"
+    - [ ] Big Nope for "NOPE"
+    - [ ] Spinning Checkerball eye for "YIPPLES"
+    - [ ] Large freaky flower thing for "TOUCH GRASS"
+    - [ ] Spooky ghost for "DRAKE"
+    - [ ] Big Jellyfish for "BUBBLES"
+    - [ ] A large sentient stick of butter for "YELLOW"
+    - [ ] Anglerfish for "PINK!!!!!!!!!!!!!!!!!!!"
+    - [ ] Fake yup for "YEP..."
+    - [ ] The Sun for "SKY"
 I will have **one week to do this** (Tue 19th to Tue 26th)
 
 # PART 1 -- REMOVING THE "SKINS"
