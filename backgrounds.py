@@ -85,19 +85,27 @@ class Background():
 
 class Floor():
     def __init__(self,image:str,player:pygame.sprite.Sprite,window:pygame.Surface,move:list=(0,0),scale:tuple=None,):
-        self.image = anim.all_loaded_images[image] if scale is None else pygame.transform.scale(anim.all_loaded_images[image],scale)
-        self.rect = self.image.get_rect()
-        self.centerx = (window.get_width()//2)
-        self.centery = window.get_height()
+        self.aimg = anim.AutoImage(host=self,name=image,resize=scale)
+        self.window = window
+        self.centerx = self.window.get_width()/2
+        self.bottom = self.window.get_height()
         self.move = move
         self.player=player
         self.hide = False
     
-    def update(self):...
+    def update(self):
+        self.aimg.update()
 
     def draw(self,surf:pygame.Surface) -> None:
         if self.hide: return
         else:
-            self.rect.centerx = self.centerx + (self.centerx-self.player.rect.x)*self.move[0] #stays centered
-            self.rect.centery = self.centery - (self.player.rect.centery - self.player.bar[1])*self.move[1] #moves with the player's y-velocity
+            # print(self.rect.center)
+            # self.rect.centerx = self.centerx + (self.centerx-self.player.rect.x)*self.move[0] #stays centered
+            # self.rect.centery = self.centery - (self.player.rect.centery - self.player.bar[1])*self.move[1] #moves with the player's y-velocity
+            if self.move[0]:
+                offsetx = (self.centerx - self.player.rect.x)*self.move[0] 
+            if self.move[1]:
+                offsety = (self.player.rect.centery - self.player.bar[1])*self.move[1]
+            self.rect.centerx = self.centerx + offsetx
+            self.rect.bottom = self.bottom - offsety
             surf.blit(self.image,self.rect)

@@ -11,6 +11,7 @@ from bullets import BulletParticle as BP
 from math import sin
 from player import PlayerDummy as PD
 from levels import worlds 
+from events import GamePlayInfo as GPI
 
 winrect = pygame.display.rect
 height,width = winrect.height,winrect.width
@@ -53,98 +54,8 @@ class Play(Template):
             3:pygame.sprite.Group(), #UI SPRITES
         }
     
-    
-
-    default_world_data = {
-            "world_name":"default",
-            "ui_type":"default",
-            "song":"placeholder.mp3",
-
-            "bg":"test.png",
-            "bg_size":[600,800],
-            "bg_speed":[0,0],
-            
-            "formation_img":None,
-            "floor_img":None,
-            "floor_size":[600,300],
-            "floor_move":[0,0.1],
-            "bullet_texture":"bullet_def",
-            
-            "levels":4,
-
-            "char_distance_x":35, 
-            "char_distance_y":40,
-
-            "throwdown_time":32, 
-            "throwdown_amount":1,
-            "spawn_time":10,
-            "max_char":25,
-            "dynamic_intensity":False,
-            "form_drop_speed":0.1,
-
-            "bullets":[],
-            "drop_health": 5,
-            "drop_bullet": 20, 
-            "speed":1,
-
-            "manual_formations":[
-                [
-                    "DAAAACCCCCAAAAD",
-                    "BBBBBBBBBBBBBBB",
-                    "AAAAAAAAAAAAAAA",
-                    "AAAAABBBBBAAAAA",
-                    "DDDDDDDDDDDDDDD"
-                ]
-            ],
-            "random":False,
-            "manual_ordered":True,
-            "manual_order":[0],
-
-            "start_patterns":{
-                "A":{
-                    "patterns":[[[0,0]]],
-                    "speed":10,
-                    "timer":5,
-                    "shoot":[2]
-                    },
-                "B":{
-                    "patterns":[[[0,0]]],
-                    "speed":10,
-                    "timer":5,
-                    "shoot":[6]
-                },
-                "C":{
-                    "patterns":[[[0,0]]],
-                    "speed":10,
-                    "timer":5,
-                    "shoot":[999]
-                },
-                "D":{
-                    "patterns":[[[0,0]]],
-                    "speed":10,
-                    "timer":5,
-                    "shoot":[2]
-                }
-            },
 
 
-            "skins":{
-                "A":None,
-                "B":None,
-                "C":None,
-                "D":None
-            },
-            "overwrite":{
-            },
-
-            "boss_levels":[4],
-            "bosses":["ufo"],
-
-
-            "events":[
-                [False,["level",2],"print('hello world!')"]
-            ]
-        }
 
     def __init__(self,
                  window:pygame.display,
@@ -197,54 +108,27 @@ class Play(Template):
         self.difficulty = 1 + self.level / 5
 
         # world data is now handled here, in code, since it updates manually
-        self.world_data = Play.default_world_data
+        # self.world_data = Play.default_world_data
 
 
         # current running game info, which replaces world data
         # this isn't a dictionary anymore because they're annoying to write
         self.char_list = [] 
-        self.char_available = enemies.available_characters.copy()
         self.char_start_patterns = {}
-        self.char_start_patterns_available = enemies.start_patterns.copy()
-        #adding a new character
-        self.new_char()
-        
-
-        # #event data - an event that plays over all else.
-        # self.event = events.NewLevelEvent(level=self.level,window=self.window)
-    
-
-
-        #updating intensities in terms of spawning and such
-        # levels.update_intensities(self.level,self.world_data)
-
+        self.backgroundlist_unlocked = []
+        #unlocking new character/background
+        GPI.unlock_enemy(playstate=self)
+        GPI.unlock_bg(playstate=self)
         #06/01/2023 - loading the formation
         #the formation handles spawning and management of most enemies, but the state manages drawing them to the window and updating them
         self.new_formation()
-        self.new_bg()
+        # self.new_bg("bg01") # now set by GPI
 
         #timer for updating new level
         self.leveltimer = 0 
-        #relating to advance sprite
-        self.in_advance:bool = False #if true, will not update much besides the background and player
-        #what boss the boss state pulls from
+
+        #needed to stop error - FIX LATER
         self.curBossName = "ufo"
-
-   
-    
-    def on_start(self,**kwargs):#__init__ v2, pretty much.
-        #06/24/2023 - Playing the song
-        audio.play_song(self.world_data["song"])
-        self.player.sprite_groups = self.sprites
-        eBM()
-
-
-
-    def on_end(self,**kwargs): #un-init, kind of
-        pygame.mixer.music.stop()
-        if tools.debug: print(self.debug.values())
-        eBM()
-
 
     
     def update(self, draw=True):
@@ -256,8 +140,9 @@ class Play(Template):
         self.background.update()
         self.background.draw(self.window)
         if self.floor is not None:
+            self.floor.update()
             self.floor.draw(self.window)
-        self.formation.draw_img(window=self.window) #displaying a special formation image if necessary
+        # self.formation.draw_img(window=self.window) #displaying a special formation image if necessary
 
 
         #updating all individual sprites, with the fourth group having special priority.
@@ -267,6 +152,8 @@ class Play(Template):
         self.sprites[0].draw(self.window)
         self.sprites[1].draw(self.window)
         self.sprites[2].draw(self.window)
+
+
 
         #ending function early if event playing
         # if self.event is not None and self.event.playing:
@@ -278,40 +165,17 @@ class Play(Template):
         self.formation.update()
 
         #print debug positions
-        for pos in self.debug[0]:
-            self.window.blit(pygame.transform.scale(img["placeholder.bmp"],(10,10)),pos)
-
-        
-
-        #ending function early if advancing
-        if self.in_advance: return 
+        # for pos in self.debug[0]:
+            # self.window.blit(pygame.transform.scale(img["placeholder.bmp"],(10,10)),pos)
         
         #calling collision
         self.collision()
         
 
         
-        #06/18/2023 - Starting a new level
+        # DEMO PURPOSES -- CHANGE LATER!!! 
         if self.formation.cleared and self.leveltimer > 180:
-            # new zone code
-            if self.level == 1 or self.level == 3:
-                self.new_char()
-            elif self.level % 5 == 0:
-                self.new_char()
-                self.new_bg()
-
-            self.level += 1
-            self.difficulty = 1 + self.level / 5        
-            self.formation.empty()
-                
-            #restarting the formation
-            self.new_formation()
-
-            #resetting the level timer
-            self.leveltimer = 0 
-
-            #restarting the new level event
-            # if self.event is not None: self.event.__init__(window=self.window,level=self.level)
+            self.new_level()
 
         #updating the wait timer
         elif self.formation.cleared:
@@ -320,6 +184,25 @@ class Play(Template):
         #08/21/2023 - Game Over - opening a new state if the player is dead
         if self.player.health <= 0:
             self.next_state = "gameover"
+
+
+
+    
+    def on_start(self,**kwargs):#__init__ v2, pretty much.
+        #06/24/2023 - Playing the song
+        audio.play_song("kurosaki.mp3")
+        self.player.sprite_groups = self.sprites
+        eBM()
+
+
+
+    def on_end(self,**kwargs): #un-init, kind of
+        pygame.mixer.music.stop()
+        if tools.debug: print(self.debug.values())
+        eBM()
+
+
+
 
 
 
@@ -337,7 +220,7 @@ class Play(Template):
     def new_formation(self):
         self.formation = formation.Formation(
             player = self.player,
-            world_data = self.world_data,
+            # world_data = self.world_data,
             char_list=self.char_list,
             start_patterns=self.char_start_patterns,
             level=self.level,
@@ -347,28 +230,46 @@ class Play(Template):
             #is_demo = self.is_demo
             )
 
-    def new_char(self):
-        #note the first added character is always A.
-        if len(self.char_list) == 0:
-            self.char_list.append("A")
-            self.char_available.pop(0)
-            pick2 = 1
-        else: 
-            pick = random.randint(0,len(self.char_available)-1)
-            self.char_list.append(self.char_available[pick])
-            self.char_available.pop(pick)
-            pick2 = random.randint(0,len(self.char_start_patterns_available)-1)
 
-        self.char_start_patterns[self.char_list[len(self.char_list)-1]] = self.char_start_patterns_available[pick2]
-        self.char_start_patterns_available.pop(pick2)
+
         
 
-    def new_bg(self):
+    def new_bg(self,bg="bg01",transition_effect:bool=False):
         #06/03/2023 - Loading in the background
-        self.background = Bg(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
+        self.background = Bg(bg, resize = (600,800), speed = (0,0))
         # also loading in the floor if it exists
-        self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
+        self.floor = Fl(
+            image='floor-default',
+            player=self.player,
+            window=self.window,
+            move=(.25,.25),
+            scale=(800,800)
+            ) 
+        # print(self.floor.image, self.floor.rect.center, self.floor.hide)
 
+    def new_zone(self):
+        # new zone code
+        GPI.unlock_enemy(playstate=self)
+        GPI.unlock_bg(playstate=self)
+
+        
+    
+    def new_level(self):
+        # updating level and difficulty info
+        self.level += 1
+        self.difficulty = 1 + self.level / 5        
+        self.formation.empty()
+        # TEST FOR DEMO
+        # self.new_zone()
+            
+        #restarting the formation
+        self.new_formation()
+
+        #resetting the level timer
+        self.leveltimer = 0 
+
+        if self.level%5 == 0 or self.level in (1,2,3):
+            self.new_zone()
 
     def event_handler(self,event):
         #if self.is_demo: return
@@ -386,6 +287,11 @@ class Play(Template):
             self.debug[0].append(pos)
             self.debug[1].append(pos2)
             print(pos,pos2)
+
+
+
+
+
 
 
 
@@ -1224,634 +1130,3 @@ class Boss(Template):
 
 
 
-
-
-
-""" OLD GAMEPLAY LOOP
-class Play(Template):
-    sprites = { #sprites are now state-specific hahaha
-            0:pygame.sprite.Group(), #ALL SPRITES
-            1:pygame.sprite.Group(), #PLAYER SPRITE, INCLUDING BULLETS ; this is because the player interacts with enemies the same way as bullets
-            2:pygame.sprite.Group(), #ENEMY SPRITES
-            3:pygame.sprite.Group(), #UI SPRITES
-        }
-    
-
-    def __init__(self,
-                 window:pygame.display,
-                 campaign:str = "main_story.order",
-                 world:int = 0,
-                 level:int = 0,
-                 level_in_world:int = 0,
-                  :bool = False, #so init can be rerun to reset the whole ass state
-                 #is_demo:bool=False, #a way to check if the player is simulated or not
-                 ):
-
-        self.sprites = Play.sprites
-
-        self.next_state = None #Needed to determine if a state is complete
-        self.fullwindow = window
-
-        self.debug = {0:[],1:[]}
-        #self.is_demo = is_demo
-
-
-        #resetting the sprite groups
-        for group in self.sprites.values():
-            group.empty()
-
-        #06/23/2023 - SETTING THE GAMEPLAY WINDOW
-        # YUP has a touhou-like border surrounding the entire game as it works
-        # Because of this, gameplay will have its own entire tiny display to work with 
-        # It still saves the original pygame window, but this is just to draw the display to.abs
-        if not is_restart: #it only makes this the first time
-            self.window = pygame.Surface(pygame.display.play_dimensions).convert_alpha()
-
-        #Player spawn
-        self.bar = ( #the field the player is able to move along
-            "h", #if the bar is horizontal or vertical.
-            pygame.display.play_dimensions[1]*0.90, #x position if vertical, y position if horizontal.
-            (20,pygame.display.play_dimensions[0]-20), #the limits on both sides for the player to move on, y positions if vertical, x positions if horizontal
-            1, #gravity. 
-            )
-            
-        self.player = player.Player(bar=self.bar,sprite_groups=self.sprites)
-        self.sprites[1].add(self.player)
-
-        #06/01/2023 - Loading in level data
-        self.campaign = campaign
-        self.world = world
-        self.level = level #the total amount of levels passed, usually used for intensities or score
-        self.level_in_world = level_in_world #the amount of levels completed in the world currently 
-        self.world_data = levels.fetch_level_info(campaign_world = (self.campaign,self.world))
-
-
-        #event data - an event that plays over all else.
-        self.event = events.NewLevelEvent(level=self.level,window=self.window)
-        
-
-        #updating based on intensity
-        if self.world_data["dynamic_intensity"]:
-            levels.update_intensities(self.level,self.world_data)
-
-        #06/01/2023 - loading the formation
-        #the formation handles spawning and management of most enemies, but the state manages drawing them to the window and updating them
-        self.formation = formation.Formation(
-            player = self.player,
-            world_data = self.world_data,
-            level=self.level,
-            level_in_world=self.level_in_world, 
-            sprites=self.sprites,
-            window=self.window,
-            #is_demo = self.is_demo
-            )
-
-        #06/03/2023 - Loading in the background
-        self.background = Bg(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
-        #also loading in the floor if it exists
-        self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
-
-
-        #timer for updating new level
-        self.leveltimer = 0 
-        #relating to advance sprite
-        self.in_advance:bool = False #if true, will not update much besides the background and player
-        #what boss the boss state pulls from
-        self.curBossName = "ufo"
-
-   
-    
-    def on_start(self,**kwargs):#__init__ v2, pretty much.
-        #06/24/2023 - Playing the song
-        audio.play_song(self.world_data["song"])
-        self.player.sprite_groups = self.sprites
-        eBM()
-
-
-
-    def on_end(self,**kwargs): #un-init, kind of
-        pygame.mixer.music.stop()
-        if tools.debug: print(self.debug.values())
-        eBM()
-
-
-    
-    def update(self, draw=True):
-        #Drawing previous gameplay frame to the window -- don't ask why, it just does. 
-        if draw: self.fullwindow.blit(pygame.transform.scale(self.window,pygame.display.play_dimensions_resize),pygame.display.play_pos)
-
-
-        #Updating backgrounds - drawing to window
-        self.background.update()
-        self.background.draw(self.window)
-        if self.floor is not None:
-            self.floor.draw(self.window)
-        self.formation.draw_img(window=self.window) #displaying a special formation image if necessary
-
-
-        #updating all individual sprites, with the fourth group having special priority.
-        self.sprites[0].update()
-        self.sprites[1].update()
-        self.sprites[2].update()
-        self.sprites[0].draw(self.window)
-        self.sprites[1].draw(self.window)
-        self.sprites[2].draw(self.window)
-
-        #ending function early if event playing
-        if self.event is not None and self.event.playing:
-            self.event.update()
-            return
-
-
-        #only updating the formation after checking for events, to prevent the level starting beforehand.
-        self.formation.update()
-
-        #print debug positions
-        for pos in self.debug[0]:
-            self.window.blit(pygame.transform.scale(img["placeholder.bmp"],(10,10)),pos)
-
-        
-
-        #ending function early if advancing
-        if self.in_advance: return 
-        
-        #calling collision
-        self.collision()
-        
-
-        
-        #06/18/2023 - Starting a new level
-        if self.formation.cleared and self.leveltimer > 180:
-            #checking to start the advance state
-            if self.level_in_world >= self.world_data["levels"]:
-                self.next_state = "advance"
-                return
-            #checking to see if the next world should be a boss intermission -- does not update levels
-            elif self.level_in_world + 1 in self.world_data['boss_levels']:
-                self.next_state = "boss"
-                self.curBossName = self.world_data['bosses'][self.world_data['boss_levels'].index(self.level_in_world + 1)]
-                self.level_in_world += 1
-                return
-            #if not, updating everything
-            else:
-                self.level += 1
-                self.level_in_world += 1
-                self.formation.empty()
-                
-            #restarting the formation
-            self.formation.__init__(
-                world_data = self.world_data,
-                level=self.level,
-                level_in_world=self.level_in_world, 
-                sprites=self.sprites,
-                player=self.player,window=self.window,
-                #is_demo = self.is_demo
-                )
-
-            #resetting the level timer
-            self.leveltimer = 0 
-
-            #restarting the new level event
-            if self.event is not None: self.event.__init__(window=self.window,level=self.level)
-
-        #updating the wait timer
-        elif self.formation.cleared:
-            self.leveltimer += 1
-        
-        #08/21/2023 - Game Over - opening a new state if the player is dead
-        if self.player.health <= 0:
-            self.next_state = "gameover"
-
-
-
-    def collision(self):
-        #Detecting collision between players and enemies 
-        collidelist=pygame.sprite.groupcollide(self.sprites[1],self.sprites[2],False,False,collided=pygame.sprite.collide_mask)
-        for key,value in collidelist.items():
-            for item in value:
-                key.on_collide(2,item)
-                item.on_collide(1,key)
-
-
-
-    def new_world(self):
-        self.world += 1
-        self.level_in_world = 0
-        self.world_data = levels.fetch_level_info(campaign_world = (self.campaign,self.world))
-        #changing bg
-        self.background.__init__(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
-        #changing floor
-        self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
-
-
-    def event_handler(self,event):
-        #if self.is_demo: return
-        self.player.controls(event)
-        #changing what comes next
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                self.next_state = "pause"
-            if tools.debug: 
-                ...
-        if event.type == pygame.MOUSEBUTTONDOWN and tools.debug:
-            pos = tuple(pygame.mouse.get_pos())
-            pos = [pos[0]-pygame.display.play_pos[0],pos[1]-pygame.display.play_pos[0]]
-            pos2 = [pygame.display.play_dimensions_resize[0]-pos[0],pos[1]]
-            self.debug[0].append(pos)
-            self.debug[1].append(pos2)
-            print(pos,pos2)
-
-"""
-
-
-"""
-class Tutorial(Template):
-    demosprites = { #sprites are now state-specific hahaha
-            0:pygame.sprite.Group(), #ALL SPRITES
-            1:pygame.sprite.Group(), #PLAYER SPRITE, INCLUDING BULLETS ; this is because the player interacts with enemies the same way as bullets
-            2:pygame.sprite.Group(), #ENEMY SPRITES
-            # 4:pygame.sprite.Group(), #UI SPRITES
-        }
-    sprites = pygame.sprite.Group()
-    
-    #tutorial player object
-    subwindow = pygame.Surface((600,800),pygame.SRCALPHA).convert_alpha()
-    subwindowrect = subwindow.get_rect()
-    bar=("h",subwindowrect.height*0.8,(10,subwindowrect.width-10),1)
-    player = PD(bar=bar,sprite_groups=demosprites)
-    #emblmes
-    t_title = Em("tutorial",current_anim="tutorial")
-    t_yes = Em("tutorial",current_anim="yes")
-    t_no = Em("tutorial",current_anim="no")
-    t_great = Em("g_great.png",coord=(winrect.width*0.8,winrect.height*0.5),isCenter=True,pattern="sine")
-    t_continue = Em("continue",current_anim="idle",coord=(0,0))
-    t_sandwich = enemies.BasicEventItem(im="home_D",coord=(subwindowrect.width*.75,bar[1]),isCenter=True)
-    t_enemylog = Em(None,force_surf = anim.generate_enemy_log(world_data = levels.fetch_level_info(("main_story.order",random.randint(0,10)))))
-    #keeping a consistent image for the continue button
-    t_continue.orig_coord = (winrect.width-t_continue.rect.width,winrect.height-t_continue.rect.height)
-
-    #text emblem -- displays specific text at a given time -- no emblem for text yet so this one's modified
-    cur_text=Em()
-    text = text.AutoNum("DO YOU NEED A TUTORIAL?\nARROW KEYS TO SELECT, Z TO CONFIRM.",host=cur_text,make_host_rect=True)
-    cur_text.aimg = text
-    
-    #tutorial graphic information
-    t_tutorial = Em(im="tutorial",current_anim="move",coord=(-100,-100)) #this will change animations based off which part of the tutorial is playing
-    tutorial_anim = ("move","jump","crouch","fastfall","shoot","focus")
-    tutorial_text = (
-        "<- OR -> TO MOVE!",
-        "UP KEY TO JUMP!\nYOU CAN JUMP ON ENEMIES!",
-        "DOWN TO CROUCH!\nGOOD FOR DODGING.",
-        "DOWN KEY WHILE\nIN THE AIR TO FASTFALL!",
-        "Z or X TO SHOOT!\nHOLD DOWN TO AUTOSHOOT.",
-        "SHIFT TO FOCUS!\nTHIS MAKES YOU SMALLER AND SLOWER!",)
-    enemies_text = (
-        "ENEMIES SIT AT THE TOP OF THE SCREEN\n AND SWERVE DOWN TO ATTACK YOU.",
-        "THERE ARE FOUR DIFFERENT ENEMY TYPES:\n A,B,C, AND D.",
-        "A SWERVES DOWN, B BOUNCES,\n C IS A TURRET, AND D IS SPECIAL PER WORLD.",
-        "A GUIDE WILL SHOW TO TELL YOU WHICH ENEMIES\n ARE WHICH AT THE START OF THE WORLD.",
-    )
-    end_text = (
-        "GREAT JOB!\nHAVE A SANDWICH AS A REWARD.",
-        "...",
-        "DAMN.",
-        "NO NO NO WAIT-"
-    )
-
-   
-
-    def __init__(self,window):
-        Template.__init__(self)
-        self.window=window
-        self.initialize_values()
-
-    def on_start(self):
-        self.initialize_values()
-        self.update_phase()
-
-    def on_end(self):
-        ...
-
-    def start(self,start=False):
-        if start:
-            #creating emblems for this purpose
-            Tutorial.sprites.add(Tutorial.t_title,Tutorial.t_yes,Tutorial.t_no,Tutorial.cur_text,Tutorial.t_continue)
-            Tutorial.t_title.add_tween_pos((winrect.centerx,-100),(winrect.centerx,50),speed=2.0,started=True,isCenter=True)
-            Tutorial.t_no.add_tween_pos((-100,winrect.centery/2),(winrect.width*0.4,winrect.centery/2),speed=2.0,started=True,isCenter=True)
-            Tutorial.t_yes.add_tween_pos((winrect.width+100,winrect.centery/2),(winrect.width*0.6,winrect.centery/2),speed=2.0,started=True,isCenter=True)
-            Tutorial.cur_text.add_tween_pos((0,winrect.height+100),(0,winrect.height*0.8),speed=5,started=True)
-            Tutorial.t_continue.add_tween_pos((Tutorial.t_continue.orig_coord[0],winrect.width+100),Tutorial.t_continue.orig_coord,speed=2.0,started=True)
-            return
-        self.counter1 += 1
-        #bg effects
-        self.bgFlash.update()
-        self.bg.update()
-        self.bg.image = self.bgFlash.image
-        self.bg.draw(self.window)
-        self.bg.speed=[5*sin(self.counter1/250),5*sin(self.counter1/400)]
-        #sprites
-        self.update_sprites()
-
-        #drawing choice
-        if not self.choice:
-            self.window.blit(img['cursor.png'],(Tutorial.t_no.rect.centerx-50, Tutorial.t_no.rect.centery-10))
-        else:
-            self.window.blit(img['cursor.png'],(Tutorial.t_yes.rect.centerx-50, Tutorial.t_yes.rect.centery-10))
-
-
-    def tutorial(self,start=False):
-        if start:
-            self.subphase=0
-            #deleting old graphics, adding new ones, changing text graphic
-            Tutorial.t_yes.kill();Tutorial.t_no.kill();Tutorial.t_continue.kill()
-            Tutorial.sprites.add(Tutorial.t_tutorial)
-            Tutorial.cur_text.aimg.update_text(Tutorial.tutorial_text[self.subphase])
-            #changing the background
-            self.bg.aimg.__init__(host=self.bg,name="tutorial_bg.png",resize=winrect.size)
-            self.bg.speed=[0,1]
-            #extra new graphic info
-            Tutorial.t_tutorial.add_tween_pos((-100,winrect.centery/2),(winrect.centerx/2,winrect.centery/2),speed=5,started=True,isCenter=True)
-            Tutorial.t_tutorial.pattern = "sine"
-            #adding the player
-            Tutorial.demosprites[1].add(Tutorial.player)
-            Tutorial.player.reset()
-            return
-
-        self.counter1 += 1
-        #bg
-        self.bg.update()
-        self.bg.draw(self.window)
-        self.bg.speed=[0,1]
-        #sprites
-        self.update_sprites()
-        #updating information
-        self.checker1 = self.checker1 or Tutorial.player.check[Tutorial.tutorial_anim[self.subphase]]
-        if self.checker1 and self.intermission > 60:
-            if self.subphase +1 >= len(Tutorial.tutorial_anim):
-                self.update_phase()
-                return
-            #updating task checking info
-            Tutorial.player.reset()
-            self.checker1 = False
-            self.subphase += 1
-            self.intermission = 0
-            #updating graphics
-            Tutorial.t_tutorial.aimg.change_anim(Tutorial.tutorial_anim[self.subphase])
-            Tutorial.cur_text.aimg.update_text(Tutorial.tutorial_text[self.subphase])
-            #killing 'great'
-            Tutorial.t_great.kill()
-        elif self.checker1 and self.intermission == 0:
-            self.intermission += 1
-            Tutorial.sprites.add(Tutorial.t_great)
-            self.kaboom(group=Tutorial.sprites,coord=Tutorial.t_great.rect.center,animation_resize=(225,120))
-        #intermission code
-        elif self.checker1:
-            self.intermission += 1
-            Tutorial.sprites.add(BP(pos=(Tutorial.t_great.rect.centerx,Tutorial.t_great.rect.centery+50),texture="greenblock"))
-            self.bg.speed=[5*sin(self.counter1/5),10*sin(self.counter1/2)]
-
-
-
-    def objective(self,start=False):
-        # self.next_state = "play"
-
-        if start:
-            self.counter1 = 0 
-            Tutorial.sprites.empty()
-            Tutorial.sprites.add(Tutorial.t_tutorial,Tutorial.t_title,Tutorial.cur_text,Tutorial.t_continue)
-            Tutorial.t_tutorial.aimg.change_anim('premise')
-            Tutorial.cur_text.add_tween_pos((0,winrect.height+100),(0,winrect.height*0.8),speed=5,started=True)
-            Tutorial.cur_text.aimg.update_text("ITEMS WITH A RED SHADOW WILL DAMAGE YOU.\nITEMS WITH A GREEN SHADOW ARE SAFE TO TOUCH.")
-            Tutorial.player.pos[0] = Tutorial.subwindowrect.centerx
-            Tutorial.player.reset_movement()
-            Tutorial.player.autoshoot=False
-            Tutorial.t_continue.add_tween_pos((Tutorial.t_continue.orig_coord[0],winrect.width+100),Tutorial.t_continue.orig_coord,speed=2.0,started=True)
-
-        #bg
-        self.counter1 += 1
-        self.bg.update()
-        self.bg.draw(self.window)
-        self.bg.speed=[0,1]
-        #sprites
-        self.update_sprites()
-
-        #Adding example elements
-        if self.counter1 % 80 == 0:
-            Tutorial.demosprites[2].add(enemies.HurtHeal(self.player,type=self.obj_type))
-            self.obj_type = not self.obj_type
-
-
-    def enemies(self,start=False):
-        if start:
-            self.counter1 = 0 
-            self.subphase = 0 
-            self.checker1 = False
-            Tutorial.sprites.empty()
-            Tutorial.sprites.add(Tutorial.t_tutorial,Tutorial.t_title,Tutorial.cur_text,Tutorial.t_continue)
-            Tutorial.t_tutorial.aimg.change_anim('enemies')
-            Tutorial.cur_text.aimg.update_text(Tutorial.enemies_text[self.subphase])
-            
-            Tutorial.t_continue.add_tween_pos((Tutorial.t_continue.orig_coord[0],winrect.width+100),Tutorial.t_continue.orig_coord,speed=2.0,started=True)
-            Tutorial.cur_text.add_tween_pos((0,winrect.height+100),(0,winrect.height*0.8),speed=5,started=True)
-            Tutorial.player.rect.centerx = winrect.centerx
-            Tutorial.player.movement[0],Tutorial.player.movement[3] = Tutorial.player.movement_old[0],Tutorial.player.movement_old[3]
-            Tutorial.player.autoshoot=False
-
-
-        self.counter1 += 1
-        self.bg.update()
-        self.bg.draw(self.window)
-        self.bg.speed=[1,0.5]
-        self.update_sprites()
-
-        if self.subphase == 3:
-            if self.counter1 % 60 == 0:
-                Tutorial.t_enemylog.aimg.image = anim.generate_enemy_log(world_data = levels.fetch_level_info(("main_story.order",random.randint(0,10))))
-
-
-
-        if self.checker1:
-            self.checker1 = False
-            self.subphase += 1
-            if self.subphase >= len(Tutorial.enemies_text):
-                self.update_phase()
-                Tutorial.t_enemylog.kill()
-            else:
-                if self.subphase == 1:
-                    Tutorial.sprites.add(Tutorial.t_enemylog)
-                    Tutorial.t_enemylog.aimg.image = anim.all_loaded_images['enemylog_hint.png']
-                    Tutorial.t_enemylog.add_tween_pos((winrect.centerx,-100),winrect.center,speed=5,started=True,isCenter=True)
-                if self.subphase == 3:
-                    Tutorial.t_enemylog.aimg.image = anim.generate_enemy_log(world_data = levels.fetch_level_info(("main_story.order",random.randint(0,10))))
-
-                Tutorial.cur_text.aimg.update_text(Tutorial.enemies_text[self.subphase])
-
-
-
-    def end(self,start=False):
-        if start:
-            #initializing values yet again
-            self.counter1 = self.subphase = 0 
-            Tutorial.demosprites[2].add(Tutorial.t_sandwich)
-            Tutorial.t_tutorial.aimg.change_anim('enemies')
-            Tutorial.cur_text.aimg.update_text(Tutorial.end_text[self.subphase])
-            Tutorial.cur_text.pattern='sine'
-            Tutorial.cur_text.add_tween_pos(Tutorial.cur_text.coord,(0,winrect.height*0.5),speed=5,started=True)
-            Tutorial.t_continue.add_tween_pos(Tutorial.t_continue.orig_coord,(Tutorial.t_continue.orig_coord[0],winrect.width+100),speed=1.0,started=True)
-            Tutorial.t_title.add_tween_pos(Tutorial.t_title.rect.center,(Tutorial.t_title.rect.centerx,-100),isCenter=True,speed=3.0,started=True)
-            Tutorial.t_tutorial.add_tween_pos(Tutorial.t_tutorial.rect.center,(0,-999),isCenter=True,speed=5.0,started=True)
-            Tutorial.player.rect.centerx = winrect.centerx
-            Tutorial.player.autoshoot=False
-
-        else:
-            self.counter1 += 1
-            
-            self.bg.update()
-            if self.subphase == 1:
-                self.bgUnflash.update()
-                self.bg.image = self.bgUnflash.image
-            self.bg.draw(self.window)
-            self.bg.speed=[1,0.5]
-            self.update_sprites()
-
-            if self.counter1 == 120:
-                Tutorial.t_continue.kill()
-                Tutorial.t_title.kill()
-                Tutorial.t_tutorial.kill()
-
-
-            #turnary operators go brr
-            self.checker1 = Tutorial.t_sandwich.touched if self.subphase == 0 else self.counter1 > 240 if self.subphase == 1 else self.counter1 > 120 if self.subphase == 2 else self.counter1 > 30 if self.subphase == 3 else False
-            #updating subphase info
-            if self.checker1:
-                self.subphase += 1
-                if self.subphase >= len(Tutorial.end_text):
-                    self.update_phase()
-                else:
-                    Tutorial.cur_text.aimg.update_text(Tutorial.end_text[self.subphase])
-                    
-
-                #phase-specific events
-                if self.subphase == 1:
-                    self.counter1 = 0 
-                    Tutorial.t_sandwich.kill()
-                    Tutorial.player.kill()
-                    self.kaboom(Tutorial.demosprites[0],Tutorial.player.rect.center,Tutorial.player.rect.size)
-
-                elif self.subphase == 2:
-                    self.bg.aimg.__init__(host=self.bg,name="NONE")
-                    self.counter1 = 0 
-                elif self.subphase == 3:
-                    self.kaboom(Tutorial.sprites,winrect.center,(winrect.size[0]*2,winrect.size[1]*2))
-                    self.counter1 = 0
-
-
-
-
-
-
-    def done(self,start=False):
-        #skipping the cutscene for now
-        self.next_state = "play"
-
-
-
-    def update(self):
-        self.phases[self.phase]()
-        self.collision()
-
-
-
-    def update_phase(self):
-        self.phase += 1
-        self.phases[self.phase](start=True)
-
-
-
-    def update_sprites(self):
-        #sprites
-        Tutorial.subwindow.fill(pygame.Color(0,0,0,0))
-        # Tutorial.subwindow.fill(pygame.Color(128,128,255,128))
-        for v in Tutorial.demosprites.values():
-            v.update()
-            v.draw(Tutorial.subwindow)
-        Tutorial.sprites.update()
-        Tutorial.sprites.draw(self.window)
-        self.window.blit(pygame.transform.scale(Tutorial.subwindow,pygame.display.play_dimensions_resize),(winrect.width-pygame.display.play_dimensions_resize[0],0))
-
-
-
-    def initialize_values(self):
-        #bg info
-        self.bgFlash = WhiteFlash(surface=self.window,img="tutorial_bg.png",start_val=0,end_val=255,spd=-1.0,isreverse=True)
-        self.bgUnflash = WhiteFlash(surface=self.window,img="tutorial_bg.png",start_val=255,end_val=0,spd=1.25)
-        self.bg=Bg(img=self.bgFlash.image,speed=[0.25,0.25],resize=pygame.display.dimensions)
-        self.bg.pos = [pygame.display.dimensions[0]/-2,pygame.display.dimensions[0]/-2]
-        
-        #emblem info
-        Tutorial.cur_text.aimg.update_text("DO YOU NEED A TUTORIAL?\nARROW KEYS TO SELECT, Z TO CONFIRM.")
-
-        #other info
-        self.next_state = None
-        self.return_state = "play"
-        #phase info
-        self.phase=-1
-        self.phases = (
-            self.start,
-            self.tutorial,
-            self.objective,
-            self.enemies,
-            self.end,
-            self.done,)
-        #start phase
-        self.choice = True #initially says you need a tutorial
-        #tutorial subphase
-        self.subphase = 0 
-        self.intermission = 0
-        self.checker1 = False
-        self.counter1 = 0 
-
-        #objective phase
-        self.obj_type = True
-        
-
-        
-
-    def event_handler(self,event):
-        if self.phase == 0:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    self.choice = True
-                elif event.key == pygame.K_LEFT:
-                    self.choice = False
-                    
-        elif self.phase == 1 or self.phase == 4:
-            Tutorial.player.controls(event)
-
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-            if self.phase == 0:
-                if self.choice:
-                        self.update_phase()
-                else:
-                    for i in range(4):
-                        self.update_phase()
-                    
-
-            if self.phase == 1:
-                if self.checker1:
-                    self.intermission = 999
-            elif self.phase == 3:
-                self.checker1 = True
-            elif self.phase == 2:
-                self.update_phase()
-                
-
-
-    def collision(self):
-        #Detecting collision between players and enemies 
-        collidelist=pygame.sprite.groupcollide(Tutorial.demosprites[1],Tutorial.demosprites[2],False,False,collided=pygame.sprite.collide_mask)
-        for key,value in collidelist.items():
-            for item in value:
-                key.on_collide(2,item)
-                item.on_collide(1,key)
-"""

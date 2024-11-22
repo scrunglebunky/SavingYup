@@ -96,6 +96,7 @@ for directory,filelist in anim_loadlist.items():
         # LOADING ANIMATION INDEX SHEET
         # note if i remade this, I wouldn't be doing this. It would be like gamemaker where it's just one loop.
         if current_file["ANIM"] is not None:
+            # print(current_file["NAME"])
             with open(str(directory)+"anim/"+str(current_file["ANIM"]),"r") as raw:
                 anim_file = json.load(raw)
                 all_loaded_spritesheets[filename][0]["anim"] = anim_file

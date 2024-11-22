@@ -15,6 +15,7 @@
         "kaboom","die"
     ],
     "./images/ui/":["boss_sun_sign","boss_sun_yippee","ui_gohere","warning","tutorial","continue"],
-    "./images/bg/":["boss_crt_bg","boss_sun_bg"],
+    "./images/bg/":["bg01","bg02","bg03","bg04","bg05","bg06","bg07","bg08",
+                    "floor-default"],
     "./images/bullets/":["bullet_def","bullet_nope","bullet_hack","bullet_aqua","bullet_happy","bullet_vapor","coin"]
 }

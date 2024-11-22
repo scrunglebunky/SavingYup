@@ -828,11 +828,8 @@ loaded = {
     'yippee':Yippee,
     'lumen':Lumen,
     }
-# enemy list for arcade move
-available_characters=list(loaded.keys())
-# potential spawn patterns the enemy could be in
-with open("./data/start_patterns.json","r") as start_patterns_raw:
-    start_patterns = json.load(start_patterns_raw) #this then merges all settings with the default settings
+
+
 
 
 
