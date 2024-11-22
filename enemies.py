@@ -1,10 +1,14 @@
-import pygame,anim,random,score,bullets,tools
+import pygame,anim,random,score,bullets,tools,json
 from audio import play_sound as ps
 from emblems import Emblem as Em
 from math import sin,cos,atan2,degrees
 from anim import AutoImage as AImg
 from player import Player
 from tools import world_log as wl
+
+
+
+
 
 class Template(pygame.sprite.Sprite):
     #default image if unchanged
@@ -27,6 +31,7 @@ class Template(pygame.sprite.Sprite):
             "offset":kwargs['offset'],
             "full":[(kwargs['pos'][0]+kwargs['offset'][0]),(kwargs['pos'][1]+kwargs['offset'][1])] # current position in idle
         }
+        # print(kwargs)None
         self.info = { #basic information on the character
             "health":kwargs['difficulty']**0,
             "score":100,
@@ -34,7 +39,7 @@ class Template(pygame.sprite.Sprite):
             "difficulty":kwargs['difficulty'],
             "state":"enter",
             "atk":False, #this is important -- it marks if the enemy can attack or not
-            'bullet_texture':kwargs['bullet_texture']
+            'bullet_texture':kwargs['bullet_texture'] if 'bullet_texture' in kwargs.keys() else "bullet_def"
         }
         self.timers = { #counters to use to check how long something is there for
             "exist":0,
@@ -51,6 +56,8 @@ class Template(pygame.sprite.Sprite):
             "start_shoot_chance":(5 - self.info['difficulty'] if self.info['difficulty']<4 else 1),
             "trip":kwargs['trip'],
             }
+    
+        # print(self.info['difficulty'])
         
         
         #image values, including spritesheets
@@ -137,8 +144,7 @@ class Template(pygame.sprite.Sprite):
     def kill(self,reason=None,play_sound = True) -> int:
         if reason == "health":
             #COIN CODE
-            for i in range(1):
-                self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1]))
+            self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1],value=self.info['difficulty']))
             #UPDATING THE KILL COUNT
             wl['kills'] += 1
         else:
@@ -209,8 +215,6 @@ class Template(pygame.sprite.Sprite):
 class A(Template): #swooping
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_A" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
-
         Template.__init__(self,kwargs=kwargs)   
         
         #values created for when the opponent attacks you
@@ -310,7 +314,6 @@ class A(Template): #swooping
 class B(Template): #jumpy
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_B" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
 
         self.info['atk'] = True
@@ -426,7 +429,6 @@ class B(Template): #jumpy
 class C(Template): #turret
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_C" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.timer = (480 - (10*self.info['difficulty'])) if (self.info['difficulty']<40) else 80
         self.time = random.randint(0,self.timer//10)
@@ -452,6 +454,7 @@ class D(Template): #special -- uses special value to inherit from that character
     # NOTE THAT THIS WON'T BE NEEDED ANYMORE! ENEMIES AREN'T LIMITED TO ONLY 4 CLASSES BECAUSE THAT WAS A STUPID IDEA!!
     def __init__(self,**kwargs):
         #placeholder value
+
         Template.__init__(self,kwargs=kwargs)
 
 
@@ -524,8 +527,7 @@ class Jelle(Template): #special jellyfish
     atk_count = 0
     atk_max = 2
     def __init__(self,**kwargs):
-        kwargs['skin'] = "hack_D" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
+        kwargs['skin'] = "aqua_D" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.atk_move = None
         self.info['atk']=True
@@ -586,7 +588,6 @@ class Jelle(Template): #special jellyfish
 class Sammich(Template):
     def __init__(self,**kwargs):
         kwargs['skin'] = "home_D" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.info['atk'] = True
         self.atk = {
@@ -635,7 +636,6 @@ class Sammich(Template):
 class Chaser(Template):
     def __init__(self,**kwargs):
         kwargs['skin'] = "happy_B" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         
         self.atk = {}
@@ -728,7 +728,6 @@ class Yippee(Template):
     #a stupid little enemy that shits confetti at you
     def __init__(self,**kwargs):
         kwargs['skin'] = "happy_D" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
 
         self.info['atk'] = True
@@ -773,7 +772,6 @@ class Lumen(Template):
     #points at you, and shoots a laser 
     def __init__(self,**kwargs):
         kwargs['skin'] = "vapor_D" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_def" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         
         self.info['atk'] = True
@@ -815,6 +813,7 @@ class Lumen(Template):
         
 
 
+
 ##SAVING ASSETS IN A DICTIONARY TO BE USED LATER
 loaded = {
     "A":A,
@@ -831,6 +830,17 @@ loaded = {
     }
 # enemy list for arcade move
 available_characters=list(loaded.keys())
+# potential spawn patterns the enemy could be in
+with open("./data/start_patterns.json","r") as start_patterns_raw:
+    start_patterns = json.load(start_patterns_raw) #this then merges all settings with the default settings
+
+
+
+
+
+
+
+
 
 
 #EXTRA ASSETS -- SPECIAL YIPPEE CONFETTI
@@ -1025,10 +1035,13 @@ class Coin(pygame.sprite.Sprite):
         img="1"
         for val in Coin.val_list:
             if value <= val:
-                img = str(val)
                 break
             else:
                 continue
+        else:
+            img = str(val)
+
+        # print(img)
         self.aimg = AImg(host=self,name="coin",current_anim=img,resize=(20,20))
         self.value = value
 

@@ -5,23 +5,27 @@ from anim import all_loaded_images as img
 class Formation():
     def __init__(self,
                 level,
-                level_in_world,
                 world_data,
                 sprites,
                 player,
-                difficulty:float=1.0,
+                char_list:list,
+                start_patterns:list,
+                difficulty:float,
                 # is_demo:bool=False,
                 **kwargs
                 ):
         #basic info
         self.state = "start" 
         self.world_data = world_data
+        self.char_list = char_list
+        self.start_patterns=start_patterns
         self.sprites = sprites
         self.player = player
         self.level = level
-        self.level_in_world = level_in_world
+        self.difficulty = difficulty
         self.window = kwargs['window'] if 'window' in kwargs.keys() else None
         # self.is_demo = is_demo #to tell if the game is being used in the title demo -> stops score
+        print(difficulty)
 
         #formation positioning
         self.pos = [pygame.display.rect.center[0],100] #positioning
@@ -53,14 +57,8 @@ class Formation():
         ######SPAWN LIST INFORMATION##############
 
         #the spawn lists needed, which tell the game what enemies to spawn
-        self.spawn_list = self.find_spawn_list(level=self.level_in_world, world_data=self.world_data)
-        # self.spawn_list=["BBBBBBBBBBBBBBBBBBBB","BBBBBBBBBBBBBBBBBBBB","BBBBBBBBBBBBBBBBBBBB","BBBBBBBBBBBBBBBBBBBB","BBBBBBBBBBBBBBBBBBBB"]
-        # self.spawn_list = [
-        #     "CCCCCCCCCCCCCCC","CCCCCCCCCCCCCCC","CCCCCCCCCCCCCCC",
-        #     "AAAABBBBBBBAAAA","AAAABBBBBBBAAAA","AAAABBBBBBBAAAA",
-        #     "AAAABBBBBBBAAAA","AAAABBBBBBBAAAA","AAAABBBBBBBAAAA",
-        #     "DDDDDDDDDDDDDDD",
-        # ]
+        self.spawn_list = Formation.find_spawn_list(level=self.level, difficulty=self.difficulty, char_list=self.char_list)
+        # print(self.spawn_list)
         self.spawned_list = []
 
         #SPAWN INFO - the game stores the offset value here in order to spawn enemies in special ways, so now they don't all have to spawn in order
@@ -107,11 +105,12 @@ class Formation():
         self.pos[0] = (pygame.display.play_dimensions[0]/2) - ((len(self.spawn_list[0])*self.world_data["char_distance_x"])/2)
 
         #difficulty calculations
-        self.difficulty = self.level//1
+        # self.difficulty = self.level//1
+        self.difficulty_rounded = int(self.difficulty//1)
         self.attack={
             #throwdown amount = how many enemies are thrown down in an attack stance #goes up once every 10 levels
-            "amount":((self.difficulty//3)+1) if (self.difficulty <= 6) else 3,
-            "max":3+(self.difficulty*2),
+            "amount":((self.difficulty_rounded//3)+1) if (self.difficulty_rounded <= 6) else 3,
+            "max":3+(self.difficulty_rounded*2),
         }
         self.timer['atk'] = (100 - (self.difficulty*4)) if self.difficulty < 25 else 1
         #timer["atk"] = how often enemies are thrown down to attack #goes down a frame every level
@@ -152,15 +151,11 @@ class Formation():
             spawned_id = self.spawn_organized[self.spawning_keys[self.spawning_key]][self.spawning_value]
             offset = self.spawn_offsets[spawned_id[0]][spawned_id[1]]
 
-
-            #finding the spawning entrance points, like the galaga loop-de-loop
-            if type_to_spawn in self.world_data['start_patterns'].keys() and len(self.world_data['start_patterns'][type_to_spawn]) > 0:
-                #fetching entrance points immediately
-                entrance_info = entrance_points = self.world_data['start_patterns'][type_to_spawn]
-                entrance_points = entrance_info['patterns']
-            else:
-                #if no entrance points
-                entrance_points = None
+            # ENTRANCE POINTS/START PATTERNS -- LIKE GALAGA THINK ABOUT IT WHOOPEEEE :3
+            #fetching entrance points immediately
+            entrance_info = self.start_patterns[type_to_spawn]
+            entrance_points = entrance_info['patterns']
+            
             
             #finding the skin to use
             ### REMOVED IN FINAL AS EACH ENEMY ONLY HAS 1 SKIN.
@@ -172,11 +167,10 @@ class Formation():
             # if type_to_spawn in self.world_data['overwrite'].keys():
             #     type_to_spawn = self.world_data['overwrite'][type_to_spawn]
 
-
             #creating enemy
             char = enemies.loaded[type_to_spawn](
                 offset=offset,
-                pos=self.pos,difficulty=self.difficulty,sprites=self.sprites,player=self.player,
+                pos=self.pos,difficulty=self.difficulty_rounded,sprites=self.sprites,player=self.player,
                 entrance_points=entrance_points[self.enter_key] if entrance_points is not None else None,
                 entrance_speed=entrance_info['speed'] if entrance_points is not None else None,
                 # skin=spawn_skin, # REMOVED the changing skins, and replacing them with defaults.
@@ -186,6 +180,7 @@ class Formation():
                 # bullet_texture=self.world_data['bullet_texture'], - REMOVED to make the game less confusing
                 # is_demo=self.is_demo
             )
+            # print("FORMATION",self.difficulty)
             #adding enemy to groups
             self.spawned_list.append(char)
             self.sprites[2].add(char)
@@ -281,21 +276,28 @@ class Formation():
         if self.state != "start":
             add = 0 
         else:
-            add = (self.timer["duration"]*self.world_data["form_drop_speed"])
+            add = (self.timer["duration"]*.25)
         self.pos[1] = 45 + (math.sin(self.timer["duration"] * 0.1) * 15) + add
         for char in self.spawned_list:
             char.formationUpdate(self.pos)
 
 
-    def find_spawn_list(self,level,world_data) -> list:
+    def find_spawn_list(level,difficulty,char_list) -> list:
+        ## THIS IS OVERCOMPLICATED
+        ## I AM NOT GOING TO KEEP THIS
+        ## IT WILL RANDOMLY GENERATE A LIST OF ENEMIES TO SPAWN
+        ## IT NO LONGER PICKS PRE-MADE FORMATIONS
+
         spawn_list = []
-        rows,columns = random.randint(5,10),random.randint(10,12)
-        if world_data["random"]: 
-            #trip to see if an entire form should be random
-            for row in range(rows):
-                spawn_list.append("")
-                for column in range(columns):
-                    spawn_list[row] += random.choice(("A","B","C","D"))
+        row_min = int(3 if difficulty <= 2 else 5)
+        row_max = int(5+difficulty//1 if difficulty < 5 else 10)
+        rows,columns = random.randint(row_min,row_max),random.randint(10,12)
+        #trip to see if an entire form should be random
+        for row in range(rows):
+            spawn_list.append([])
+            for column in range(columns):
+                spawn_list[row].append(random.choice(char_list))
+        """
         #picking an ordered form from the set
         elif world_data['manual_ordered']:
             #the easy way, since arithmetic SUCKS
@@ -308,6 +310,7 @@ class Formation():
         #picking a random form from the set
         else:
             spawn_list = random.choice(world_data["manual_formations"])
+        """
         return spawn_list
 
 

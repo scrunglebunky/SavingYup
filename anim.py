@@ -11,7 +11,7 @@ all_loaded_images = {}
 
 
     
-#5/8/23 - DEFINING THING TO LOAD ALL IMAGES
+#5/8/23 - TAKING AN IMAGE OUT OF A SPRITESHEET
 def get_image(sheet,
                   wh:tuple,
                   xy:tuple,
@@ -29,6 +29,9 @@ def get_image(sheet,
         #output
         return output
 
+
+
+# SPLITS A SPRITESHEET INTO ITS INDIVIDUAL SPRITES VIA get_image
 def generate_sprite(data):
     spritesheet=[]
     raw=pygame.image.load(data["NAME"]+".png").convert_alpha()
@@ -45,21 +48,37 @@ def generate_sprite(data):
             spritesheet.append(cur_img)
     return spritesheet
 
+
+# GENERATES A MASK FOR EVERY ITEM IN THE SPRITE LIST
 def generate_masks(spritesheet):
     masks = []
     for sprite in spritesheet:
         masks.append(pygame.mask.from_surface(sprite))
     return masks
 
-#06/01/2023 - USING ANIM_LOADLIST TO FIND OUT WHAT TO LOAD
+
+
+
+
+
+
+
+
+
+
+#06/01/2023 - LOADING SPRITESHEET LOADLISTS
 with open("./data/anim_loadlist.json","r") as raw:
     anim_loadlist = json.load(raw)
-#12/15/2023 - TAKING DEFAULT FILE
-with open("./images/default.json") as raw:
+#12/15/2023 - LOADING DEFAULT SPRITE FILE
+with open("./data/default-spritesheet.json") as raw:
     default = json.load(raw)
 
 
-#06/01/2023 - REVAMP OF OLD CODE - LOADING THE ANIM LOADLIST
+
+
+
+
+#06/01/2023 - ##lOADING AND INDEXING EVERY SPRITESHEET
 for directory,filelist in anim_loadlist.items():
     #There is no longer a break if there's no json, as the list contains all the json files needed without any scraping
     for filename in filelist:
@@ -74,20 +93,21 @@ for directory,filelist in anim_loadlist.items():
         all_loaded_spritesheets[filename] = (current_file,spritesheet,masksheet)
 
 
-        #loading animation files if existent
+        # LOADING ANIMATION INDEX SHEET
+        # note if i remade this, I wouldn't be doing this. It would be like gamemaker where it's just one loop.
         if current_file["ANIM"] is not None:
             with open(str(directory)+"anim/"+str(current_file["ANIM"]),"r") as raw:
                 anim_file = json.load(raw)
                 all_loaded_spritesheets[filename][0]["anim"] = anim_file
-            #5/25/23 - FIXING ANIMATION FPSes"
+            #5/25/23 - CONVERTS FPS to [ingame frames per animation frames]
             for animation in anim_file.keys():
                 anim_file[animation]["FPS"] = 60/anim_file[animation]["FPS"]
-        #default image
+        #default animation sheet
         else:
-            with open("./images/characters/anim/default.json","r") as raw:
+            with open("./data/default-anim.json","r") as raw:
                 anim_file = json.load(raw)
                 all_loaded_spritesheets[filename][0]["anim"] = anim_file
-            #5/25/23 - FIXING ANIMATION FPSes"
+            # same fps conversions
             for animation in anim_file.keys():
                 anim_file[animation]["FPS"] = 60/anim_file[animation]["FPS"]
 
@@ -109,7 +129,12 @@ for directory,filelist in img_loadlist.items():
     for filename in filelist:
         all_loaded_images[str(filename)] = pygame.image.load(directory+filename).convert_alpha()
 
-#ADDING EXTRA COLORS
+
+
+
+
+
+#BASIC EASY DEFAULT COLOR IMAGES
 all_loaded_images['black'] = pygame.Surface((10,10))
 all_loaded_images['black'].fill("#000000")
 
@@ -130,28 +155,6 @@ NONE = pygame.Surface((10,10)).convert_alpha()
 NONE.fill(pygame.Color(0,0,0,0))
 
 all_loaded_images["NONE"] = NONE
-
-"""
-#5/8/23 - LOADING IN ALL IMAGES WITH DATA
-jsonlist = os.listdir("./images/characters")
-for item in jsonlist:
-    #breaking if not json, OR if the "anim" keyword is detected
-    if ".json" not in item or "anim" in item: continue
-    #going through with everything
-    with open("./images/characters/"+str(item),"r") as raw:
-        file = json.load(raw)
-    #adding to the main dictionary
-    all_loaded_spritesheets[item] = (file,generate_sprite(file))
-    #5/11/23 - LOADING ANIMATION FILES IF EXISTANT
-    if file["ANIM"] is not None:
-        with open("./images/characters/"+str(file["ANIM"]),"r") as raw:
-            anim_file = json.load(raw)
-            all_loaded_spritesheets[item][0]["anim"] = anim_file
-        #5/25/23 - FIXING ANIMATION FPSes"
-        for animation in anim_file.keys():
-            anim_file[animation]["FPS"] = 60/anim_file[animation]["FPS"]
-"""
-
 
 # 5/8/23 - WHAT DO THE SPRITESHEETS DO?
 # the spritesheet class is going to refer to the all_loaded_spritesheets dict and pull from it

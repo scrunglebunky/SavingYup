@@ -7,7 +7,6 @@
 - There should only be one bullet asset
 - There shouldn't be worlds, only randomly generated levels that slowly get more chaotic as time goes on.
 ## WHAT TO DO
-- [ ] Make the only available bosses the UFO and the big Nope
 - [x] Remove the "skins" and make the enemies only have one basic skin
     - Enemy A: Nope A
     - Enemy B: Nope B
@@ -21,15 +20,16 @@
 - [x] Remove the tutorial
     - There will be less clutter, so they'll learn the complicated stuff themselves
 - [x] Remove the end results
-- [ ] Remove the demo code from Play State, and remove uses of it from the Title Screen
+- [x] Remove the demo code from Play State, and remove uses of it from the Title Screen
     - It's extra bloat that isn't needed, and if it is it could be an inhereted class, not integrated
-- [ ] Simplify the Game Over.
+- [ ] Simplify the Game Over, and title screen
 - [x] Remove the changing bullets (they can change, but they're not supposed to normally)
-- [ ] Make a new campaign/world just called "arcade"
+- [x] Make a new campaign/world just called "arcade"
     - There is only one enemy
     - New enemies get added every 5 levels
     - Each new enemy class has a randomly-assigned formation pattern that does not change for the entire game
-    - World BG/FG will change every 5 levels
+        - [x] this pulls from a random list of **all** the start patterns
+- [] World BG/FG will change every 5 levels
 I will have **one week to do this** (Tue 19th to Tue 26th)
 
 # PART 1 -- REMOVING THE "SKINS"

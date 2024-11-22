@@ -1,4 +1,4 @@
-import pygame,os,player,text,random,levels,json,formation,anim,audio,tools,events,score,enemies,enemies_bosses
+import pygame,os,player,text,random,formation,anim,audio,tools,events,score,enemies,enemies_bosses
 from anim import all_loaded_images as img
 from anim import WhiteFlash
 from text import display_numbers as dn
@@ -44,27 +44,111 @@ class Template():
 
 
 
-#gameplay
+#UPDATED GAMEPLAY
 class Play(Template):
     sprites = { #sprites are now state-specific hahaha
             0:pygame.sprite.Group(), #ALL SPRITES
             1:pygame.sprite.Group(), #PLAYER SPRITE, INCLUDING BULLETS ; this is because the player interacts with enemies the same way as bullets
             2:pygame.sprite.Group(), #ENEMY SPRITES
-            # 4:pygame.sprite.Group(), #UI SPRITES
+            3:pygame.sprite.Group(), #UI SPRITES
         }
-    demo_sprites = { #sprites exclusively for the demo state
-            0:pygame.sprite.Group(), #ALL SPRITES
-            1:pygame.sprite.Group(), #PLAYER SPRITE, INCLUDING BULLETS ; this is because the player interacts with enemies the same way as bullets
-            2:pygame.sprite.Group(), #ENEMY SPRITES
+    
+    
+
+    default_world_data = {
+            "world_name":"default",
+            "ui_type":"default",
+            "song":"placeholder.mp3",
+
+            "bg":"test.png",
+            "bg_size":[600,800],
+            "bg_speed":[0,0],
+            
+            "formation_img":None,
+            "floor_img":None,
+            "floor_size":[600,300],
+            "floor_move":[0,0.1],
+            "bullet_texture":"bullet_def",
+            
+            "levels":4,
+
+            "char_distance_x":35, 
+            "char_distance_y":40,
+
+            "throwdown_time":32, 
+            "throwdown_amount":1,
+            "spawn_time":10,
+            "max_char":25,
+            "dynamic_intensity":False,
+            "form_drop_speed":0.1,
+
+            "bullets":[],
+            "drop_health": 5,
+            "drop_bullet": 20, 
+            "speed":1,
+
+            "manual_formations":[
+                [
+                    "DAAAACCCCCAAAAD",
+                    "BBBBBBBBBBBBBBB",
+                    "AAAAAAAAAAAAAAA",
+                    "AAAAABBBBBAAAAA",
+                    "DDDDDDDDDDDDDDD"
+                ]
+            ],
+            "random":False,
+            "manual_ordered":True,
+            "manual_order":[0],
+
+            "start_patterns":{
+                "A":{
+                    "patterns":[[[0,0]]],
+                    "speed":10,
+                    "timer":5,
+                    "shoot":[2]
+                    },
+                "B":{
+                    "patterns":[[[0,0]]],
+                    "speed":10,
+                    "timer":5,
+                    "shoot":[6]
+                },
+                "C":{
+                    "patterns":[[[0,0]]],
+                    "speed":10,
+                    "timer":5,
+                    "shoot":[999]
+                },
+                "D":{
+                    "patterns":[[[0,0]]],
+                    "speed":10,
+                    "timer":5,
+                    "shoot":[2]
+                }
+            },
+
+
+            "skins":{
+                "A":None,
+                "B":None,
+                "C":None,
+                "D":None
+            },
+            "overwrite":{
+            },
+
+            "boss_levels":[4],
+            "bosses":["ufo"],
+
+
+            "events":[
+                [False,["level",2],"print('hello world!')"]
+            ]
         }
 
     def __init__(self,
                  window:pygame.display,
-                 campaign:str = "main_story.order",
-                 world:int = 0,
                  level:int = 0,
-                 level_in_world:int = 0,
-                 is_restart:bool = False, #so init can be rerun to reset the whole ass state
                  #is_demo:bool=False, #a way to check if the player is simulated or not
                  ):
 
@@ -85,10 +169,9 @@ class Play(Template):
         # YUP has a touhou-like border surrounding the entire game as it works
         # Because of this, gameplay will have its own entire tiny display to work with 
         # It still saves the original pygame window, but this is just to draw the display to.abs
-        if not is_restart: #it only makes this the first time
-            self.window = pygame.Surface(pygame.display.play_dimensions).convert_alpha()
+        self.window = pygame.Surface(pygame.display.play_dimensions).convert_alpha()
 
-        #Player spawn
+        #Player movement info
         self.bar = ( #the field the player is able to move along
             "h", #if the bar is horizontal or vertical.
             pygame.display.play_dimensions[1]*0.90, #x position if vertical, y position if horizontal.
@@ -99,39 +182,46 @@ class Play(Template):
         self.player = player.Player(bar=self.bar,sprite_groups=self.sprites)
         self.sprites[1].add(self.player)
 
-        #06/01/2023 - Loading in level data
-        self.campaign = campaign
-        self.world = world
-        self.level = level #the total amount of levels passed, usually used for intensities or score
-        self.level_in_world = level_in_world #the amount of levels completed in the world currently 
-        self.world_data = levels.fetch_level_info(campaign_world = (self.campaign,self.world))
 
 
-        #event data - an event that plays over all else.
-        self.event = events.NewLevelEvent(level=self.level,window=self.window)
+
+
+
+
+
+
+        #06/01/2023 - Loading in level data -- NOT ANYMORE!!
+        # self.campaign = campaign
+        # self.world = world
+        self.level = 0 #the total amount of levels passed, usually used for intensities or score
+        self.difficulty = 1 + self.level / 5
+
+        # world data is now handled here, in code, since it updates manually
+        self.world_data = Play.default_world_data
+
+
+        # current running game info, which replaces world data
+        # this isn't a dictionary anymore because they're annoying to write
+        self.char_list = [] 
+        self.char_available = enemies.available_characters.copy()
+        self.char_start_patterns = {}
+        self.char_start_patterns_available = enemies.start_patterns.copy()
+        #adding a new character
+        self.new_char()
         
 
-        #updating based on intensity
-        if self.world_data["dynamic_intensity"]:
-            levels.update_intensities(self.level,self.world_data)
+        # #event data - an event that plays over all else.
+        # self.event = events.NewLevelEvent(level=self.level,window=self.window)
+    
+
+
+        #updating intensities in terms of spawning and such
+        # levels.update_intensities(self.level,self.world_data)
 
         #06/01/2023 - loading the formation
         #the formation handles spawning and management of most enemies, but the state manages drawing them to the window and updating them
-        self.formation = formation.Formation(
-            player = self.player,
-            world_data = self.world_data,
-            level=self.level,
-            level_in_world=self.level_in_world, 
-            sprites=self.sprites,
-            window=self.window,
-            #is_demo = self.is_demo
-            )
-
-        #06/03/2023 - Loading in the background
-        self.background = Bg(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
-        #also loading in the floor if it exists
-        self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
-
+        self.new_formation()
+        self.new_bg()
 
         #timer for updating new level
         self.leveltimer = 0 
@@ -179,9 +269,9 @@ class Play(Template):
         self.sprites[2].draw(self.window)
 
         #ending function early if event playing
-        if self.event is not None and self.event.playing:
-            self.event.update()
-            return
+        # if self.event is not None and self.event.playing:
+        #     self.event.update()
+        #     return
 
 
         #only updating the formation after checking for events, to prevent the level starting beforehand.
@@ -203,37 +293,25 @@ class Play(Template):
         
         #06/18/2023 - Starting a new level
         if self.formation.cleared and self.leveltimer > 180:
-            #checking to start the advance state
-            if self.level_in_world >= self.world_data["levels"]:
-                self.next_state = "advance"
-                return
-            #checking to see if the next world should be a boss intermission -- does not update levels
-            elif self.level_in_world + 1 in self.world_data['boss_levels']:
-                self.next_state = "boss"
-                self.curBossName = self.world_data['bosses'][self.world_data['boss_levels'].index(self.level_in_world + 1)]
-                self.level_in_world += 1
-                return
-            #if not, updating everything
-            else:
-                self.level += 1
-                self.level_in_world += 1
-                self.formation.empty()
+            # new zone code
+            if self.level == 1 or self.level == 3:
+                self.new_char()
+            elif self.level % 5 == 0:
+                self.new_char()
+                self.new_bg()
+
+            self.level += 1
+            self.difficulty = 1 + self.level / 5        
+            self.formation.empty()
                 
             #restarting the formation
-            self.formation.__init__(
-                world_data = self.world_data,
-                level=self.level,
-                level_in_world=self.level_in_world, 
-                sprites=self.sprites,
-                player=self.player,window=self.window,
-                #is_demo = self.is_demo
-                )
+            self.new_formation()
 
             #resetting the level timer
             self.leveltimer = 0 
 
             #restarting the new level event
-            if self.event is not None: self.event.__init__(window=self.window,level=self.level)
+            # if self.event is not None: self.event.__init__(window=self.window,level=self.level)
 
         #updating the wait timer
         elif self.formation.cleared:
@@ -255,13 +333,40 @@ class Play(Template):
 
 
 
-    def new_world(self):
-        self.world += 1
-        self.level_in_world = 0
-        self.world_data = levels.fetch_level_info(campaign_world = (self.campaign,self.world))
-        #changing bg
-        self.background.__init__(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
-        #changing floor
+    
+    def new_formation(self):
+        self.formation = formation.Formation(
+            player = self.player,
+            world_data = self.world_data,
+            char_list=self.char_list,
+            start_patterns=self.char_start_patterns,
+            level=self.level,
+            difficulty=self.difficulty,
+            sprites=self.sprites,
+            window=self.window,
+            #is_demo = self.is_demo
+            )
+
+    def new_char(self):
+        #note the first added character is always A.
+        if len(self.char_list) == 0:
+            self.char_list.append("A")
+            self.char_available.pop(0)
+            pick2 = 1
+        else: 
+            pick = random.randint(0,len(self.char_available)-1)
+            self.char_list.append(self.char_available[pick])
+            self.char_available.pop(pick)
+            pick2 = random.randint(0,len(self.char_start_patterns_available)-1)
+
+        self.char_start_patterns[self.char_list[len(self.char_list)-1]] = self.char_start_patterns_available[pick2]
+        self.char_start_patterns_available.pop(pick2)
+        
+
+    def new_bg(self):
+        #06/03/2023 - Loading in the background
+        self.background = Bg(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
+        # also loading in the floor if it exists
         self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
 
 
@@ -281,8 +386,6 @@ class Play(Template):
             self.debug[0].append(pos)
             self.debug[1].append(pos2)
             print(pos,pos2)
-
-
 
 
 
@@ -596,7 +699,7 @@ class GameOver(Template):
 
     def generate_rank(self) -> str:
         #makes a rank value and gives you a set of ranks based off of it
-        rank_val = score.score * (1 + 0.01*self.play_state.world) * (1+(0.01*self.play_state.level))
+        rank_val = score.score * (1+(0.01*self.play_state.level))
         ranks = {
             0:"joke", #joke 
             100:"horrible", #horrible
@@ -655,7 +758,6 @@ class GameOver(Template):
         score.score = 0
         self.play_state.__init__(
             window=self.play_state.fullwindow,
-            is_restart=True
         )
         self.__init__(window=self.window,play_state=self.play_state)
         score.save_scores(scores=score.scores)
@@ -699,7 +801,6 @@ class Pause(Template):
                 self.next_state = "title"
                 self.play_state.__init__(
                     window=self.play_state.fullwindow,
-                    is_restart=True
                 )
             if event.key == pygame.K_ESCAPE:
                 self.next_state = self.return_state
@@ -732,20 +833,20 @@ class Advance(Template):
         self.play_state = play_state
         self.next_state = None
         #phases
-        self.phases = (self.phase0,self.phase1,self.phase2,self.phase3,self.phase4)
+        self.phases = (self.phase0,self.phase1,self.phase2,self.phase3)
         """ PHASE LIST
         0 - the background slowly fading in
         1 - "LEVEL COMPLETE" hitting the screen
         2 - A list of certain things that have occurred: killed enemies, damage taken, shots fired, accuracy
-        3 - Saying where you are going, with a scaled-down picture of the background. 
-        4 - Playing a random animation that launches the player offscreen"""
+        X - Saying where you are going, with a scaled-down picture of the background. 
+        3 - Playing a random animation that launches the player offscreen"""
         #defining a bunch of values elsewhere
         self.initialize_values()   
 
         
     def on_start(self):
         #advancing the world early in playstate so the right info is fetched
-        self.play_state.new_world()
+        # self.play_state.new_world()
         #player
         self.play_state.player.movement_redo()
         self.play_state.player.bullet_lock = True
@@ -847,11 +948,11 @@ class Advance(Template):
         if done:
             self.counter1 = 0
             self.phase = 3
-            self.sprites.add(self.em_nextlevel,self.em_movingto,self.em_nextleveltext,self.em_enemylog)
+            # self.sprites.add(self.em_nextlevel,self.em_movingto,self.em_nextleveltext,self.em_enemylog)
 
 
 
-
+    """
     def phase3(self):
         #fade the background away
         self.bg.update()
@@ -870,10 +971,10 @@ class Advance(Template):
         if self.counter1 > 360:
             self.counter1 = 0
             self.phase = 4
+    """
 
 
-
-    def phase4(self):
+    def phase3(self):
         #fade the background away
         self.bgUnflash.update()
         self.bg.update()
@@ -903,9 +1004,7 @@ class Advance(Template):
         if self.counter1 > 150:
             self.next_state = "play"
     
-    def phase5(self):
-        ...
-        
+   
 
     def event_handler(self,event):
         self.play_state.player.controls(event)    
@@ -940,11 +1039,10 @@ class Advance(Template):
         self.bg.image = self.bgFlash.image
         #other assets
         self.em_complete = Em(im="levelcomplete.png",coord=(0,0))
-        self.em_nextlevel = Em(im=self.play_state.world_data['bg'],resize=(225,300),pattern="sine",coord=(winrect.width*0.75,winrect.centery),isCenter=True)
-        self.em_movingto = Em(im="a_movingto.png",pattern="jagged",coord=(self.em_nextlevel.rect.centerx,self.em_nextlevel.rect.top-25),isCenter=True)
-        self.em_nextleveltext = Em(force_surf = text.load_text(str(self.play_state.world_data['world_name']),50),pattern="jagged",coord=(self.em_nextlevel.rect.centerx,self.em_nextlevel.rect.bottom+25),isCenter=True)
-        self.em_enemylog = Em(force_surf = anim.generate_enemy_log(world_data=self.play_state.world_data), pattern = 'sine', 
-                coord = (self.em_nextleveltext.rect.centerx,self.em_nextleveltext.rect.bottom), isCenter=True)
+        #self.em_nextlevel = Em(im=self.play_state.world_data['bg'],resize=(225,300),pattern="sine",coord=(winrect.width*0.75,winrect.centery),isCenter=True)
+        # self.em_movingto = Em(im="a_movingto.png",pattern="jagged",coord=(self.em_nextlevel.rect.centerx,self.em_nextlevel.rect.top-25),isCenter=True)
+        #self.em_nextleveltext = Em(force_surf = text.load_text(str(self.play_state.world_data['world_name']),50),pattern="jagged",coord=(self.em_nextlevel.rect.centerx,self.em_nextlevel.rect.bottom+25),isCenter=True)
+        # self.em_enemylog = Em(force_surf = anim.generate_enemy_log(world_data=self.play_state.world_data), pattern = 'sine',  coord = (self.em_nextleveltext.rect.centerx,self.em_nextleveltext.rect.bottom), isCenter=True)
         # self.sprites.add(self.bg)
         
         #state 1 values -> emblems
@@ -1126,6 +1224,244 @@ class Boss(Template):
 
 
 
+
+
+
+""" OLD GAMEPLAY LOOP
+class Play(Template):
+    sprites = { #sprites are now state-specific hahaha
+            0:pygame.sprite.Group(), #ALL SPRITES
+            1:pygame.sprite.Group(), #PLAYER SPRITE, INCLUDING BULLETS ; this is because the player interacts with enemies the same way as bullets
+            2:pygame.sprite.Group(), #ENEMY SPRITES
+            3:pygame.sprite.Group(), #UI SPRITES
+        }
+    
+
+    def __init__(self,
+                 window:pygame.display,
+                 campaign:str = "main_story.order",
+                 world:int = 0,
+                 level:int = 0,
+                 level_in_world:int = 0,
+                  :bool = False, #so init can be rerun to reset the whole ass state
+                 #is_demo:bool=False, #a way to check if the player is simulated or not
+                 ):
+
+        self.sprites = Play.sprites
+
+        self.next_state = None #Needed to determine if a state is complete
+        self.fullwindow = window
+
+        self.debug = {0:[],1:[]}
+        #self.is_demo = is_demo
+
+
+        #resetting the sprite groups
+        for group in self.sprites.values():
+            group.empty()
+
+        #06/23/2023 - SETTING THE GAMEPLAY WINDOW
+        # YUP has a touhou-like border surrounding the entire game as it works
+        # Because of this, gameplay will have its own entire tiny display to work with 
+        # It still saves the original pygame window, but this is just to draw the display to.abs
+        if not is_restart: #it only makes this the first time
+            self.window = pygame.Surface(pygame.display.play_dimensions).convert_alpha()
+
+        #Player spawn
+        self.bar = ( #the field the player is able to move along
+            "h", #if the bar is horizontal or vertical.
+            pygame.display.play_dimensions[1]*0.90, #x position if vertical, y position if horizontal.
+            (20,pygame.display.play_dimensions[0]-20), #the limits on both sides for the player to move on, y positions if vertical, x positions if horizontal
+            1, #gravity. 
+            )
+            
+        self.player = player.Player(bar=self.bar,sprite_groups=self.sprites)
+        self.sprites[1].add(self.player)
+
+        #06/01/2023 - Loading in level data
+        self.campaign = campaign
+        self.world = world
+        self.level = level #the total amount of levels passed, usually used for intensities or score
+        self.level_in_world = level_in_world #the amount of levels completed in the world currently 
+        self.world_data = levels.fetch_level_info(campaign_world = (self.campaign,self.world))
+
+
+        #event data - an event that plays over all else.
+        self.event = events.NewLevelEvent(level=self.level,window=self.window)
+        
+
+        #updating based on intensity
+        if self.world_data["dynamic_intensity"]:
+            levels.update_intensities(self.level,self.world_data)
+
+        #06/01/2023 - loading the formation
+        #the formation handles spawning and management of most enemies, but the state manages drawing them to the window and updating them
+        self.formation = formation.Formation(
+            player = self.player,
+            world_data = self.world_data,
+            level=self.level,
+            level_in_world=self.level_in_world, 
+            sprites=self.sprites,
+            window=self.window,
+            #is_demo = self.is_demo
+            )
+
+        #06/03/2023 - Loading in the background
+        self.background = Bg(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
+        #also loading in the floor if it exists
+        self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
+
+
+        #timer for updating new level
+        self.leveltimer = 0 
+        #relating to advance sprite
+        self.in_advance:bool = False #if true, will not update much besides the background and player
+        #what boss the boss state pulls from
+        self.curBossName = "ufo"
+
+   
+    
+    def on_start(self,**kwargs):#__init__ v2, pretty much.
+        #06/24/2023 - Playing the song
+        audio.play_song(self.world_data["song"])
+        self.player.sprite_groups = self.sprites
+        eBM()
+
+
+
+    def on_end(self,**kwargs): #un-init, kind of
+        pygame.mixer.music.stop()
+        if tools.debug: print(self.debug.values())
+        eBM()
+
+
+    
+    def update(self, draw=True):
+        #Drawing previous gameplay frame to the window -- don't ask why, it just does. 
+        if draw: self.fullwindow.blit(pygame.transform.scale(self.window,pygame.display.play_dimensions_resize),pygame.display.play_pos)
+
+
+        #Updating backgrounds - drawing to window
+        self.background.update()
+        self.background.draw(self.window)
+        if self.floor is not None:
+            self.floor.draw(self.window)
+        self.formation.draw_img(window=self.window) #displaying a special formation image if necessary
+
+
+        #updating all individual sprites, with the fourth group having special priority.
+        self.sprites[0].update()
+        self.sprites[1].update()
+        self.sprites[2].update()
+        self.sprites[0].draw(self.window)
+        self.sprites[1].draw(self.window)
+        self.sprites[2].draw(self.window)
+
+        #ending function early if event playing
+        if self.event is not None and self.event.playing:
+            self.event.update()
+            return
+
+
+        #only updating the formation after checking for events, to prevent the level starting beforehand.
+        self.formation.update()
+
+        #print debug positions
+        for pos in self.debug[0]:
+            self.window.blit(pygame.transform.scale(img["placeholder.bmp"],(10,10)),pos)
+
+        
+
+        #ending function early if advancing
+        if self.in_advance: return 
+        
+        #calling collision
+        self.collision()
+        
+
+        
+        #06/18/2023 - Starting a new level
+        if self.formation.cleared and self.leveltimer > 180:
+            #checking to start the advance state
+            if self.level_in_world >= self.world_data["levels"]:
+                self.next_state = "advance"
+                return
+            #checking to see if the next world should be a boss intermission -- does not update levels
+            elif self.level_in_world + 1 in self.world_data['boss_levels']:
+                self.next_state = "boss"
+                self.curBossName = self.world_data['bosses'][self.world_data['boss_levels'].index(self.level_in_world + 1)]
+                self.level_in_world += 1
+                return
+            #if not, updating everything
+            else:
+                self.level += 1
+                self.level_in_world += 1
+                self.formation.empty()
+                
+            #restarting the formation
+            self.formation.__init__(
+                world_data = self.world_data,
+                level=self.level,
+                level_in_world=self.level_in_world, 
+                sprites=self.sprites,
+                player=self.player,window=self.window,
+                #is_demo = self.is_demo
+                )
+
+            #resetting the level timer
+            self.leveltimer = 0 
+
+            #restarting the new level event
+            if self.event is not None: self.event.__init__(window=self.window,level=self.level)
+
+        #updating the wait timer
+        elif self.formation.cleared:
+            self.leveltimer += 1
+        
+        #08/21/2023 - Game Over - opening a new state if the player is dead
+        if self.player.health <= 0:
+            self.next_state = "gameover"
+
+
+
+    def collision(self):
+        #Detecting collision between players and enemies 
+        collidelist=pygame.sprite.groupcollide(self.sprites[1],self.sprites[2],False,False,collided=pygame.sprite.collide_mask)
+        for key,value in collidelist.items():
+            for item in value:
+                key.on_collide(2,item)
+                item.on_collide(1,key)
+
+
+
+    def new_world(self):
+        self.world += 1
+        self.level_in_world = 0
+        self.world_data = levels.fetch_level_info(campaign_world = (self.campaign,self.world))
+        #changing bg
+        self.background.__init__(self.world_data['bg'], resize = self.world_data['bg_size'], speed = self.world_data['bg_speed'])
+        #changing floor
+        self.floor = Fl(image=self.world_data['floor_img'],player=self.player,window=self.window,move=self.world_data['floor_move'],scale=self.world_data['floor_size']) if self.world_data['floor_img'] is not None else None
+
+
+    def event_handler(self,event):
+        #if self.is_demo: return
+        self.player.controls(event)
+        #changing what comes next
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.next_state = "pause"
+            if tools.debug: 
+                ...
+        if event.type == pygame.MOUSEBUTTONDOWN and tools.debug:
+            pos = tuple(pygame.mouse.get_pos())
+            pos = [pos[0]-pygame.display.play_pos[0],pos[1]-pygame.display.play_pos[0]]
+            pos2 = [pygame.display.play_dimensions_resize[0]-pos[0],pos[1]]
+            self.debug[0].append(pos)
+            self.debug[1].append(pos2)
+            print(pos,pos2)
+
+"""
 
 
 """
