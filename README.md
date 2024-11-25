@@ -31,8 +31,8 @@
         - [x] this pulls from a random list of **all** the start patterns
 - [x] World BG/FG will change every 5 levels
 - [ ] Special events that do graphical changes for the funsies
-- [ ] Sounds.
-- [ ] A shop that sells upgrades
+- [x] Sounds.
+- [x] A shop that sells upgrades
     - [x] Triple Shot
     - [x] Homing Missile
     - Extra damage
