@@ -19,6 +19,8 @@
         "icon_door.png","icon_welcome.png","icon_sold.png"],
     "./images/bg/":[
         "splash.png","uibox.png","test.png","level_complete_bg.png","tutorial_bg.png","game_over_bg.png"],
+    "./images/bullets/":
+    ["default_bullet.png","missile_shot.png","triple_shot-1.png","triple_shot-2.png","triple_shot-3.png","wide_shot.png"],
     "resize":[
         ["config_menu.png",[400,150]],
         ["logo.png",[200,150]],
@@ -32,6 +34,12 @@
         ["hiscore.png",[300,225]],
         ["hiscore_name.png",[200,100]],
         ["levelcomplete.png",[225,112]],
-        ["g_great.png",[200,100]]
+        ["g_great.png",[200,100]],
+        ["default_bullet.png",[16,16]],
+        ["triple_shot-1.png",[8,8]],
+        ["triple_shot-2.png",[8,8]],
+        ["triple_shot-3.png",[8,8]],
+        ["wide_shot.png",[64,16]],
+        ["missile_shot.png",[16,32]]
     ]
 }

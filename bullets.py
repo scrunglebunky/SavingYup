@@ -82,7 +82,7 @@ class DefaultBullet():
         DefaultBullet.update_size_info()
         if len(DefaultBullet.spawned) < player.bullet_max:
             #it spawns the bullet as requested, and logs it
-            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=270,start_pos=player.rect.center)
+            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=270,start_pos=player.rect.center,texture="default_bullet.png")
             sprite_groups[1].add(itm)
             DefaultBullet.spawned.append(itm)
             return True
@@ -113,14 +113,15 @@ class DefaultBullet():
 
 class TripleBullet(DefaultBullet):
     icon="icon_tripleshot.png"
-
+    angles = (250,270,290)
+    images = ("triple_shot-1.png","triple_shot-2.png","triple_shot-3.png")
     def shoot(player,sprite_groups):
         # if the player hasn't run out of bullets
         DefaultBullet.update_size_info()
         if len(DefaultBullet.spawned) < (player.bullet_max*3): #bullet max is tripled since youre sending out three times as many bullets
             #it spawns the bullet as requested, and logs it
-            for i in (250,270,290):
-                itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=i,start_pos=player.rect.center)
+            for i in range(3):
+                itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=TripleBullet.angles[i],start_pos=player.rect.center,texture=TripleBullet.images[i])
                 sprite_groups[1].add(itm)
                 DefaultBullet.spawned.append(itm)
             return True
@@ -144,7 +145,7 @@ class RocketMissile(DefaultBullet):
         DefaultBullet.update_size_info()
         if len(DefaultBullet.spawned) < player.bullet_max:
             #it spawns the bullet as requested, and logs it
-            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=angle,start_pos=player.rect.center,angle_isradians = (pick!=None))
+            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=angle,start_pos=player.rect.center,angle_isradians = (pick!=None),texture="missile_shot.png")
             sprite_groups[1].add(itm)
             DefaultBullet.spawned.append(itm)
             return True
@@ -176,7 +177,7 @@ class WideShot(DefaultBullet):
         DefaultBullet.update_size_info()
         if len(DefaultBullet.spawned) < player.bullet_max:
             #it spawns the bullet as requested, and logs it
-            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=270,start_pos=player.rect.center,texture="wideshot.png")
+            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=5,angle=270,start_pos=player.rect.center,texture="wide_shot.png")
             sprite_groups[1].add(itm)
             DefaultBullet.spawned.append(itm)
             return True

@@ -64,7 +64,7 @@ class Player(pygame.sprite.Sprite):
         self.bullet_dmg = 1
         # MORE UPGRADE VALUES -- PERKS
         self.perks = {
-            "rocketboots":False,
+            "rocketboots":0,
             "child":0,
             "magnet":False,
         }
