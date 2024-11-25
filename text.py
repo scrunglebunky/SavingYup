@@ -1,7 +1,11 @@
 # ANDREW CHURCH - 2023
 import pygame,math,json
 pygame.font.init()
-terminalfont = pygame.font.Font("./data/font.ttf",30)
+terminalfont_30 = pygame.font.Font("./data/font.ttf",30)
+terminalfont_20 = pygame.font.Font("./data/font.ttf",20)
+terminalfont_10 = pygame.font.Font("./data/font.ttf",10)
+terminalfont_15 = pygame.font.Font("./data/font.ttf",15)
+
 
 
 #5/30/2023 - START OF TEXT PROGRAMMING
@@ -15,7 +19,7 @@ loaded_text = {}
 #5/30/2023 - LOADING NUMBERS
 load_list = [".","-","+","x","%",0,1,2,3,4,5,6,7,8,9]
 for num in load_list:
-    loaded_text[str(num)] = terminalfont.render(str(num),False,"white","black")
+    loaded_text[str(num)] = terminalfont_30.render(str(num),False,"white","black")
 #5/30/2023 - DISPLAY_NUMBERS
 # There is separate function for displaying numbers because I'm not gonna store several numbers as their own stupid variables, as that would take up too much RAM
 # What it does here, instead, is split the number into each individual digit and displays them separately 
@@ -65,7 +69,7 @@ def load_text(
             image = loaded_text[text]
         # setting the image if it is not loaded
         else:
-            image = terminalfont.render(
+            image = terminalfont_30.render(
                 str(text), True, fg, bg
             )
             if add_to_loaded: loaded_text[text] = image
@@ -79,11 +83,12 @@ def load_text(
 
 class AutoNum():
     #a modification of AutoImage that exclusively handles numbers.
-    def __init__(self,text:any,host:pygame.sprite.Sprite = None,make_host_rect:bool=False):
+    def __init__(self,text:any,host:pygame.sprite.Sprite = None,make_host_rect:bool=False,font:pygame.font.Font=terminalfont_30):
         #loading text
         self.cur = str(text) 
-        self.image = terminalfont.render(self.cur,False,"white","black")
+        self.image = font.render(self.cur,False,"white","black")
         self.mask = pygame.mask.from_surface(self.image)
+        self.font = font
         #host information
         self.hashost = host is not None
         self.host = host
@@ -104,7 +109,7 @@ class AutoNum():
         #making sure it's different
         if str(text) != self.cur:
             #changing it
-            self.image = terminalfont.render(text,False,"white","black")
+            self.image = self.font.render(text,False,"white","black")
             if self.hashost:
                 self.host.image = self.image
                 #saving

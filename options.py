@@ -37,6 +37,10 @@ import anim
 
 #07/13/2023 - This actually applies the settings 
 def apply_settings(border = None):
+    # NOW LISTEN.
+    #   THIS IS COOL AND ALL.
+    #   BUT THIS ADDS UNNECESSARY DEPTH TO WHAT WAS A SMALL PROJECT.
+    #   SO THERE WILL BE VOLUME AND SOME OTHER STUFF, BUT THE RESOLUTION STAYS.
     #display
     pygame.display.dimensions = (settings["screen_width"][1],settings["screen_height"][1]) 
     pygame.display.play_dimensions_resize = (settings["gameplay_width"][1],settings["gameplay_height"][1])
@@ -50,6 +54,7 @@ def apply_settings(border = None):
     #writing data
     with open("./data/config.json","w") as data:
         data.write(json.dumps(settings))
+
 apply_settings()
 
 

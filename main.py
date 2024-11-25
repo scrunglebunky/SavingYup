@@ -36,9 +36,9 @@ states["play"] = all_states.Play(window=window)
 states["options"] = options.State(window=window,border=border)
 states["pause"] = all_states.Pause(window=window,play_state=states["play"]) 
 states["title"] = all_states.Title(window=window,border=border)
-states["gameover"] = all_states.GameOver(window=window,play_state=states["play"])
-states["advance"] = all_states.Advance(window=window,play_state=states["play"])
-states["boss"] = all_states.Boss(play_state=states["play"])
+# states["gameover"] = all_states.GameOver(window=window,play_state=states["play"])
+# states["advance"] = all_states.Advance(window=window,play_state=states["play"])
+# states["boss"] = all_states.Boss(play_state=states["play"])
 # states["tutorial"] = all_states.Tutorial(window=window) Part 2 - Removing the Tutorial
 
 #07/23/2023 - SWITCHING STATES
@@ -81,7 +81,7 @@ while run:
     #filling the screen in case something is offscreen
     # window.fill(defaultcolor)
     #06/23/2023 - drawing border to window 
-    border.update_values(score=score.score,lives=states['play'].player.health)
+    border.update_values(score=states['play'].player.coins,lives=states['play'].player.health)
     border.draw(window)
     
 

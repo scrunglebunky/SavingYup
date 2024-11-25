@@ -14,8 +14,9 @@
 		"tentacle","crust_fish","boss_sun","boss_sun_arm","boss_sun_flash",
         "kaboom","die"
     ],
-    "./images/ui/":["boss_sun_sign","boss_sun_yippee","ui_gohere","warning","tutorial","continue"],
+    "./images/ui/":["boss_sun_sign","boss_sun_yippee","ui_gohere","warning","tutorial","continue","shopkeeper","shoptitle"],
     "./images/bg/":["bg01","bg02","bg03","bg04","bg05","bg06","bg07","bg08",
+                    "bgSHOP",
                     "floor-default"],
     "./images/bullets/":["bullet_def","bullet_nope","bullet_hack","bullet_aqua","bullet_happy","bullet_vapor","coin"]
 }

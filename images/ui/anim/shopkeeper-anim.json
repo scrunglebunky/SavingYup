@@ -1,0 +1,34 @@
+{
+    "idle":{
+        "frames":[
+            0
+        ],
+        "FPS":60, 
+        "loop":30, 
+        "return_to":"idle"
+        },
+    "happy":{
+        "frames":[
+            1
+        ],
+        "FPS":60, 
+        "loop":30, 
+        "return_to":"idle"
+        },
+    "angry":{
+        "frames":[
+            2
+        ],
+        "FPS":60, 
+        "loop":30, 
+        "return_to":"idle"
+        },
+    "think":{
+        "frames":[
+            3
+        ],
+        "FPS":60, 
+        "loop":30, 
+        "return_to":"idle"
+        }
+}

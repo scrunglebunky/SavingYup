@@ -25,10 +25,10 @@ class Background():
         self.pos[0] += self.speed[0] #x pos
         self.pos[1] += self.speed[1] #y pos
         #resetting positioning
-        if self.pos[0] > self.border[0] or self.pos[0]*-1 > self.border[0]:
+        if abs(self.pos[0]) > self.size[0]:
             self.pos[0] = 0 #x position
             # print('reset x')
-        if self.pos[1] > self.border[1] or self.pos[1]*-1 > self.border[1]:
+        if abs(self.pos[1]) > self.size[1]:
             self.pos[1] = 0 
             # print('reset y')
         
@@ -57,22 +57,22 @@ class Background():
         #drawing repeats of the background if any of it is offscreen
         #07/10/2023 - instead of individually blitting, it makes a list for easy modification
         blit_list = [ ] 
-        if pos[0] > 0 or force:#LEFT
-            blit_list.append((pos[0]-self.size[0],pos[1]))
-        elif pos[0] < 0 or force:#RIGHT
-            blit_list.append((pos[0]+self.size[0],pos[1]))
-        if pos[1] > 0 or force:#UP
-            blit_list.append((pos[0],pos[1]-self.size[1]))
-        elif pos[1] < 0 or force:#DOWN
-            blit_list.append((pos[0],pos[1]+self.size[1]))
-        if pos[0] > 0 and pos[1] > 0 or force:#UPLEFT
-            blit_list.append((pos[0]-self.size[0],pos[1]-self.size[1]))
-        if pos[0] > 0 and pos[1] < 0 or force:#DOWNLEFT
-            blit_list.append((pos[0]-self.size[0],pos[1]+self.size[1]))
-        if pos[0] < 0 and pos[1] > 0 or force:#UPRIGHT
-            blit_list.append((pos[0]+self.size[0],pos[1]-self.size[0]))
-        if pos[0] < 0 and pos[1] < 0 or force:#DOWNRIGHT
-            blit_list.append((pos[0]+self.size[0],pos[1]+self.size[1]))
+        # if pos[0] > 0 or force:#LEFT
+        blit_list.append((pos[0]-self.size[0],pos[1]))
+        # elif pos[0] < 0 or force:#RIGHT
+        blit_list.append((pos[0]+self.size[0],pos[1]))
+        # if pos[1] > 0 or force:#UP
+        blit_list.append((pos[0],pos[1]-self.size[1]))
+        # elif pos[1] < 0 or force:#DOWN
+        blit_list.append((pos[0],pos[1]+self.size[1]))
+        # if pos[0] > 0 and pos[1] > 0 or force:#UPLEFT
+        blit_list.append((pos[0]-self.size[0],pos[1]-self.size[1]))
+        # if pos[0] > 0 and pos[1] < 0 or force:#DOWNLEFT
+        blit_list.append((pos[0]-self.size[0],pos[1]+self.size[1]))
+        # if pos[0] < 0 and pos[1] > 0 or force:#UPRIGHT
+        blit_list.append((pos[0]+self.size[0],pos[1]-self.size[1]))
+        # if pos[0] < 0 and pos[1] < 0 or force:#DOWNRIGHT
+        blit_list.append((pos[0]+self.size[0],pos[1]+self.size[1]))
 
 
         #displaying all blits

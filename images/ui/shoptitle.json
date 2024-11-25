@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/ui/img/shoptitle",
+    "ANIM": "../../bg/anim/bg-default-anim.json",
+    "SHEET_SIZE": [
+        1023,
+        220
+    ],
+    "TILE_SIZE": [
+        341,
+        220
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        3
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 0.5,
+    "anim": {}
+}

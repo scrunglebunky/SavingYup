@@ -1,0 +1,23 @@
+{
+    "NAME": "./images/ui/img/shopkeeper",
+    "ANIM": "shopkeeper-anim.json",
+    "SHEET_SIZE": [
+        1230,
+        317
+    ],
+    "TILE_SIZE": [
+        246,
+        317
+    ],
+    "ROWS/COLUMNS": [
+        1,
+        5
+    ],
+    "colorkey": [
+        0,
+        0,
+        0
+    ],
+    "scale": 0.75,
+    "anim": {}
+}

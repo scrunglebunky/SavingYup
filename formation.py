@@ -110,13 +110,25 @@ class Formation():
             "amount":((self.difficulty_rounded//3)+1) if (self.difficulty_rounded <= 6) else 3,
             "max":3+(self.difficulty_rounded*2),
         }
+        # DIFFICULTY HARD-CODED CALCULATIONS
+        if self.difficulty <= 1.2:
+            self.timer['atk'] = 100 
+        elif self.difficulty <= 3:
+            self.timer['atk'] = 100-(self.difficulty-1.5)*20
+        elif self.difficulty <= 5:
+            self.timer['atk'] = 40-(self.difficulty-3)*10
+        elif self.difficulty <= 8:
+            self.timer['atk'] = 30-(self.difficulty-5)*10
+        elif self.difficulty <= 10:
+            self.timer['atk'] = 10 - (self.difficulty - 8)*1
         self.timer['atk'] = (100 - (self.difficulty*4)) if self.difficulty < 25 else 1
+        print(self.timer["atk"])
         #timer["atk"] = how often enemies are thrown down to attack #goes down a frame every level
         #max_enemies = how many enemies can be down at a time, goes up by 1 every 5 levels
         
         #grace periods get slightly longer and start more often as the game gets harder
-        self.timer['grace_start'] = (480 - self.difficulty*20) if self.difficulty < 10 else 60
-        self.timer['grace_end'] = self.timer['grace_start']+60 + (self.difficulty * 15 if self.difficulty < 4 else 60)
+        # self.timer['grace_start'] = (480 - self.difficulty*20) if self.difficulty < 10 else 60
+        # self.timer['grace_end'] = self.timer['grace_start']+60 + (self.difficulty * 15 if self.difficulty < 4 else 60)
 
         #a key used to figure out what enemy is to be spawned during the start state.
         self.enter_key = 0 #what is used for spawning entrance values, yada yada yada
@@ -127,7 +139,7 @@ class Formation():
         #timer updates
         self.timer["duration"] += 1
         self.timer["time"] = self.timer["time"] + 1 if self.timer["time"] < self.timer["reset"] else 0 
-        self.timer["grace"] = self.timer["grace"] + 1 if self.timer ["grace"] < self.timer["grace_end"] else 0
+        # self.timer["grace"] = self.timer["grace"] + 1 if self.timer ["grace"] < self.timer["grace_end"] else 0
         #clear check
         self.cleared = (len(self.spawned_list) <= 0)
     
@@ -226,7 +238,7 @@ class Formation():
 
     def check_for_atk(self): #throwing down an enemy to attack the player
         #only runs if the timer is ok
-        if (self.timer["time"] % self.timer["atk"] == 0) and (self.timer["grace"] < self.timer["grace_start"]):
+        if (self.timer["time"] % self.timer["atk"] == 0): #and (self.timer["grace"] < self.timer["grace_start"]):
             #counting all enemies in idle 
             atk_count = 0
             trip = False #a trip to see if the enemies are still entering - WILL NOT ATTACK
@@ -240,7 +252,7 @@ class Formation():
     
 
     def make_attack(self,idle_count:list):
-        for i in range(self.attack['amount']):
+        for i in range(random.randint(1,3)):
             index = random.randint(0,(len(idle_count)-1))
             choice = idle_count[index]
             if self.spawned_list[choice].info['state'] != 'attack':
@@ -256,7 +268,7 @@ class Formation():
             add = 0 
         else:
             add = (self.timer["duration"]*.25)
-        self.pos[1] = 45 + (math.sin(self.timer["duration"] * 0.1) * 15) + add
+        self.pos[1] = 45 + (math.sin(self.timer["duration"] * 0.1) * 15) + (self.timer["duration"]*.25) - add
         for char in self.spawned_list:
             char.formationUpdate(self.pos)
 

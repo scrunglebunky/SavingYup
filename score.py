@@ -90,10 +90,13 @@ scoreboard = generate_scoreboard()
 
 
 
-
-score=0
-def change(num:int):
-    if type(num) == int:
-        score += num
-def reset():
-    score = 0
+# THIS ISN'T USED ANYMORE.
+# THE COINS, AS WELL AS OTHER GAME STATUS INFO LIKE HEALTH, IS IN THE PLAYER ASSET
+# HOWEVER, GAME ASSETS LIKE ENEMIES AND SUCH ARE HANDLED BY THE PLAY STATE
+# LUCKILY I PROGRAMMED SCORE TO BE OKAY WITH THIS BY DEFAULT.
+# score=0
+# def change(num:int):
+#     if type(num) == int:
+#         score += num
+# def reset():
+#     score = 0

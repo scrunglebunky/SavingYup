@@ -57,12 +57,7 @@ def load_all_songs():
 
 def play_sound(name,category:str = None,channel:int = None):
     if not DISABLED and name in sounds.keys():
-        if name in type_channels.keys():
-            pygame.mixer.Channel(type_channels[name]).play(sounds[name])
-        elif type(channel) == int:
-            pygame.mixer.Channel(channel).play(sounds[name])
-        else:
-            sounds[name].play()
+        sounds[name].play()
     elif not DISABLED:
         print(str(name) + " not found")
         

@@ -45,8 +45,8 @@ class Player(pygame.sprite.Sprite):
         self.momentum = 0
 
         #HEALTH
-        self.health = 15
-        self.coins = 0
+        self.health = 3
+        self.coins = 1
         self.invincibility_counter = 0 
         self.dead = self.health < 1
 
@@ -57,9 +57,17 @@ class Player(pygame.sprite.Sprite):
         #UPGRADE VALUES -- UNFINISHED
         self.bullet_max = 3 #how many bullets can be on screen at one given time
         self.bullet_time = 16 #shoots once every x frames
-        self.current_bullet = "default" #the current bullet being shot at the moment
+        self.bullet_list = ["default"]
+        self.bullet_list_index = 0 
+        self.current_bullet = self.bullet_list[self.bullet_list_index] #the current bullet being shot at the moment
         self.bullet_lock = False #stop shooting 
         self.bullet_dmg = 1
+        # MORE UPGRADE VALUES -- PERKS
+        self.perks = {
+            "rocketboots":False,
+            "child":0,
+            "magnet":False,
+        }
 
         # ADDING UPGRADES NOW, HOORAY!
         # you could shoot manually or hold down the button to autoshoot
@@ -83,16 +91,13 @@ class Player(pygame.sprite.Sprite):
         self.collision()
         self.health_update()
 
-
-        #debug
-        if self.autoshoot and self.autoshoottimer%self.bullet_time==0 and self.autoshoottimer != 0 and not self.bullet_lock:
-            self.shoot()
-        if self.autoshoot: 
+        if self.autoshoot:
             self.autoshoottimer += 1
-
-        #demo
-        if self.demo:
-            self.invincibility_counter = 6
+            # if the autoshoot timer has passed bullet time
+            if (self.autoshoottimer >= self.bullet_time) and not self.bullet_lock:
+                self.shoot()
+                self.autoshoottimer = 0 
+        
 
 
 
@@ -101,32 +106,52 @@ class Player(pygame.sprite.Sprite):
         #ENGAGING movement
         if event.type == pygame.KEYDOWN:
             #CALLING MOVEMENT FUNCTIONS
-            if event.key == pygame.K_LEFT:
-                self.move(False)
-            if event.key == pygame.K_RIGHT:
-                self.move(True)
-            if event.key == pygame.K_UP:
-                self.jump()
-            if event.key == pygame.K_DOWN:
-                self.crouch(True)
-            if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
-                self.focus()
+            match event.key:
+                case pygame.K_LEFT:
+                    self.move(False)
+                case pygame.K_RIGHT:
+                    self.move(True)
+                case pygame.K_UP:
+                    self.jump()
+                case pygame.K_DOWN:
+                    self.crouch(True)
+                case pygame.K_LSHIFT:
+                    self.focus()
+                case pygame.K_RSHIFT:
+                    self.focus()
+                    
+                #SHOOTING
+                case pygame.K_z:
+                    if not self.bullet_lock:
+                        self.shoot()
+                        self.autoshoottimer = 0 
+                        self.autoshoot = True
                 
+                # CHANGING WEAPON
+                case pygame.K_x:
+                    self.bullet_list_index += 1
+                    if self.bullet_list_index >= len(self.bullet_list):
+                        self.bullet_list_index = 0 
+                    self.current_bullet = self.bullet_list[self.bullet_list_index]
 
-                
 
-            #SHOOTING
-            if (event.key == pygame.K_x or event.key == pygame.K_z) and not (self.bullet_lock):
-                self.shoot()
-                self.autoshoottimer = 0 
-                self.autoshoot = True
 
             #AUTOSHOOT
             if tools.debug:
                 if event.key == pygame.K_3:
                     self.health += 1
+                if event.key == pygame.K_2:
+                    self.bullet_dmg = 1
+                    self.bullet_list = ["default","tripleshot","rocket","wide"]
+                    self.bullet_time = 0
+                    self.bullet_max = 1000
+                    self.health = 999
+                    self.perks['magnet'] = self.perks['rocketboots'] = True
+                    self.coins += 1
+                    self.coins *= 1000
                 if event.key == pygame.K_0:
                     self.health -= 1
+                    
 
 
         #RELEASING movement
@@ -246,8 +271,9 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self):
         did_shoot = bullets.LOADED[self.current_bullet].shoot(sprite_groups=self.sprite_groups,player=self)
-        if not self.movement[4] and did_shoot: self.aimg.change_anim("shoot")
-            
+        if not self.movement[4] and did_shoot: 
+            self.aimg.change_anim("shoot")
+            audio.play_sound("bap1.wav")
 
     def move(self,dir:bool=True,release:bool=False):
         if not release: 
@@ -314,7 +340,8 @@ class Player(pygame.sprite.Sprite):
             rect.center = self.rect.center[:]
             self.rect = rect
         
-
+    def add_child(self):
+        ...
 
 
 class PlayerDummy(Player):

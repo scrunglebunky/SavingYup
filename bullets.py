@@ -76,7 +76,7 @@ class DefaultBullet():
     spawned = [ ]
     enemylist = [ ] 
     enemy_parent_class = None # the game sets this after everything is set up and done, because this file can't import enemies 
-    
+    icon="icon_dmgup.png"
     def shoot(player,sprite_groups) -> bool:
         # if the player hasn't run out of bullets
         DefaultBullet.update_size_info()
@@ -112,6 +112,8 @@ class DefaultBullet():
 
 
 class TripleBullet(DefaultBullet):
+    icon="icon_tripleshot.png"
+
     def shoot(player,sprite_groups):
         # if the player hasn't run out of bullets
         DefaultBullet.update_size_info()
@@ -126,6 +128,8 @@ class TripleBullet(DefaultBullet):
             return False
 
 class RocketMissile(DefaultBullet):
+    icon="icon_rocketshot.png"
+
     def shoot(player,sprite_groups):
         # indexes enemies
         DefaultBullet.update_enemylist(sprite_groups[2])
@@ -164,13 +168,15 @@ class BombMissile(DefaultBullet):
 
 
 class WideShot(DefaultBullet):
+    icon="icon_wideshot.png"
+    
     # a slow moving, bigger bullet
     def shoot(player,sprite_groups) -> bool:
         # if the player hasn't run out of bullets
         DefaultBullet.update_size_info()
         if len(DefaultBullet.spawned) < player.bullet_max:
             #it spawns the bullet as requested, and logs it
-            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=270,start_pos=player.rect.center)
+            itm = BulletRAW(sprite_groups=sprite_groups,dmg=player.bullet_dmg,speed=15,angle=270,start_pos=player.rect.center,texture="wideshot.png")
             sprite_groups[1].add(itm)
             DefaultBullet.spawned.append(itm)
             return True
@@ -217,7 +223,7 @@ class BulletParticle(pygame.sprite.Sprite):
 
 LOADED = {
     "default":DefaultBullet,
-    "triple":TripleBullet,
+    "tripleshot":TripleBullet,
     "rocket":RocketMissile,
     "bomb":BombMissile,
     "wide":WideShot
