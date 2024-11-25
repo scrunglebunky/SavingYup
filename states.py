@@ -6,6 +6,7 @@ from text import text_list as tl
 from backgrounds import Background as Bg
 from backgrounds import Floor as Fl
 from emblems import Emblem as Em
+from emblems import TextEmblem  as TEm
 from bullets import emptyBulletMax as eBM
 from bullets import BulletParticle as BP
 from math import sin
@@ -60,6 +61,7 @@ class Play(Template):
     def __init__(self,
                  window:pygame.display,
                  level:int = 0,
+                 oldshop:shop.Shop = None,
                  #is_demo:bool=False, #a way to check if the player is simulated or not
                  ):
 
@@ -95,7 +97,10 @@ class Play(Template):
 
 
         #Creating a SHOP ASSET
-        self.shop = shop.Shop(player=self.player)
+        if oldshop == None:
+            self.shop = shop.Shop(player=self.player)
+        else:
+            self.shop = oldshop
         #changing the shop's position
         self.shop.rect.center = pygame.display.rect.center
 
@@ -133,8 +138,7 @@ class Play(Template):
         #timer for updating new level
         self.leveltimer = 0 
 
-        #needed to stop error - FIX LATER
-        self.curBossName = "ufo"
+        
 
     
     def update(self, draw=True):
@@ -202,7 +206,9 @@ class Play(Template):
         
         #08/21/2023 - Game Over - opening a new state if the player is dead
         if self.player.health <= 0:
-            self.next_state = "gameover"
+            self.next_state = "title"
+            #re-initializing itself
+            self.__init__(window=self.fullwindow,oldshop=self.shop)
 
         # FINALLY DRAWING EVERYTHING TO THE SCREEN AT THE **END** BECAUSE IM NOT A PSYCHOPATH
         self.fullwindow.blit(pygame.transform.scale(self.window,pygame.display.play_dimensions_resize),pygame.display.play_pos)
@@ -257,7 +263,7 @@ class Play(Template):
 
     def new_bg(self,bg="bg01",transition_effect:bool=False):
         #06/03/2023 - Loading in the background
-        self.background = Bg(bg, resize = (600,800), speed = (0,0))
+        self.background = Bg(bg, resize = (600,800), speed = (0,1))
         # also loading in the floor if it exists
         self.floor = Fl(
             image='floor-default',
@@ -325,11 +331,13 @@ class Play(Template):
 
 
 #title screen
+# THIS ALSO HAS TO BE UPDATED
+# USE THE EMBLEMS I GAVE YOU DAMNIT
 class Title(Template):
     emblems = {}
     emblems_perm = {}
     sprites=pygame.sprite.Group()
-    em_continue = Em(im='continue')
+    em_continue = TEm(txt="PRESS Z TO CONTINUE\nARROW KEYS MOVE, Z SHOOTS, X CHANGES WEAPON")
 
     def __init__(self,window:pygame.Surface,border): #Remember init is run only once, ever.
         self.window=window
@@ -353,7 +361,7 @@ class Title(Template):
             # "welcome":(pygame.display.rect.width*0.01,pygame.display.rect.height*0.01),
         #self.image_placements["demo"] = (pygame.display.rect.width*0.01,pygame.display.rect.height*0.1)
         self.image_placements["score"] = (pygame.display.rect.width*0.99 - self.resize[0] ,pygame.display.rect.height*0.1)
-        Title.em_continue.change_pos((winrect.centerx,winrect.centery),isCenter=True)
+        Title.em_continue.change_pos((winrect.centerx,winrect.bottom*.8),isCenter=True)
 
         self.hiscoresheet = pygame.transform.scale(self.hiscoresheet,self.resize)
         
@@ -374,21 +382,13 @@ class Title(Template):
         
         #drawing
         # self.window.blit(img['demo.png'],self.image_placements['welcome'])
-        
-        #demo
-        #updating and drawing
-        Title.em_continue.update()
-        self.window.blit(Title.em_continue.image,Title.em_continue.rect)
-        #self.demo_state.update(draw=False)
-        #self.window.blit(pygame.transform.scale(self.demo_state.window,self.resize),self.image_placements['demo'])
-        self.window.blit(self.hiscoresheet,self.image_placements['score'])
-         ###### demo player controls
-        # event = pygame.event.Event(random.choice([pygame.KEYDOWN,pygame.KEYUP]), key = random.choice([pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_z,pygame.K_x])) #create the event        
-        # #stopping constant movement
-        # if event.type == pygame.KEYDOWN and (event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT):
-        #     self.demo_state.player.move(dir=event.key == pygame.K_RIGHT,release=True)
-        # else: self.demo_state.player.controls(event)
 
+        Title.em_continue.update()
+
+        self.window.blit(Title.em_continue.image,Title.em_continue.rect)
+        
+        # self.window.blit(self.hiscoresheet,self.image_placements['score'])
+        
         #timer updating
         self.timer += 1
         if self.timer > 360:

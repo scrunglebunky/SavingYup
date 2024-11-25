@@ -64,6 +64,15 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
         - [ ] "event.NewBG" will make the bg fall down and bounce to replace the old bg
         - [ ] "event.NewLevel" will flash a bunch of text saying how you completed a level and adding some score bonuses
         - [ ] "event.NewWorld" does the same thing.
-    4. [ ] Adding the GameOver/highscore state back.
-        - The old one was too complicated and convoluted.
-        - It just flashes the game over screen, and if you got a high score it prompts you to type your name. 
+    4. OPTIMIZE WHAT WAS ALREADY THERE
+        1. [ ] Adding the GameOver/highscore state back.
+            - The old one was too complicated and convoluted.
+            - It just flashes the game over screen, and if you got a high score it prompts you to type your name. 
+        2. [ ] Optimize the title screen
+            - I made emblems.
+            - Emblems should be used, not some crappy dictionary thing.
+        3. [ ] FIX THE UI BORDER
+            - THIS ONE IS ALSO LAME
+            - IT SHOULD JUST BE PASSED THE PLAYER CLASS AND DRAW IMAGES AND MAKE EMBLEMS
+            - Change the images too
+- However, I will not be doing this right now. The game will stay in this unfinished, technically-playable state for another week or so now.
