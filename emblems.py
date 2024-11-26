@@ -41,8 +41,6 @@ class Emblem(pygame.sprite.Sprite):
         self.change_pos(coord,isCenter=isCenter)
 
     def update(self):
-        if self.pattern is not None: self.pattern_f += 1; self.play_pattern()
-        self.rect.topleft = self.coord[0]+self.pattern_offset[0],self.coord[1]+self.pattern_offset[1]
         self.aimg.update()
 
         #checking for kill condition
@@ -53,8 +51,14 @@ class Emblem(pygame.sprite.Sprite):
         if len(self.tweens['move']) > 5 and not self.tweens['move'][4]:
             self.tween_pos()
 
-        #what the hell
-        # print(self.rect.center)
+        if self.pattern is not None: self.pattern_f += 1; self.play_pattern()
+        self.rect.topleft = self.coord[0]+self.pattern_offset[0],self.coord[1]+self.pattern_offset[1]
+
+        #hiding
+        if self.hide:
+            self.rect.topleft = -1000,-1000
+
+        
 
     
     def play_pattern(self):
@@ -133,7 +137,7 @@ class TextEmblem(Emblem):
         self.pattern_offset = [0,0] #what pattern affects
 
         # image setting information, NOW A NUMBER!!
-        self.aimg = text.AutoNum(text=txt,host=self,make_host_rect=True,font=font)
+        self.aimg = text.AutoNum(text=txt,host=self,make_host_rect=True,font=font,resize=resize)
         self.text = txt
 
         # rect/positioning information
@@ -143,16 +147,20 @@ class TextEmblem(Emblem):
         self.change_pos(coord,isCenter=isCenter)
 
     def update(self):
-        if self.pattern is not None: self.pattern_f += 1; self.play_pattern()
-        self.rect.topleft = self.coord[0]+self.pattern_offset[0],self.coord[1]+self.pattern_offset[1]
-        self.aimg.update()
+        
 
         # updating the tweens
         if len(self.tweens['move']) > 5 and not self.tweens['move'][4]:
             self.tween_pos()
 
-        # note that there is no longer a reference to animation kill on loop
-        # you should know why.
+        #positioning/image/patterns tuff
+        if self.pattern is not None: self.pattern_f += 1; self.play_pattern()
+        self.rect.topleft = self.coord[0]+self.pattern_offset[0],self.coord[1]+self.pattern_offset[1]
+        self.aimg.update()
+
+        #hiding
+        if self.hide:
+            self.rect.topleft = -1000,-1000
 
     def update_text(self,txt):
         self.aimg.update_text(txt)

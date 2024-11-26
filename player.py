@@ -1,6 +1,6 @@
 #Code by Andrew Church
 import pygame,anim,math,bullets,audio,tools,random
-
+import gameplay_log as log
 # "bar":(
 #         "h", #if the bar is horizontal or vertical.
 #         450, #x position if vertical, y position if horizontal.
@@ -239,6 +239,7 @@ class Player(pygame.sprite.Sprite):
             audio.play_sound("ouch.mp3" if self.health > 0 else "scream.mp3")
             if self.health <= 0: 
                 self.kill()
+            log.log_zone["damage"] += amount
 
 
 

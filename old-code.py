@@ -1044,3 +1044,50 @@ class BorderOld():
         if not self.animated:return 
         Border.sprites.update()
 """
+
+""" THE PAUSE STATE
+to be quite frank this was actually one of the better states here in terms of simplicity
+however, it should be a menu sprite instead of its own state
+
+#paused
+class Pause(Template):
+    def __init__(self,window:pygame.Surface,play_state):
+        
+        self.next_state = None #Needed to determine if a state is complete
+        self.return_state = "play"
+        self.play_state = play_state
+        self.window = window
+        self.bg = play_state.window
+        self.logo_pos:list = [0,0] #[frames_in,y_pos] 
+        self.bgpos = pygame.display.play_pos[0] + 35 , pygame.display.play_pos[1] + 38
+
+    def on_start(self,**kwargs): #__init__ v2, pretty much.
+        audio.play_song("kurosaki.mp3")
+        if 'return_state' in kwargs.keys(): self.return_state = kwargs['return_state']
+    def on_end(self,**kwargs): #un-init, kind of
+        pygame.mixer.music.stop()
+
+    def update(self):
+        #displaying of all the pause graphics and such - likely heavily unoptimized.
+        self.bg.blit(img["paused.png"],(0,0))
+        self.bg.blit(img["paused.png"],(0,600))
+        self.window.blit(pygame.transform.scale(img["pauseborder.png"],pygame.display.play_dimensions_resize),pygame.display.play_pos)
+        self.window.blit(pygame.transform.scale(self.bg,(390,270)),self.bgpos)
+
+    def event_handler(self,event):
+        #changing what comes next
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                self.next_state = "options","pause"
+            if event.key == pygame.K_q:
+                self.next_state = "title"
+                self.play_state.__init__(
+                    window=self.play_state.fullwindow,
+                )
+            if event.key == pygame.K_ESCAPE:
+                self.next_state = self.return_state
+
+
+
+
+"""

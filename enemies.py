@@ -4,7 +4,8 @@ from emblems import Emblem as Em
 from math import sin,cos,atan2,degrees
 from anim import AutoImage as AImg
 from player import Player
-from tools import world_log as wl
+# from tools import world_log as wl
+import gameplay_log as log
 
 
 
@@ -146,11 +147,12 @@ class Template(pygame.sprite.Sprite):
             #COIN CODE
             self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1],value=self.info['difficulty'],player=self.player))
             #UPDATING THE KILL COUNT
-            wl['kills'] += 1
+            log.log_zone['kills'] += 1
             #playing a sound because
             ps("dead.mp3")
         else:
-            wl['got_away'] += 1
+            log.log_zone['got_away'] += 1
+            ...
         #KILLING THE SPRITE ANYWAYS
         pygame.sprite.Sprite.kill(self)
         self.info['dead'] = True

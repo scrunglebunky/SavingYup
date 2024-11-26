@@ -125,11 +125,14 @@ for directory,filelist in img_loadlist.items():
     # The last index of the loadlist will be 'resize', with each index being [imagename, [width,height]]
     if directory == "resize":
         for filename in filelist:
-            all_loaded_images[str(filename[0])] = pygame.transform.scale(all_loaded_images[str(filename[0])],filename[1])
+            if str(filename[0] in all_loaded_images.keys()):
+                all_loaded_images[str(filename[0])] = pygame.transform.scale(all_loaded_images[str(filename[0])],filename[1])
         continue
     for filename in filelist:
-        all_loaded_images[str(filename)] = pygame.image.load(directory+filename).convert_alpha()
-
+        try:
+            all_loaded_images[str(filename)] = pygame.image.load(directory+filename).convert_alpha()
+        except FileNotFoundError:
+            print(str(filename),"Not Found")
 
 
 

@@ -6,7 +6,7 @@ import tools
 clock = tools.Clock(pygame.time.Clock())
 run=True; cur_state = None
 
-defaultcolor = "#AAAAAA"
+defaultcolor = "#000000"
 window = pygame.display.get_surface() 
 pygame.display.rect = pygame.display.get_surface().get_rect()
 pygame.display.play_pos = 20,20
@@ -32,14 +32,9 @@ tools.debug = True
 # Because of this, it's just gonna s up every state as an object instead of a class
 states = {}
 state = "title"
-states["play"] = all_states.Play(window=window)
+states["play"] = all_states.Play(window=window,border=border)
 states["options"] = options.State(window=window,border=border)
-states["pause"] = all_states.Pause(window=window,play_state=states["play"]) 
 states["title"] = all_states.Title(window=window,border=border)
-# states["gameover"] = all_states.GameOver(window=window,play_state=states["play"])
-# states["advance"] = all_states.Advance(window=window,play_state=states["play"])
-# states["boss"] = all_states.Boss(play_state=states["play"])
-# states["tutorial"] = all_states.Tutorial(window=window) Part 2 - Removing the Tutorial
 
 #07/23/2023 - SWITCHING STATES
 # States have an issue now where, since they are all initialized at startup, some things that should only be run when the state *actually* starts still appears.
@@ -56,11 +51,6 @@ def state_switch(
         cur_state.on_end(); cur_state.next_state = None #resetting next state
         cur_state = states[state.lower()] #switching state
         cur_state.on_start() #telling state it's been started
-
-    elif type(state) == tuple and (type(state[0]) == str and state[0].lower() in states.keys()):
-        cur_state.on_end(); cur_state.next_state = None
-        cur_state = states[state[0].lower()]
-        cur_state.on_start(return_state = state[1])
     else:
         global run
         run = False
@@ -79,21 +69,17 @@ freeze = False
 while run:
 
     #filling the screen in case something is offscreen
-    # window.fill(defaultcolor)
+    window.fill(defaultcolor)
     #06/23/2023 - drawing border to window 
-    border.update_values(score=states['play'].player.coins,lives=states['play'].player.health)
+    border.update_gameinfo(states["play"].player)
     border.draw(window)
     
 
     #event handler
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            if tools.demo:
-                pass
-                # print("haha")
-            else:
-                run = False
-                # print("false")
+            run = False
+            # print("false")
         if event.type == pygame.KEYDOWN:
             #DEBUG - max FPS
             if event.key == pygame.K_1:
@@ -126,6 +112,9 @@ while run:
 
 
     
+# saving score
+score.save_scores()
 
+# ending
 pygame.quit()
 exit()

@@ -44,12 +44,12 @@ class Shop(pygame.sprite.Sprite):
 
         # image and rect codes. This is because the gameplay is initiated by the play state, and has multiple sprite values to handle the images.
         # If I go back to optimize this game, for instance, the gameplay background will also be a sprite
-        self.image = pygame.Surface(size=(400,400))
+        self.image = pygame.Surface(size=(400,400)).convert_alpha()
         self.rect = self.image.get_rect()
 
 
         # if the shop is marked as "active", gameplay pauses and draws this sprite
-        self.active = True
+        self.active = False
         # the index for what item you are on. this them moves the self.sprite_cursor to graphically show everything
         self.index=9999
         self.cur_price=0 
@@ -91,7 +91,7 @@ class Shop(pygame.sprite.Sprite):
 
 
         # CREATING A NEW SHOP INSTANCE, SO THIS IS USABLE ON STARTUP. I KNOW ITS WASTEFUL BUT I DONT CARE ITS RUN ONCE
-        self.new_shop()
+        self.start(False)
 
 
     def update(self):
@@ -230,9 +230,9 @@ class Shop(pygame.sprite.Sprite):
         # print(self.player.coins)
 
     # STARTUP CODE
-    def new_shop(self):
-        self.active = True # it auto activates itself
-        psong("meowchill.mp3")
+    def start(self,active:bool=True):
+        self.active = active # it auto activates itself
+        if active: psong("meowchill.mp3")
         self.sprite_shopkeep.aimg.change_anim("happy")
         self.new_shop_items()
         self.set_info()

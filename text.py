@@ -1,6 +1,7 @@
 # ANDREW CHURCH - 2023
 import pygame,math,json
 pygame.font.init()
+terminalfont_50 = pygame.font.Font("./data/font.ttf",50)
 terminalfont_30 = pygame.font.Font("./data/font.ttf",30)
 terminalfont_20 = pygame.font.Font("./data/font.ttf",20)
 terminalfont_10 = pygame.font.Font("./data/font.ttf",10)
@@ -83,10 +84,13 @@ def load_text(
 
 class AutoNum():
     #a modification of AutoImage that exclusively handles numbers.
-    def __init__(self,text:any,host:pygame.sprite.Sprite = None,make_host_rect:bool=False,font:pygame.font.Font=terminalfont_30):
+    def __init__(self,text:any,host:pygame.sprite.Sprite = None,make_host_rect:bool=False,font:pygame.font.Font=terminalfont_30,resize=None):
         #loading text
         self.cur = str(text) 
         self.image = font.render(self.cur,False,"white","black")
+        self.resize = resize
+        if self.resize is not None:
+            self.image=pygame.transform.scale(self.image,self.resize)
         self.mask = pygame.mask.from_surface(self.image)
         self.font = font
         #host information
@@ -110,6 +114,8 @@ class AutoNum():
         if str(text) != self.cur:
             #changing it
             self.image = self.font.render(text,False,"white","black")
+            if self.resize is not None:
+                self.image=pygame.transform.scale(self.image,self.resize)
             if self.hashost:
                 self.host.image = self.image
                 #saving

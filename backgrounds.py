@@ -8,13 +8,12 @@ import pygame,anim,options
 class Background():
 
 
-    def __init__(self,img:str,resize:list,speed:list,border_size:tuple=pygame.display.play_dimensions,**kwargs):
+    def __init__(self,img:str,resize:list,speed:list,**kwargs):
         # It stores an image, a position tuple, and a speed tuple
         self.aimg = anim.AutoImage(host=self,name=img,resize=resize)
         self.size = [self.image.get_width(),self.image.get_height()]
         self.pos = [0,0]
         self.speed = speed[:]
-        self.border = (self.image.get_width(),self.image.get_height())
 
 
 
@@ -41,14 +40,13 @@ class Background():
             self.duplicates(window,pos=self.pos,force=force)
 
 
-    def change(self,img,resize,speed,border_size:tuple=pygame.display.play_dimensions):
+    def change(self,img,resize,speed):
         # It stores an image, a position tuple, and a speed tuple
         self.image = anim.all_loaded_images[img]
         self.image = pygame.transform.scale(self.image,resize)
         self.size = resize.copy()
         self.pos = [0,0]
         self.speed = speed.copy()
-        self.border = border_size
 
 
     def duplicates(self,window:pygame.display,pos:tuple=None,force:bool=False):

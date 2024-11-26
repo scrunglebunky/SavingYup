@@ -1,7 +1,7 @@
 #Program by Andrew Church 5/26/23
 import pygame,audio,tools,random, math
+import gameplay_log as log
 from anim import AutoImage as AImg
-from tools import world_log as wl
 from math import sin,cos,radians,degrees,atan2
 # from enemies import Template as enemytemplate
 
@@ -37,6 +37,9 @@ class BulletRAW(pygame.sprite.Sprite):
         # placing self
         self.start_pos = start_pos
         self.rect.center = start_pos
+
+        #updating log that a bullet was shot
+        log.log_zone["shots"] += 1
     
     def update(self):
         self.aimg.update()
@@ -62,7 +65,7 @@ class BulletRAW(pygame.sprite.Sprite):
         if self.health <= 0:
             for i in range(5):self.sprite_groups[0].add(BulletParticle(self.rect.center))
             #updating the 'hits' counter. this means that the accuracy is different from the kills
-            wl['hits'] += 1
+            log.log_zone['hits'] += 1
             # audio.play_sound("smallboom0.wav")
 
 

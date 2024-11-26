@@ -65,13 +65,14 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
         - [ ] "event.NewLevel" will flash a bunch of text saying how you completed a level and adding some score bonuses
         - [ ] "event.NewWorld" does the same thing.
     4. OPTIMIZE WHAT WAS ALREADY THERE
-        1. [ ] Adding the GameOver/highscore state back.
+        1. [x] Adding the GameOver/highscore state back.
             - The old one was too complicated and convoluted.
             - It just flashes the game over screen, and if you got a high score it prompts you to type your name. 
-        2. [ ] Optimize the title screen
+        2. [x] Optimize the title screen
             - I made emblems.
             - Emblems should be used, not some crappy dictionary thing.
-        3. [ ] FIX THE UI BORDER
+            - Not gonna lie it looks bad but thats intentional
+        3. [x] FIX THE UI BORDER
             - THIS ONE IS ALSO LAME
             - IT SHOULD JUST BE PASSED THE PLAYER CLASS AND DRAW IMAGES AND MAKE EMBLEMS
             - Change the images too

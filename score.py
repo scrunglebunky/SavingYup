@@ -1,5 +1,5 @@
 #Code by Andrew Church
-import json,pygame,text
+import json,pygame,text,random
 from anim import all_loaded_images as img
 
 #07/29/2023 - Keeping track of the high scores, and then creating individual scores and a full scoreboard image
@@ -35,26 +35,37 @@ def organize_scores(scores:list) -> list:
 scores = organize_scores(scores)
 
 #saving scores
-def save_scores(scores:list) -> None:
+def save_scores(scores:list=scores) -> None:
     with open("./data/scores.json","w") as raw:
         raw.write(json.dumps(scores))
 
+#seeing if a score got in or not
+def check_score(score:int,scores:list = scores) -> bool:
+    if len(scores) < 10:
+        return True
+    else:
+        return score > scores[0][1] 
+
 #adding score
-def add_score(scores:list,score:int,name:str) -> list:
+def add_score(score:int,scores:list=scores,name:str="YUP!",save=False) -> list:
     scores.append([name,score])
     scores=organize_scores(scores)
+    if save:
+        save_scores(scores)
     return scores
+
+
 
 
 #full package
 def test() -> bool:
-    try:
-        s:dict = reload_scores()
-        s:dict = organize_scores(s)
-        save_scores(s)
-        return True
-    except:
-        return False
+    s:dict = reload_scores()
+    for i in range(10):
+        s = add_score(random.randint(0,100000),scores=s)
+    s:dict = organize_scores(s)
+    save_scores(s)
+    return True
+
 
 
 ############ THE GRAPHICS
@@ -76,13 +87,12 @@ def regenerate_graphics():
     for score in scores:
         scores_graphics.append(generate_graphic(score[1],score[0]))
     return scores_graphics
-scores_graphics = regenerate_graphics()
 
 #generating a full scoreboard image
-def generate_scoreboard(scores_graphics:list = scores_graphics, do_regenerate_graphics:bool=True) -> pygame.Surface:
+def generate_scoreboard() -> pygame.Surface:
     full = pygame.Surface((400,600),pygame.SRCALPHA,32).convert_alpha()
     full.blit(img["high_scores.png"],(0,0))
-    if do_regenerate_graphics: scores_graphics = regenerate_graphics()
+    scores_graphics = regenerate_graphics()
     for i in range(len(scores_graphics)):
         full.blit(scores_graphics[(len(scores_graphics)-1)-i],(75,150+40*i))
     return full

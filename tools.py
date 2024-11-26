@@ -158,10 +158,3 @@ demo = False
 debug = False
 
 
-#global logs
-log = {"kills":0,"got_away":0,"shots":0,"hits":0,"damage":0}
-world_log = log.copy()
-def update_log():
-    for k,v in world_log.items():
-        log[k] = world_log[k]
-        world_log[k] = 0

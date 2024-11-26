@@ -8,44 +8,55 @@ import json,text,pygame,random,audio,tools
 # The config.json file is a dictionary containing info about how the game works
 # This file is needed, though there is a default dictionary held here 
 # This is held in the options file instead of MAIN, so all items can access it
-settingsDEFAULT = {
-    "fullscreen":["switch",False],
-
-    "mute":["switch",False],
-    "music_vol":["knob",0.5,0.05],
-    "sound_vol":["knob",0.5,0.05],
-
-    "screen_width":["knob",900,5],
-    "screen_height":["knob",675,5],
-    "gameplay_width":["knob",450,5],
-    "gameplay_height":["knob",600,5],
-
-    "moving_backgrounds":["switch",True]
+settingsDEFAULT = {   
+    "fullscreen": ["switch", False], 
+    "mute": ["switch", False], 
+    "music_vol": ["knob", 0.5, 0.05], 
+    "sound_vol": ["knob", 0.5, 0.05], 
+    # "screen_width": ["knob", 800, 5], 
+    # "screen_height": ["knob", 600, 5], 
+    # "gameplay_width": ["knob", 450, 5], 
+    # "gameplay_height": ["knob", 600, 5], 
+    "high_resolution": ["switch",False],
+    # "moving_backgrounds": ["switch", True]}
 }
+# (800,800) (600,800)
+# (800,600) (450,600)
 # loading in the file
 with open("./data/config.json","r") as set_raw:
     settings = settingsDEFAULT.copy()
     settings.update(json.load(set_raw)) #this then merges all settings with the default settings
 del set_raw
 
-pygame.display.dimensions = (settings["screen_width"][1],settings["screen_height"][1]) 
-pygame.display.play_dimensions_resize = (settings["gameplay_width"][1],settings["gameplay_height"][1])
-pygame.display.set_mode(pygame.display.dimensions, pygame.SCALED)
+print(settings)
 
-#07/13/2023 - finishing the rest of the imports now that the settings are complete
-import anim
+# pygame.display.dimensions = (settings["screen_width"][1],settings["screen_height"][1]) 
+# pygame.display.play_dimensions_resize = (settings["gameplay_width"][1],settings["gameplay_height"][1])
+# pygame.display.set_mode(pygame.display.dimensions, pygame.SCALED)
+
 
 #07/13/2023 - This actually applies the settings 
 def apply_settings(border = None):
     # NOW LISTEN.
     #   THIS IS COOL AND ALL.
     #   BUT THIS ADDS UNNECESSARY DEPTH TO WHAT WAS A SMALL PROJECT.
-    #   SO THERE WILL BE VOLUME AND SOME OTHER STUFF, BUT THE RESOLUTION STAYS.
+    #   SO THERE WILL BE VOLUME AND SOME OTHER STUFF, BUT THE RESOLUTION STAYS THE SAME.
     #display
-    pygame.display.dimensions = (settings["screen_width"][1],settings["screen_height"][1]) 
-    pygame.display.play_dimensions_resize = (settings["gameplay_width"][1],settings["gameplay_height"][1])
+    if settings["high_resolution"] == True: 
+        pygame.display.dimensions = (1000,800)
+        pygame.display.play_dimensions_resize = (600,800)
+        print('hi-res set')
+    else: 
+        pygame.display.dimensions = (720,640)
+        pygame.display.play_dimensions_resize = (450,600)
+        print('low-res set')
+
     # print(pygame.display.dimensions)
-    pygame.display.set_mode(pygame.display.dimensions, pygame.SCALED if not settings['fullscreen'][1] else pygame.FULLSCREEN|pygame.SCALED)
+    if settings['fullscreen'][1]:
+        pygame.display.set_mode(pygame.display.dimensions,pygame.FULLSCREEN|pygame.SCALED)
+    else:
+        pygame.display.set_mode(pygame.display.dimensions)
+
     #sounds
     audio.change_volumes(ostvol = settings["music_vol"][1] , soundvol = settings["sound_vol"][1])
     if settings["mute"][1]: audio.change_volumes(ostvol = 0 , soundvol = 0)
@@ -57,6 +68,8 @@ def apply_settings(border = None):
 
 apply_settings()
 
+#07/13/2023 - finishing the rest of the imports now that the settings are complete
+import anim
 
 #SETTINGS (KNOB) INDEX MEANINGS:
 # [type,current_setting,iteration_amount,min,max]
