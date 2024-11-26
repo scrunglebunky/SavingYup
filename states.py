@@ -15,6 +15,7 @@ from player import PlayerDummy as PD
 from levels import worlds 
 from menu_gameplay import GamePlay as GP
 from menu_gameover import GameOver as GO
+from menu_pause import Pause
 
 winrect = pygame.display.rect
 height,width = winrect.height,winrect.width
@@ -85,12 +86,20 @@ class Play(Template):
         self.gameover = GO(self)
         self.gameover.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 
+        #creating a PAUSE asset
+        self.pause = Pause(self)
+        self.pause.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 
     def update(self, draw=True):
+        ### INTERRUPT CODE -- PAUSING
+        if self.pause.active:
+            self.pause.update()
+            self.window.blit(self.pause.image,self.pause.rect)
+            return
+
         ### INTERRUPT CODE -- THE GAMEOVER
         if self.gameover.active:
             self.gameover.update()
-            self.window.blit(pygame.transform.scale(self.gameplay.image,pygame.display.play_dimensions_resize),self.gameplay.rect)
             self.window.blit(self.gameover.image,self.gameover.rect)
             return
 
@@ -98,7 +107,6 @@ class Play(Template):
         if self.shop.active:
             self.shop.update()
             # note that it re-draws the gameplay window for pretty much a special effect, and then draws the shop over it.
-            self.window.blit(pygame.transform.scale(self.gameplay.image,pygame.display.play_dimensions_resize),self.gameplay.rect)
             self.window.blit(self.shop.image,self.shop.rect)
             # ending -- because the shop pauses
             return
@@ -126,9 +134,14 @@ class Play(Template):
 
 
     def event_handler(self,event):
+        # INTERRUPT CODE -- PAUSE.ACTIVE
+        if self.pause.active:
+            self.pause.event_handler(event)
+            return
         # INTERRUPT CODE -- GAMEOVER.ACTIVE
         if self.gameover.active:
             self.gameover.event_handler(event)
+            return
         # INTERRUPT CODE -- SHOP.ACTIVE
         if self.shop.active:
             self.shop.event_handler(event)

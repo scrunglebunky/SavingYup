@@ -273,3 +273,8 @@ class GamePlay(pygame.sprite.Sprite):
 
     def event_handler(self,event):
         self.player.controls(event)
+        match event.type:
+            case pygame.KEYDOWN:
+                match event.key:
+                    case pygame.K_ESCAPE:
+                        self.playstate.pause.start()
