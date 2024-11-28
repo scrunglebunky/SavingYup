@@ -236,6 +236,8 @@ class Shop(pygame.sprite.Sprite):
         self.sprite_shopkeep.aimg.change_anim("happy")
         self.new_shop_items()
         self.set_info()
+        self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
+
 
     # STARTUP CODE - SETTING THE ITEMS UP FOR SALE
     def new_shop_items(self):

@@ -39,6 +39,9 @@ class GameOver(pygame.sprite.Sprite):
         log.log_push()
         self.generate_resultsheet()
         self.displayed = "" 
+        # positioning 
+        self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
+
 
     def update(self):
         # updating/displaying sprites

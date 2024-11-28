@@ -58,13 +58,7 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
             - different idle state
         - Note that the formation handles bosses as just another enemy in the formation.
             - It checks if the enemy dies, and then updates for a new formation
-    3. [ ] Graphical effects
-        - Little tidbits and EVENTS will play for every new level, new world, etc.
-        - These will not freeze the game and will happen rather smoothly.
-        - [ ] "event.NewBG" will make the bg fall down and bounce to replace the old bg
-        - [ ] "event.NewLevel" will flash a bunch of text saying how you completed a level and adding some score bonuses
-        - [ ] "event.NewWorld" does the same thing.
-    4. OPTIMIZE WHAT WAS ALREADY THERE
+    3. OPTIMIZE WHAT WAS ALREADY THERE
         1. [x] Adding the GameOver/highscore state back.
             - The old one was too complicated and convoluted.
             - It just flashes the game over screen, and if you got a high score it prompts you to type your name. 
@@ -76,4 +70,19 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
             - THIS ONE IS ALSO LAME
             - IT SHOULD JUST BE PASSED THE PLAYER CLASS AND DRAW IMAGES AND MAKE EMBLEMS
             - Change the images too
+            - actually this is just going to become a menu sprite like the other ones
 - However, I will not be doing this right now. The game will stay in this unfinished, technically-playable state for another week or so now.
+
+
+
+# DOCUMENTING WHAT I'VE BEEN DOING
+## ENEMY/BG UNLOCKING
+- World data no longer exists
+- The gameplay assets only have lists of unlocked enemies/BGs/start patterns
+- This is handled through a class filled with static methods known as Info
+## MENU ASSETS
+- I got rid of a majority of the "states" and replaced them with "MENU" assets
+- These "menu" assets are pygame.sprite.Sprite(s) that handle everything themselves and leave the play state to just hold them
+- Doing this, the amount of needed states has been dropped down to just Title and Play.
+- advance, gameover, gameplay, lore, options, pause, and shop are all menu assets, handled entirely through playstate
+## BOSSES

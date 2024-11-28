@@ -10,7 +10,7 @@ defaultcolor = "#000000"
 window = pygame.display.get_surface() 
 pygame.display.rect = pygame.display.get_surface().get_rect()
 pygame.display.play_pos = 20,20
-pygame.display.play_dimensions = 600,800 #oh cool, I can make a self variable in the pygame.display. hot.
+pygame.display.play_dimensions = 600,800 #oh cool, I can make a self variable in the pygame.display.
 pygame.display.play_rect = pygame.Rect(0,0,pygame.display.play_dimensions[0],pygame.display.play_dimensions[1])
 pygame.display.set_caption("YUP RevD")
 
@@ -20,7 +20,6 @@ universal_sprite_group = pygame.sprite.Group() #This used to be a dictionary use
 #06/01/20 23 - IMPORTING GAME-RELATED STUFF NEEDED AFTER ALL IS SET UP
 import options,score,ui_border,score,anim
 import states as all_states
-
 #06/22/2023 - SETTING BORDER IMAGE / SPRITESHEET
 border = ui_border.Border(window=window)
 
@@ -33,7 +32,6 @@ tools.debug = True
 states = {}
 state = "title"
 states["play"] = all_states.Play(window=window,border=border)
-states["options"] = options.State(window=window,border=border)
 states["title"] = all_states.Title(window=window,border=border)
 
 #07/23/2023 - SWITCHING STATES

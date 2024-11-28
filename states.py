@@ -3,7 +3,6 @@ import menu_shop as shop
 from anim import all_loaded_images as img
 from anim import WhiteFlash
 from text import display_numbers as dn
-from text import text_list as tl
 from backgrounds import Background as Bg
 from backgrounds import Floor as Fl
 from emblems import Emblem as Em
@@ -16,6 +15,8 @@ from levels import worlds
 from menu_gameplay import GamePlay as GP
 from menu_gameover import GameOver as GO
 from menu_pause import Pause
+from menu_options import Options
+from menu_lore import Lore
 
 winrect = pygame.display.rect
 height,width = winrect.height,winrect.width
@@ -80,17 +81,27 @@ class Play(Template):
 
         #Creating a SHOP ASSET
         self.shop = shop.Shop(player=self.player) if oldshop is None else oldshop
-        self.shop.rect.center =  (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 
         #Creating a GAMEOVER asset
         self.gameover = GO(self)
-        self.gameover.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 
         #creating a PAUSE asset
         self.pause = Pause(self)
-        self.pause.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
+
+        #creating a OPTIONS asset
+        self.options = Options(self)
+        
+        #creating a LORE asset, which will only start when the game first starts
+        self.lore = Lore(self)
+        self.lore.active = True
 
     def update(self, draw=True):
+        ### INTERRUPT CODE -- OPTIONS MENU
+        if self.options.active:
+            self.options.update()
+            self.window.blit(self.options.image,self.options.rect)
+            return
+
         ### INTERRUPT CODE -- PAUSING
         if self.pause.active:
             self.pause.update()
@@ -101,6 +112,12 @@ class Play(Template):
         if self.gameover.active:
             self.gameover.update()
             self.window.blit(self.gameover.image,self.gameover.rect)
+            return
+
+        ### INTERRUPT CODE -- THE LORE SCREEN
+        if self.lore.active:
+            self.lore.update()
+            self.window.blit(self.lore.image,self.lore.rect)
             return
 
         ### INTERRUPT CODE -- THE SHOP 
@@ -134,6 +151,10 @@ class Play(Template):
 
 
     def event_handler(self,event):
+        # INTERRUPT CODE -- OPTIONS.ACTIVE
+        if self.options.active:
+            self.options.event_handler(event)
+            return
         # INTERRUPT CODE -- PAUSE.ACTIVE
         if self.pause.active:
             self.pause.event_handler(event)
@@ -141,6 +162,10 @@ class Play(Template):
         # INTERRUPT CODE -- GAMEOVER.ACTIVE
         if self.gameover.active:
             self.gameover.event_handler(event)
+            return
+        # INTERRUPT CODE -- LORE.ACTIVE
+        if self.lore.active:
+            self.lore.event_handler(event)
             return
         # INTERRUPT CODE -- SHOP.ACTIVE
         if self.shop.active:

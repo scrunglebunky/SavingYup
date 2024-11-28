@@ -13,7 +13,7 @@ from backgrounds import Background as Bg
 class Pause(pygame.sprite.Sprite):
     sprites = pygame.sprite.Group()
     bg = Bg("bgPAUSE",resize=(400,400),speed=(1,1))
-    spr_text = TEm("PAUSED\nPRESS ESC TO UNPAUSE\nX FOR OPTIONS\nC TO QUIT",font=text.terminalfont_20,hide=False)
+    spr_text = TEm("PAUSED\nESC: UNPAUSE\nX: OPTIONS\nC: QUIT",font=text.terminalfont_20,hide=False)
     spr_pauseplayer = Em("pauseplayer",coord=(200,200),isCenter=True)
     sprites.add(spr_text,spr_pauseplayer)
 
@@ -34,6 +34,7 @@ class Pause(pygame.sprite.Sprite):
 
     def start(self):
         self.active = True
+        self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 
     def event_handler(self,event):
         match event.type:
@@ -42,6 +43,6 @@ class Pause(pygame.sprite.Sprite):
                     case pygame.K_ESCAPE:
                         self.active = False
                     case pygame.K_x:
-                        self.playstate.settings.start()
+                        self.playstate.options.start()
                     case pygame.K_c:
                         self.playstate.end()

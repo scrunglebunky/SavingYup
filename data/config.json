@@ -1,1 +1,1 @@
-{"fullscreen": ["switch", false], "mute": ["switch", false], "music_vol": ["knob", 0.5, 0.05], "sound_vol": ["knob", 0.5, 0.05], "high_resolution": ["switch", true]}
+{"fullscreen": ["switch", false], "mute": ["switch", false], "music_vol": ["knob", 0.5, 0.05], "sound_vol": ["knob", 0.5, 0.05], "high_resolution": ["switch", false]}
