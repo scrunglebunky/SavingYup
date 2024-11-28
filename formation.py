@@ -122,7 +122,7 @@ class Formation():
         elif self.difficulty <= 10:
             self.timer['atk'] = 10 - (self.difficulty - 8)*1
         self.timer['atk'] = (100 - (self.difficulty*4)) if self.difficulty < 25 else 1
-        print(self.timer["atk"])
+        print(self.difficulty,self.timer["atk"])
         #timer["atk"] = how often enemies are thrown down to attack #goes down a frame every level
         #max_enemies = how many enemies can be down at a time, goes up by 1 every 5 levels
         

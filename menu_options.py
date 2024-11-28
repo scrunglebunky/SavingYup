@@ -1,4 +1,4 @@
-import options,pygame,anim,text
+import options,pygame,anim,text,random
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
@@ -8,7 +8,7 @@ from backgrounds import Background as Bg
 class Options(pygame.sprite.Sprite):
     # sprite stuff
     sprites = pygame.sprite.Group()
-    bg = Bg("bgOPTIONS",resize=(400,400),speed=(-1,1))
+    bg = Bg("bgOPTIONS",resize=(400,400),speed=(0,0))
     spr_title = TEm("OPTIONS MENU",coord=(200,20),isCenter=True,pattern="jagged")
     spr_cursor = TEm("<",coord=(0,0))
     spr_guide = TEm("ARROW KEYS TO SET\nZ: APPLY\nX: DEFAULTS\nESC: LEAVE",coord=(0,300),font=text.terminalfont_20)

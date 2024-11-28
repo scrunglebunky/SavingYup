@@ -6,7 +6,8 @@ from audio import play_sound as psound
 from audio import play_song as psong
 from backgrounds import Floor as Fl
 import gameplay_log as log
-
+from bullets import LOADED as bulletloaded
+from anim import AutoImage as AImg
 
 
 
@@ -116,7 +117,9 @@ class Info():
 
     
 
-
+# WHAT IS THIS DOING?
+# I have moved everything that involves gameplay into this one simple sprite
+# This handles everything, and lets playstate know when to open another menu asset
 class GamePlay(pygame.sprite.Sprite):
     sprites = { #sprites are now state-specific hahaha
             0:pygame.sprite.Group(), #ALL SPRITES
@@ -250,6 +253,12 @@ class GamePlay(pygame.sprite.Sprite):
 
     
     def new_level(self):
+        # new zone info. If there is a new zone, it does this first.
+        if self.level%5 == 0:
+            self.new_zone()
+        elif self.level in (1,2,3):
+            self.new_zone(False)
+            
         # updating level and difficulty info
         self.level += 1
         self.difficulty = 1 + self.level / 5        
@@ -263,10 +272,7 @@ class GamePlay(pygame.sprite.Sprite):
         #resetting the level timer
         self.leveltimer = 0 
 
-        if self.level%5 == 0:
-            self.new_zone()
-        elif self.level in (1,2,3):
-            self.new_zone(False)
+        
 
     def start(self):
         self.active = True
@@ -278,3 +284,105 @@ class GamePlay(pygame.sprite.Sprite):
                 match event.key:
                     case pygame.K_ESCAPE:
                         self.playstate.pause.start()
+
+
+
+
+# WHAT IS **THIS** DOING?
+# This pretty much does the job of what the UI_Border did, in terms of displaying ui elements like items and such
+# It was genuinely pointless to put those into the window itself, instead of being inside another image like this.
+class GamePlayUI(pygame.sprite.Sprite):
+    sprites = pygame.sprite.Group()
+    width,height=300,500
+
+    spr_logo =  Em(im = "logo.png",coord = (0,0))
+    sprites.add(spr_logo)
+
+    spr_coins = Em(im="ui_coins.png", coord = (0,100))
+    spr_coins_text = TEm(txt="$0",coord=(64,spr_coins.coord[1]+32),font = text.terminalfont_30)
+    sprites.add(spr_coins,spr_coins_text)
+
+    spr_lives = Em(im="ui_lives.png",coord=(0,175))
+    spr_lives_text = TEm(txt="0",coord=(64,spr_lives.coord[1]+32),font=text.terminalfont_30)
+    sprites.add(spr_lives,spr_lives_text)
+
+    spr_weapon = Em(im="ui_weapon.png",coord=(0,250),resize=(64,64))
+    spr_weapon_current = Em("NONERN",coord=spr_weapon.coord,resize=(64,64))
+    sprites.add(spr_weapon,spr_weapon_current)
+
+    spr_dmg = Em(im="icon_dmgup.png",coord=(0,325),resize=(32,32))
+    spr_dmg_text = TEm(txt="0",coord=(32,spr_dmg.coord[1]),font=text.terminalfont_20)
+    sprites.add(spr_dmg,spr_dmg_text)
+
+    spr_shootrate = Em(im="icon_shootrateup.png",coord=(0,355),resize=(32,32))
+    spr_shootrate_text = TEm(txt="0",coord=(32,spr_shootrate.coord[1]),font=text.terminalfont_20)
+    sprites.add(spr_shootrate,spr_shootrate_text)
+
+    spr_maxbullets = Em(im="icon_maxbulletup.png",coord=(0,385),resize=(32,32))
+    spr_maxbullets_text = TEm(txt="0",coord=(32,spr_maxbullets.coord[1]),font=text.terminalfont_20)
+    sprites.add(spr_maxbullets,spr_maxbullets_text)
+
+    spr_rocketboots = Em(im="icon_rocketbootperk.png",coord=(0,415),resize=(32,32),hide=True)
+    spr_rocketboots_text = TEm(txt="0",coord=(32,spr_rocketboots.coord[1]),font=text.terminalfont_20,hide=True)
+    sprites.add(spr_rocketboots,spr_rocketboots_text)
+
+    spr_magnet = Em(im="icon_magnetperk.png",coord=(0,445),resize=(32,32),hide=True)
+    sprites.add(spr_magnet)
+
+
+    
+    # invididual sprite images to show upgrades, which are all shrunk down.
+    icon_rocketboots = AImg(name="icon_rocketboots.png",resize=(32,32)).image 
+    icon_dmgup = AImg(name="icon_dmgup.png",resize=(32,32)).image 
+    icon_shootrateup = AImg(name="icon_dmgup.png",resize=(32,32)).image 
+
+    def __init__(self,playstate):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((GamePlayUI.width,GamePlayUI.height)).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.playstate = playstate #pulls player info from playstate
+        self.gameplay:GamePlay = self.playstate.gameplay #the gameplay sprite
+        self.player = self.gameplay.player #the player from gameplay
+        self.active = False #this isn't used however i am keeping it here for yada yada parent class stuff.
+
+    def update(self):
+        self.image.fill("#7f7fff")
+        self.update_gameinfo()
+        GamePlayUI.sprites.update()
+        GamePlayUI.sprites.draw(self.image)
+
+    def event_handler(self,event):
+        ...
+
+    def update_gameinfo(self):
+        GamePlayUI.spr_coins_text.update_text(str(self.player.coins))
+        GamePlayUI.spr_lives_text.update_text(str(self.player.health))
+        GamePlayUI.spr_dmg_text.update_text("x"+str(self.player.bullet_dmg))
+        GamePlayUI.spr_maxbullets_text.update_text("x"+str(self.player.bullet_max))
+        GamePlayUI.spr_shootrate_text.update_text(str(round((60/(self.player.bullet_time if self.player.bullet_time > 0 else 1)),2))+" DPS")
+        GamePlayUI.spr_rocketboots_text.update_text("x"+str(self.player.perks['rocketboots']))
+        #changing spr_weapon_current ONLY IF it has changed
+        if bulletloaded[self.player.current_bullet].icon != GamePlayUI.spr_weapon_current.aimg.name:
+            GamePlayUI.spr_weapon_current.aimg.__init__(host=GamePlayUI.spr_weapon_current,name=bulletloaded[self.player.current_bullet].icon,resize=(64,64))
+        #rocketboots sprite
+        if self.player.perks['rocketboots'] > 0:
+            GamePlayUI.spr_rocketboots.hide = GamePlayUI.spr_rocketboots_text.hide = False
+        #magnet sprite
+        if self.player.perks['magnet'] is not False:
+            GamePlayUI.spr_magnet.hide = False
+
+        # this is more basic info of the placement of the rect but i think it fits here too
+        # repositioning if the game resolution has changed
+        if self.rect.left != pygame.display.play_dimensions_resize[0]+16:
+            self.rect.left = pygame.display.play_dimensions_resize[0]+16
+
+    def draw_nonsprite_gameinfo(self):
+        #this draws things like upgrades, shootrate, damage purchases, etc
+        if self.player.perks['rocketboots'] > 0:
+            ...
+
+    def start(self):
+        self.active = True
+        self.rect.left = pygame.display.play_dimensions_resize[0]+16
+
+    

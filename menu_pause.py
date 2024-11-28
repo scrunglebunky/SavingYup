@@ -1,5 +1,5 @@
 # DO LATER
-import pygame,text
+import pygame,text,random,audio
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
@@ -14,7 +14,7 @@ class Pause(pygame.sprite.Sprite):
     sprites = pygame.sprite.Group()
     bg = Bg("bgPAUSE",resize=(400,400),speed=(1,1))
     spr_text = TEm("PAUSED\nESC: UNPAUSE\nX: OPTIONS\nC: QUIT",font=text.terminalfont_20,hide=False)
-    spr_pauseplayer = Em("pauseplayer",coord=(200,200),isCenter=True)
+    spr_pauseplayer = Em("pauseplayer.png",coord=(200,200),isCenter=True)
     sprites.add(spr_text,spr_pauseplayer)
 
     def __init__(self,playstate):
@@ -35,6 +35,7 @@ class Pause(pygame.sprite.Sprite):
     def start(self):
         self.active = True
         self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
+        audio.play_song("kurosaki.mp3")
 
     def event_handler(self,event):
         match event.type:

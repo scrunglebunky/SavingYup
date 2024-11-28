@@ -45,6 +45,10 @@ def apply_settings(border = None):
     else:
         pygame.display.set_mode(pygame.display.dimensions)
 
+    # resetting pygame.display rect info
+    pygame.display.rect = pygame.display.get_surface().get_rect()
+
+
     #sounds
     audio.change_volumes(ostvol = settings["music_vol"][1] , soundvol = settings["sound_vol"][1])
     if settings["mute"][1]: audio.change_volumes(ostvol = 0 , soundvol = 0)

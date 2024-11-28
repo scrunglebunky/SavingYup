@@ -1,4 +1,4 @@
-import options,pygame,anim,text
+import options,pygame,anim,text,random
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
@@ -7,16 +7,15 @@ class Lore(pygame.sprite.Sprite):
     #same sprite group stuff
     sprites = pygame.sprite.Group()
     spr_text = TEm("BASE DIALOG",coord=(0,250))
-    spr_images = Em("loreimages",coord=(0,0),resize=(400,250))
+    spr_images = Em("loreimages",coord=(0,0),resize=(400,250),current_anim="0")
     sprites.add(spr_images,spr_text)
     #lore/text info
     textlist = [
-        "THE EVIL NOPES\nARE TRYING TO TAKE OVER\n THE YUP'S HOME PLANET",
-        "YUP SEES THEM OUT\nOF HER HOUSE AND IS LIKE\n WOW I NEED TO STOP THAT",
+        "THE EVIL NOPES\nARE TRYING TO TAKE OVER","THE YUP'S HOME PLANET",
+        "YUP SEES THEM OUT\nOF HER HOUSE AND IS LIKE","\n \"WOW I NEED TO STOP THAT\"",
         "SHE BLASTS OFF\nEQUIPPED WITH HER YUP GUN\nREADY TO DEFEND",
         "ITS UP TO YOU\nTO KILL THEM.\nGO!!!!!!!!!!!",
     ]
-
 
     def __init__(self,playstate):
         pygame.sprite.Sprite.__init__(self)
@@ -38,7 +37,7 @@ class Lore(pygame.sprite.Sprite):
         Lore.sprites.draw(self.image)
 
     def start(self):
-        self.__init__()
+        self.__init__(self.playstate)
         self.active = True
         self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 

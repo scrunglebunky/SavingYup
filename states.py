@@ -13,6 +13,7 @@ from math import sin
 from player import PlayerDummy as PD
 from levels import worlds 
 from menu_gameplay import GamePlay as GP
+from menu_gameplay import GamePlayUI as GPUI
 from menu_gameover import GameOver as GO
 from menu_pause import Pause
 from menu_options import Options
@@ -76,8 +77,10 @@ class Play(Template):
 
         #Creating a GAMEPLAY ASSET, which holds all GAMEPLAY INFO in a SPRITE
         self.gameplay = GP(self)
+        self.gameplayui = GPUI(self)
         self.player = self.gameplay.player
         self.gameplay.start()
+        self.gameplayui.start()
 
         #Creating a SHOP ASSET
         self.shop = shop.Shop(player=self.player) if oldshop is None else oldshop
@@ -93,7 +96,10 @@ class Play(Template):
         
         #creating a LORE asset, which will only start when the game first starts
         self.lore = Lore(self)
-        self.lore.active = True
+        self.lore.start()
+
+        #debug
+        # self.shop.start(True)
 
     def update(self, draw=True):
         ### INTERRUPT CODE -- OPTIONS MENU
@@ -132,22 +138,25 @@ class Play(Template):
         # RUNNING THE GAMEPLAY
         if self.gameplay.active:
             self.gameplay.update()
+            self.gameplayui.update()
             self.window.blit(pygame.transform.scale(self.gameplay.image,pygame.display.play_dimensions_resize),self.gameplay.rect)
+            self.window.blit(self.gameplayui.image,self.gameplayui.rect)
 
 
     def on_start(self,**kwargs):#__init__ v2, pretty much.
         # emptying the bulletmaximum and making sure the player knows which sprite groups to refer to 
         # self.player.sprite_groups = self.sprites
-        self.border.spr_logo.change_pos(pos = (pygame.display.play_dimensions_resize[0],winrect.height*0.05),isCenter=False)
-        self.border.change_vis(False)
-        eBM()
+        # self.border.spr_logo.change_pos(pos = (pygame.display.play_dimensions_resize[0],winrect.height*0.05),isCenter=False)
+        # self.border.change_vis(False)
+        # eBM()
+        ...
 
 
 
     def on_end(self,**kwargs): #un-init, kind of
         pygame.mixer.music.stop()
         # if tools.debug: print(self.debug.values())
-        eBM()
+        # eBM()
 
 
     def event_handler(self,event):
@@ -215,16 +224,17 @@ class Title(Template):
 
     def __init__(self,window:pygame.Surface,border): #Remember init is run only once, ever.
         self.window=window
-        self.border=border
+        # self.border=border
         self.next_state = None
         self.lifespan = 0
    
     
     def on_start(self):
         #self.demo_state.__init__(window = self.window, world = 1, level = random.randint(0,50), is_demo = True)
-        self.border.spr_logo.change_pos(pos = (winrect.centerx,winrect.height*0.1),isCenter=True)
-        self.border.change_vis(True,self.border.spr_logo)
-        self.border.spr_logo.hide = False
+        # self.border.spr_logo.change_pos(pos = (winrect.centerx,winrect.height*0.1),isCenter=True)
+        # self.border.change_vis(True,self.border.spr_logo)
+        # self.border.spr_logo.hide = False
+        ...
 
     def on_end(self):
         #this doesn't change the positioning of the icons or anything. It lets the other state, Play, handle it.

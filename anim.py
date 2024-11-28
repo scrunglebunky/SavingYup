@@ -260,7 +260,8 @@ class AutoImage():
                 current_anim:str='idle',
                 force_surf:pygame.Surface=None,
                 resize=None,
-                generate_rect:bool=True):
+                generate_rect:bool=True,
+                generate_mask:bool=True):
         self.host=host
         self.hashost = host is not None
         self.name = name
@@ -280,14 +281,15 @@ class AutoImage():
         else:
             self.image = all_loaded_images['placeholder.bmp']
             if resize is not None: self.image = pygame.transform.scale(self.image,resize)
-        self.mask = pygame.mask.from_surface(self.image)
+        if generate_mask: self.mask = pygame.mask.from_surface(self.image)
 
 
         #HOST INFORMATION
         #Now, instead of each and every single sprite managing the image, rect, and mask info, the spritesheet will do it itself!
         if self.hashost:
             self.host.image = self.image
-            self.host.mask = self.mask
+            if generate_mask:
+                self.host.mask = self.mask
             if generate_rect:
                 self.host.rect = self.image.get_rect()
     
@@ -296,6 +298,7 @@ class AutoImage():
             self.spritesheet.update()
             self.image = self.spritesheet.image
             self.mask = self.spritesheet.mask
+            if self.spritesheet.resize is not None: self.image = pygame.transform.scale(self.image,self.spritesheet.resize)
 
         #setting the host's imge and mask
         if self.hashost:

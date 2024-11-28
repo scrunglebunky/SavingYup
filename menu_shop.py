@@ -190,9 +190,9 @@ class Shop(pygame.sprite.Sprite):
                 self.items_index["dmg_up"]["bought"] += 1
             # perks -- ahahahahaha 
             case "rocketboots":
-                self.player.perks['rocketboots'] = True
-                self.purchasable.remove("rocketboots")
-                self.sprites_items[self.index].update_text("SOLD")
+                self.player.perks['rocketboots'] += 1
+                # self.purchasable.remove("rocketboots")
+                # self.sprites_items[self.index].update_text("SOLD")
             case "child":
                 self.player.add_child()
             case "magnet":
@@ -237,8 +237,15 @@ class Shop(pygame.sprite.Sprite):
         self.new_shop_items()
         self.set_info()
         self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
-
-
+        #welcome text , resetting it
+        self.index=9999
+        self.sprite_description.update_text(random.choice(Shop.dialog))
+        self.sprite_icon.__init__(im="icon_welcome.png",
+            coord=(0,self.image.get_height()*.7),
+            resize=(128,128),
+            )   
+        self.sprite_price.update_text(txt=("WELCOME!"))
+ 
     # STARTUP CODE - SETTING THE ITEMS UP FOR SALE
     def new_shop_items(self):
         purchasable = self.purchasable.copy()

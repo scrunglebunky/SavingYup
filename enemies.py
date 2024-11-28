@@ -34,7 +34,7 @@ class Template(pygame.sprite.Sprite):
         }
         # print(kwargs)None
         self.info = { #basic information on the character
-            "health":kwargs['difficulty']**0,
+            "health":kwargs['difficulty']//1,
             "score":100,
             "dead":False,
             "difficulty":kwargs['difficulty'],

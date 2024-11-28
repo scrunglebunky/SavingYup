@@ -74,7 +74,7 @@
     "dmg_up":{
         "icon":"icon_dmgup.png",
         "type":"base_up",
-        "base_price":100,
+        "price_base":100,
         "price_mult_bought":2,
         "price_mult_level":0,
         "description":"DEAL MORE DAMAGE PER SHOT!!"
@@ -84,11 +84,24 @@
     "INDEX-perk":["rocketboots","child","magnet"],
     "INDEX-up":["maxbullet_up","health_up","shootrate_up","dmg_up"],
     "INDEX-weapon":["tripleshot","rocket","wide"],
-    "INDEX-purchasable":["rocketboots","child","magnet","maxbullet_up","health_up","shootrate_up","tripleshot","rocket","wide"],
+    "INDEX-purchasable":["rocketboots","child","magnet","maxbullet_up","health_up","shootrate_up","tripleshot","rocket","wide","dmg_up"],
     "INDEX-welcometext":[
         "HEY YOU LOOK POOR\n WANNA GET EVEN POORER??",
         "LET'S RUIN YOUR CHANCE\n OF HAVING A HIGH SCORE",
         "YOU DON'T SEE\n FELLOW YUPS OFTEN",
-        "I DON'T LIKE YOU."
+        "I DON'T LIKE YOU.",
+        "DO YOU LIKE BUYING\nTHINGS? I DO",
+        "THIS GAME WAS IN\nDEVELOPMENT FOR SIx\nYEARS. DO YOU KNOW\nWHAT YOU COULD DO IN THAT TIEM?",
+        "CHROMAKOPIA GREEN UGH\nLIKE PICKLE RICK\nCHROMAKOPIA I GOT A COLD I'M\nCRAZY SICK MOCHA STARBUCK\nHOT BROWN DRINK",
+        "SO ANYWAYS THERE'S THESE\nGUYS IN TOILETS AND THEY\nARE IN A WAR WITH\nTHESE CAMERA HEAD GUYS",
+        "MEOW :3",
+        "heyyyyyyyyyy ;)",
+        "WAZZAAAAAAAAAA\nAAAAAAAAAA\nAAAAAPPPPP",
+        "UNGA BUNGA",
+        "UNREGISTERED\n\nFIREARM!!!!",
+        "I'M BAD AT PROGRAMMING",
+        "I WANT TO LEAVE HERE\n BUT THESE CONFINES\nDO NOT LET ME.",
+        "follow me on newgrounds",
+        "EACH AND EVERY\nINTRICATE DETAIL\nFOR NOTHING."
     ]
 }

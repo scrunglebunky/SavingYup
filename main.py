@@ -12,7 +12,7 @@ pygame.display.rect = pygame.display.get_surface().get_rect()
 pygame.display.play_pos = 20,20
 pygame.display.play_dimensions = 600,800 #oh cool, I can make a self variable in the pygame.display.
 pygame.display.play_rect = pygame.Rect(0,0,pygame.display.play_dimensions[0],pygame.display.play_dimensions[1])
-pygame.display.set_caption("YUP RevD")
+pygame.display.set_caption("WELCOME TO YUP GAME!!!")
 
 #GAME STUFF
 universal_sprite_group = pygame.sprite.Group() #This used to be a dictionary used everywhere but all groups have now been moved to their own respective states

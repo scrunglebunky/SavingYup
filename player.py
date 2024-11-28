@@ -43,6 +43,7 @@ class Player(pygame.sprite.Sprite):
         #how fast the character moves
         self.speed = 7.5
         self.momentum = 0
+        self.jumps = 0 # how many times the player has double jumped
 
         #HEALTH
         self.health = 3
@@ -146,7 +147,8 @@ class Player(pygame.sprite.Sprite):
                     self.bullet_time = 0
                     self.bullet_max = 1000
                     self.health = 999
-                    self.perks['magnet'] = self.perks['rocketboots'] = True
+                    self.perks['magnet'] = 1
+                    self.perks['rocketboots'] = 10
                     self.coins += 1
                     self.coins *= 1000
                 if event.key == pygame.K_0:
@@ -202,6 +204,7 @@ class Player(pygame.sprite.Sprite):
             self.movement[0] = 0
             self.aimg.change_anim("land")
             for i in range(5):self.sprite_groups[0].add(bullets.BulletParticle((self.pos[0],self.rect.bottom)))
+            self.jumps = 0 #resetting double jump value
             #AUTO CROUCH
             if pygame.key.get_pressed()[pygame.K_DOWN]:
                 #crouching
@@ -295,6 +298,9 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
         if self.movement[0] == 0:
+            self.bounce()
+        elif self.jumps < self.perks['rocketboots']:
+            self.jumps += 1
             self.bounce()
     
 
