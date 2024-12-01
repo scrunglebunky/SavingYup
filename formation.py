@@ -26,7 +26,7 @@ class Formation():
         # print(difficulty)png
 
         #formation positioning
-        self.pos = [pygame.display.rect.center[0],100] #positioning
+        self.pos = [pygame.display.rect.centerx,100] #positioning
         self.speed = 1 #how fast it takes for the position to heck off 
         self.cleared = False #if the screen is complete
 
@@ -100,6 +100,7 @@ class Formation():
         #########################################
 
         #figuring out sizes and positioning based on spawn_list size
+        #note the position is topleft
         self.pos[0] = (pygame.display.play_dimensions[0]/2) - ((len(self.spawn_list[0])*35)/2)
 
         #difficulty calculations
@@ -233,7 +234,8 @@ class Formation():
     
 
     def state_done(self):
-        ...
+        #error purposes, so it does the things it's supposed to when it's all dead
+        self.state_idle()
 
 
     def check_for_atk(self): #throwing down an enemy to attack the player
@@ -271,6 +273,9 @@ class Formation():
         self.pos[1] = 45 + (math.sin(self.timer["duration"] * 0.1) * 15) + (self.timer["duration"]*.25) - add
         for char in self.spawned_list:
             char.formationUpdate(self.pos)
+        # if the positioning goes off of the stage, the formation kills itself
+        if self.pos[1] > self.player.bar[1]+64:
+            self.state = "destroy"
 
 
     def find_spawn_list(level,difficulty,char_list) -> list:

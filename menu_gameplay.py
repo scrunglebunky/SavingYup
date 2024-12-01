@@ -159,7 +159,7 @@ class GamePlay(pygame.sprite.Sprite):
         GamePlay.sprites[1].add(self.player)
 
         # level/difficulty info
-        self.level = 0 #the total amount of levels passed, usually used for intensities or score
+        self.level = 1 #the total amount of levels passed, usually used for intensities or score
         self.difficulty = 1 + self.level / 5
 
 
@@ -245,19 +245,21 @@ class GamePlay(pygame.sprite.Sprite):
             scale=(800,800)
             ) 
     
-    def new_zone(self,shop=True):
+    def new_zone(self,shop=True,advance=True):
         # new zone code
         Info.unlock_enemy(gameplay=self)
         Info.unlock_bg(gameplay=self)
+        if advance: self.playstate.advance.start()
         if shop: self.playstate.shop.start()
 
     
     def new_level(self):
         # new zone info. If there is a new zone, it does this first.
-        if self.level%5 == 0:
+        if self.level in (0,1,2,3):
+            self.new_zone(False,False)
+        elif self.level%5 == 0:
             self.new_zone()
-        elif self.level in (1,2,3):
-            self.new_zone(False)
+         
             
         # updating level and difficulty info
         self.level += 1

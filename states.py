@@ -18,6 +18,7 @@ from menu_gameover import GameOver as GO
 from menu_pause import Pause
 from menu_options import Options
 from menu_lore import Lore
+from menu_advance import Advance
 
 winrect = pygame.display.rect
 height,width = winrect.height,winrect.width
@@ -98,6 +99,10 @@ class Play(Template):
         self.lore = Lore(self)
         self.lore.start()
 
+        #creating an ADVANCE asset which plays with every new (actual) zone
+        self.advance = Advance(self)
+        # self.advance.start()
+
         #debug
         # self.shop.start(True)
 
@@ -124,6 +129,12 @@ class Play(Template):
         if self.lore.active:
             self.lore.update()
             self.window.blit(self.lore.image,self.lore.rect)
+            return
+
+        ### INTERRUPT CODE -- THE ADVANCE SCREEN
+        if self.advance.active:
+            self.advance.update()
+            self.window.blit(self.advance.image,self.advance.rect)
             return
 
         ### INTERRUPT CODE -- THE SHOP 
@@ -175,6 +186,10 @@ class Play(Template):
         # INTERRUPT CODE -- LORE.ACTIVE
         if self.lore.active:
             self.lore.event_handler(event)
+            return
+        # INTERRUPT CODE -- ADVANCE.ACTIVE
+        if self.advance.active:
+            self.advance.event_handler(event)
             return
         # INTERRUPT CODE -- SHOP.ACTIVE
         if self.shop.active:

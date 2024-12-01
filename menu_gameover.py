@@ -31,7 +31,9 @@ class GameOver(pygame.sprite.Sprite):
         self.active = True
         # creating a tween so the player slowly falls
         GameOver.spr_playergraphic.tweens["move"] = []
-        GameOver.spr_playergraphic.add_tween_pos(cur_pos=GameOver.spr_playergraphic.rect.center,target_pos = (GameOver.spr_playergraphic.rect.centerx,500), speed=0.5, started=True,isCenter = True)
+        GameOver.spr_playergraphic.add_tween_pos(cur_pos=(200,-32),target_pos = (GameOver.spr_playergraphic.rect.centerx,500), speed=0.5, started=True,isCenter = True)
+        # resetting the gameover text if you've lost before
+        GameOver.spr_resultgraphic.update_text("")
         # high score information
         self.got_highscore = score.check_score(self.playstate.player.coins)
         if self.got_highscore: score.add_score(self.playstate.player.coins,name="YOU!")

@@ -71,8 +71,9 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
             - IT SHOULD JUST BE PASSED THE PLAYER CLASS AND DRAW IMAGES AND MAKE EMBLEMS
             - Change the images too
             - actually this is just going to become a menu sprite like the other ones
-- However, I will not be doing this right now. The game will stay in this unfinished, technically-playable state for another week or so now.
-
+        4. [x] Re-add the advance state back, just as a transition so you know more things are going to be added
+        5. [ ] Add a graphic that plays at the start of each level, just a little thing that says "LEVEL x" or "BOSS LEVEL"
+- However, I will not be doing this right now. The game will stay in this unfinished, technically-playable state for another week or so now
 
 
 # DOCUMENTING WHAT I'VE BEEN DOING
