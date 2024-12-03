@@ -161,27 +161,26 @@ class GamePlay(Menu):
         GamePlay.sprites[1].add(self.player)
 
         # level/difficulty info
-        self.level = 1 #the total amount of levels passed, usually used for intensities or score
+        self.level = 0 #the total amount of levels passed, usually used for intensities or score
         self.difficulty = 1 + (self.level-1) / 5
+        self.leveltimer = 0 
 
+        # the formation -- error preventing
+        self.formation = None
 
         # current running game info, which replaces world data
         # this isn't a dictionary anymore because they're annoying to write
         self.char_list = [] 
         self.char_start_patterns = {}
         self.backgroundlist_unlocked = []
-        #unlocking new character/background
-        Info.unlock_enemy(gameplay=self)
-        Info.unlock_bg(gameplay=self) # this also sets the background
-        self.darkness = Bg('darkness.png',(600,800),speed=(0,0))
-        #06/01/2023 - loading the formation
-        #the formation handles spawning and management of most enemies, but the state manages drawing them to the window and updating them
-        self.new_formation()
-        # self.new_bg("bg01") # now set by GPI
+        # more graphical stuff
+        self.darkness = Bg('darkness.png',(600,800),speed=(0,0)) # setting
         self.platform = PF(self.player)
+        self.background = Bg(None,(600,800),(0,0))
+        # unlocking new character/background, which is done in new_level since new_zone is called
+        self.new_level() #CHAR LIST, BACKGROUND LIST, FORMATION, ALL SPAWNED
+        
 
-        #timer for updating new level
-        self.leveltimer = 0 
 
     
 
@@ -292,8 +291,8 @@ class GamePlay(Menu):
         # updating level and difficulty info
         self.level += 1
         self.difficulty = 1 + self.level / 5        
-        self.formation.empty()
-        
+        if self.formation is not None: self.formation.empty()
+
         # TEST FOR DEMO
         # self.new_zone()
             

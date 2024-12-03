@@ -13,7 +13,7 @@ class NewLevel(Menu):
     sprites.add(spr_level,spr_level_number)
     bg = Bg("bgPAUSE",(300,300),(5,5))
 
-    def __init__(self,playstate,end:int=120):
+    def __init__(self,playstate,endtime:int=60):
         # basic pygame.sprite stuff
         self.image = pygame.Surface((300,100)).convert_alpha()
         self.rect = self.image.get_rect()
@@ -27,12 +27,12 @@ class NewLevel(Menu):
         # timer for how long this lasts + active info
         self.active = False
         self.lifespan = 0
-        self.end = end
+        self.endtime = endtime
     
     def update(self):
         # updating the timer
         self.lifespan += 1
-        if self.lifespan >= self.end:
+        if self.lifespan >= self.endtime:
             self.end()
         # basic sprite + draw stuff
         NewLevel.bg.update()
@@ -43,13 +43,13 @@ class NewLevel(Menu):
         
 
 
-    def start(self,end:int=120):
+    def start(self,endtime:int=60):
         # resets the lifespan timer 
         self.lifespan = 0
         self.active = True
-        self.end = end
+        self.endtime = endtime
         # updates the level number
-        NewLevel.spr_level_number.update_text(str(self.playstate.gameplay.level + 1))
+        NewLevel.spr_level_number.update_text(str(self.playstate.gameplay.level))
         # plays a sound
         psound("tada.mp3")
         # positioning

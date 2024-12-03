@@ -63,7 +63,8 @@ class Advance(Menu):
         self.lifespan = 0
         self.active = True
         # resetting some sprites
-        Advance.spr_resultgraphic.update_text("")
+        Advance.spr_resultgraphic.update_text("YOU BEAT A ZONE!")
+        Advance.spr_resultgraphic.update()
         # updating rect
         self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 
@@ -71,7 +72,7 @@ class Advance(Menu):
     def generate_bonuses_and_text(self) -> list:
         out = ["YOU BEAT A ZONE!"]
         #accuracy bonus information
-        accuracy = round(((log.log_total['hits']/log.log_zone['shots']) if log.log_zone['shots'] is not 0 else 1) ,2)
+        accuracy = round(((log.log_zone['hits']/log.log_zone['shots']) if log.log_zone['shots'] is not 0 else 1) ,2)
         accuracybonus = accuracy * 1000 * self.playstate.gameplay.difficulty
         out.append( "\nACCURACY BONUS: " + str(accuracy*100) + "% * 100 * " + str(self.playstate.gameplay.difficulty) + " = " + str(accuracybonus))
         self.bonuses["accuracy"] = accuracybonus

@@ -217,17 +217,19 @@ class Player(pygame.sprite.Sprite):
 
     def hurt(self,amount:int=1):
         if self.invincibility_counter < 1:
-            # graphical / audio stuff
-            self.aimg.change_anim("hurt")
-            for i in range(20): self.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="redblock"))
-            audio.play_sound("ouch.mp3" if self.health > 0 else "scream.mp3")
-            
             # actually changing info
             self.health -= amount
             self.invincibility_counter = 60
             if self.health <= 0: 
                 self.kill()
             log.log_zone["damage"] += amount
+
+            # graphical / audio stuff
+            self.aimg.change_anim("hurt")
+            for i in range(20): self.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="redblock"))
+            audio.play_sound("ouch.mp3" if self.health > 0 else "scream.mp3")
+            
+            
 
 
 

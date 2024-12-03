@@ -1,4 +1,4 @@
-import pygame,os,player,text,random,formation,anim,audio,tools,events,score,enemies,enemies_bosses
+import pygame,os,player,text,random,formation,anim,audio,tools,events,score,enemies
 import menu_shop as shop
 from anim import all_loaded_images as img
 from anim import WhiteFlash
@@ -79,6 +79,12 @@ class Play(Template):
         self.menus={} # a dictionary of all the menus
         self.queue=[] # a list of what is to be made active next
         self.priority=["pause","options","gameover","advance","newlevel","lore","shop","gameplay","gameplayui"]
+        self.queue_started = False # the queue doesn't do anything if this isn't true
+        # adding items to queue
+        # self.add_queue('shop')
+        self.add_queue('lore')
+        # self.add_queue('gameplay')
+
 
         #Creating a GAMEPLAY ASSET, which holds all GAMEPLAY INFO in a SPRITE
         self.gameplay = GP(self)
@@ -87,7 +93,7 @@ class Play(Template):
         
 
         # creating the other more minor assets
-        self.shop = shop.Shop(player=self.player) if oldshop is None else oldshop #Creating a SHOP ASSET
+        self.shop = shop.Shop(player=self.player) 
         self.gameover = GO(self) #Creating a GAMEOVER asset
         self.pause = Pause(self) #creating a PAUSE asset
         self.options = Options(self) #creating a OPTIONS asset
@@ -106,17 +112,21 @@ class Play(Template):
         self.menus['advance'] = self.advance
         self.menus['newlevel'] = self.newlevel
 
-        # starting
-        self.add_queue('lore')
-        self.add_queue('gameplay')
+        # starting the game
+        self.start_queue()
 
+        
+
+        
     def update(self, draw=True):
         # checking to see what's going on with the start queue
-        if len(self.queue) > 0 and not self.menus[self.queue[0]].active:
+        if self.queue_started and (len(self.queue) > 0 and not self.menus[self.queue[0]].active):
             # if the first in the queue is no longer active, it removes itself from the queue and starts with the next
-            self.queue.pop(0)
+            self.queue.pop(0)  
             if len(self.queue) > 0: 
                 self.menus[self.queue[0]].start()
+            print(self.queue)
+            
 
         # iterating through each .active and updating them
         for i in self.priority:
@@ -142,8 +152,18 @@ class Play(Template):
 
     def add_queue(self,menu:str):
         self.queue.append(menu)
-        if len(self.queue) == 1:
+        if self.queue_started and len(self.queue) == 1:
             self.menus[menu].start()
+        
+        print(self.queue)
+
+
+    def start_queue(self):
+        self.queue_started = True
+        if len(self.queue) > 0:
+            self.menus[self.queue[0]].start()
+
+        print(self.queue)
 
     def on_start(self,**kwargs):#__init__ v2, pretty much.
         # emptying the bulletmaximum and making sure the player knows which sprite groups to refer to 
@@ -151,6 +171,7 @@ class Play(Template):
         # self.border.spr_logo.change_pos(pos = (pygame.display.play_dimensions_resize[0],winrect.height*0.05),isCenter=False)
         # self.border.change_vis(False)
         # eBM()
+        
         ...
 
 
@@ -170,7 +191,7 @@ class Play(Template):
        
 
     def end(self,next_state:str="title"):
-        self.__init__(window=self.window,oldshop=self.shop,border=self.border)
+        self.__init__(window=self.window,border=self.border)
         self.next_state = next_state
 
 
