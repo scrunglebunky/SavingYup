@@ -8,16 +8,16 @@
         "logo.png",
         "ui_lives.png","ui_weapon.png","ui_coins.png","cursor.png",
         "arrow.png",
-        "title_image.jpg",
+        "title_image.jpg","advancetitle.png",
         "config_menu.png","on.png","off.png","paused.png","pauseborder.png",
         "high_scores.png","hiscore.png","hiscore_name.png",
         "icon_childperk.png","icon_magnetperk.png","icon_rocketbootperk.png",
         "icon_dmgup.png","icon_healthup.png","icon_maxbulletup.png","icon_shootrateup.png",
         "icon_tripleshot.png","icon_wideshot.png","icon_rocketshot.png",
         "icon_door.png","icon_welcome.png","icon_sold.png",
-        "pauseplayer.png"],
+        "pauseplayer.png","newlevel_level.png"],
     "./images/bg/":[
-        "splash.png","uibox.png","test.png","level_complete_bg.png","tutorial_bg.png","game_over_bg.png","bgGAMEOVER_2.png"],
+        "splash.png","uibox.png","test.png","level_complete_bg.png","tutorial_bg.png","game_over_bg.png","bgGAMEOVER_2.png","darkness.png"],
     "./images/bullets/":
     ["default_bullet.png","missile_shot.png","triple_shot-1.png","triple_shot-2.png","triple_shot-3.png","wide_shot.png"],
     "resize":[

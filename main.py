@@ -83,9 +83,7 @@ while run:
             if event.key == pygame.K_1:
                 if tools.debug: clock.FPS = 0 if clock.FPS == 60 else 60
             if event.key == pygame.K_u:
-                #if tools.debug: freeze = not freeze
-                pass
-
+                print(clock.clock.get_fps())
         cur_state.event_handler(event=event)
  
     #debug pause function

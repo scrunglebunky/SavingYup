@@ -80,7 +80,7 @@ class Background():
                 )
 
 
-
+# DO NOT USE ANYMORE.
 class Floor():
     def __init__(self,image:str,player:pygame.sprite.Sprite,window:pygame.Surface,move:list=(0,0),scale:tuple=None,):
         self.aimg = anim.AutoImage(host=self,name=image,resize=scale)
@@ -107,3 +107,23 @@ class Floor():
             self.rect.centerx = self.centerx + offsetx
             self.rect.bottom = self.bottom - offsety
             surf.blit(self.image,self.rect)
+
+# a platform that follows the player
+class PlatformFollow(pygame.sprite.Sprite):
+    def __init__(self,player):
+        pygame.sprite.Sprite.__init__(self)
+        # very simple stuff
+        self.aimg = anim.AutoImage(host=self,name="platform")
+        self.player = player
+        # doing what update does immediately
+        self.update()
+    
+    def update(self):
+        self.aimg.update()
+        self.rect.top = self.player.bar[1] + 20
+        self.rect.centerx = self.player.rect.centerx - self.player.momentum
+
+    def on_collide(*args,**kwargs):
+        ...
+    def hurt(*args,**kwargs):
+        ...

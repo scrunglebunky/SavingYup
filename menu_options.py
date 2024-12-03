@@ -95,3 +95,4 @@ class Options(pygame.sprite.Sprite):
                         options.restore_defaults()
                     case pygame.K_ESCAPE:
                         self.active = False
+                        self.playstate.add_queue('pause')

@@ -19,6 +19,7 @@ from menu_pause import Pause
 from menu_options import Options
 from menu_lore import Lore
 from menu_advance import Advance
+from menu_newlevel import NewLevel
 
 winrect = pygame.display.rect
 height,width = winrect.height,winrect.width
@@ -75,84 +76,74 @@ class Play(Template):
         # THIS IS THE NEW WAY THAT PLAYSTATE RUNS
         # THE GAMEPLAY, GAMEOVER, SHOP, PAUSE, AND SETTINGS ARE ALL "ASSETS" LIKE THIS
         # NOTE THAT THESE CAN **CONTROL PLAYSTATE** BY CALLING FUNCTIONS. IF PLAYSTATE ENDS OR CHANGES AND YOU DON'T SEE WHY, ONE OF THESE ASSETS DID SOMETHING TO IT.
+        self.menus={} # a dictionary of all the menus
+        self.queue=[] # a list of what is to be made active next
+        self.priority=["pause","options","gameover","advance","newlevel","lore","shop","gameplay","gameplayui"]
 
         #Creating a GAMEPLAY ASSET, which holds all GAMEPLAY INFO in a SPRITE
         self.gameplay = GP(self)
         self.gameplayui = GPUI(self)
         self.player = self.gameplay.player
-        self.gameplay.start()
-        self.gameplayui.start()
-
-        #Creating a SHOP ASSET
-        self.shop = shop.Shop(player=self.player) if oldshop is None else oldshop
-
-        #Creating a GAMEOVER asset
-        self.gameover = GO(self)
-
-        #creating a PAUSE asset
-        self.pause = Pause(self)
-
-        #creating a OPTIONS asset
-        self.options = Options(self)
         
-        #creating a LORE asset, which will only start when the game first starts
-        self.lore = Lore(self)
-        self.lore.start()
 
-        #creating an ADVANCE asset which plays with every new (actual) zone
-        self.advance = Advance(self)
-        # self.advance.start()
+        # creating the other more minor assets
+        self.shop = shop.Shop(player=self.player) if oldshop is None else oldshop #Creating a SHOP ASSET
+        self.gameover = GO(self) #Creating a GAMEOVER asset
+        self.pause = Pause(self) #creating a PAUSE asset
+        self.options = Options(self) #creating a OPTIONS asset
+        self.lore = Lore(self) #creating a LORE asset, which will only start when the game first starts
+        self.advance = Advance(self) #creating an ADVANCE asset which plays with every new (actual) zone
+        self.newlevel = NewLevel(self) #creating a NEWLEVEL asset that plays with every new level
 
-        #debug
-        # self.shop.start(True)
+        # adding said assets to the menus dict
+        self.menus['gameplay'] = self.gameplay
+        self.menus['gameplayui'] = self.gameplayui
+        self.menus['shop'] = self.shop
+        self.menus['gameover'] = self.gameover
+        self.menus['pause'] = self.pause
+        self.menus['options'] = self.options
+        self.menus['lore'] = self.lore
+        self.menus['advance'] = self.advance
+        self.menus['newlevel'] = self.newlevel
+
+        # starting
+        self.add_queue('lore')
+        self.add_queue('gameplay')
 
     def update(self, draw=True):
-        ### INTERRUPT CODE -- OPTIONS MENU
-        if self.options.active:
-            self.options.update()
-            self.window.blit(self.options.image,self.options.rect)
-            return
+        # checking to see what's going on with the start queue
+        if len(self.queue) > 0 and not self.menus[self.queue[0]].active:
+            # if the first in the queue is no longer active, it removes itself from the queue and starts with the next
+            self.queue.pop(0)
+            if len(self.queue) > 0: 
+                self.menus[self.queue[0]].start()
 
-        ### INTERRUPT CODE -- PAUSING
-        if self.pause.active:
-            self.pause.update()
-            self.window.blit(self.pause.image,self.pause.rect)
-            return
+        # iterating through each .active and updating them
+        for i in self.priority:
+            menu = self.menus[i]
+            if menu.active:
+                menu.update()
 
-        ### INTERRUPT CODE -- THE GAMEOVER
-        if self.gameover.active:
-            self.gameover.update()
-            self.window.blit(self.gameover.image,self.gameover.rect)
-            return
-
-        ### INTERRUPT CODE -- THE LORE SCREEN
-        if self.lore.active:
-            self.lore.update()
-            self.window.blit(self.lore.image,self.lore.rect)
-            return
-
-        ### INTERRUPT CODE -- THE ADVANCE SCREEN
-        if self.advance.active:
-            self.advance.update()
-            self.window.blit(self.advance.image,self.advance.rect)
-            return
-
-        ### INTERRUPT CODE -- THE SHOP 
-        if self.shop.active:
-            self.shop.update()
-            # note that it re-draws the gameplay window for pretty much a special effect, and then draws the shop over it.
-            self.window.blit(self.shop.image,self.shop.rect)
-            # ending -- because the shop pauses
-            return
+        # iterating through each .active and drawing them
+        for i in range(len(self.priority)):
+            menu = self.menus[self.priority[len(self.priority)-(1+i)]]
+            if menu.active:
+                self.window.blit(menu.image,menu.rect)
 
 
-        # RUNNING THE GAMEPLAY
-        if self.gameplay.active:
-            self.gameplay.update()
-            self.gameplayui.update()
-            self.window.blit(pygame.transform.scale(self.gameplay.image,pygame.display.play_dimensions_resize),self.gameplay.rect)
-            self.window.blit(self.gameplayui.image,self.gameplayui.rect)
+        # # RUNNING THE GAMEPLAY
+        # if self.gameplay.active:
+        #     self.gameplay.update()
+        #     self.gameplayui.update()
+        #     self.window.blit(pygame.transform.scale(self.gameplay.image,pygame.display.play_dimensions_resize),self.gameplay.rect)
+        #     self.window.blit(self.gameplayui.image,self.gameplayui.rect)
 
+
+
+    def add_queue(self,menu:str):
+        self.queue.append(menu)
+        if len(self.queue) == 1:
+            self.menus[menu].start()
 
     def on_start(self,**kwargs):#__init__ v2, pretty much.
         # emptying the bulletmaximum and making sure the player knows which sprite groups to refer to 
@@ -171,48 +162,12 @@ class Play(Template):
 
 
     def event_handler(self,event):
-        # INTERRUPT CODE -- OPTIONS.ACTIVE
-        if self.options.active:
-            self.options.event_handler(event)
-            return
-        # INTERRUPT CODE -- PAUSE.ACTIVE
-        if self.pause.active:
-            self.pause.event_handler(event)
-            return
-        # INTERRUPT CODE -- GAMEOVER.ACTIVE
-        if self.gameover.active:
-            self.gameover.event_handler(event)
-            return
-        # INTERRUPT CODE -- LORE.ACTIVE
-        if self.lore.active:
-            self.lore.event_handler(event)
-            return
-        # INTERRUPT CODE -- ADVANCE.ACTIVE
-        if self.advance.active:
-            self.advance.event_handler(event)
-            return
-        # INTERRUPT CODE -- SHOP.ACTIVE
-        if self.shop.active:
-            self.shop.event_handler(event)
-            return
-        #if self.is_demo: return
-        if self.gameplay.active: 
-            self.gameplay.event_handler(event)
-        #changing what comes next
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                # self.next_state = "options"
-                ...
-            if tools.debug: 
-                ...
-        # if event.type == pygame.MOUSEBUTTONDOWN and tools.debug:
-        #     pos = tuple(pygame.mouse.get_pos())
-        #     pos = [pos[0]-pygame.display.play_pos[0],pos[1]-pygame.display.play_pos[0]]
-        #     pos2 = [pygame.display.play_dimensions_resize[0]-pos[0],pos[1]]
-        #     self.debug[0].append(pos)
-        #     self.debug[1].append(pos2)
-        #     print(pos,pos2)
-
+        # iterating through each .active and doing their controls
+        for i in self.priority:
+            menu = self.menus[i]
+            if menu.active:
+                menu.event_handler(event)
+       
 
     def end(self,next_state:str="title"):
         self.__init__(window=self.window,oldshop=self.shop,border=self.border)

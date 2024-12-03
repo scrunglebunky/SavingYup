@@ -42,8 +42,10 @@ class Pause(pygame.sprite.Sprite):
             case pygame.KEYDOWN:
                 match event.key:
                     case pygame.K_ESCAPE:
+                        self.playstate.add_queue('gameplay')
                         self.active = False
                     case pygame.K_x:
-                        self.playstate.options.start()
+                        self.playstate.add_queue('options')
+                        self.active = False
                     case pygame.K_c:
                         self.playstate.end()

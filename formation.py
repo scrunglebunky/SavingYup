@@ -48,7 +48,7 @@ class Formation():
             "spawn":120, #how often it takes for something to spawn
             "reset":720, #when the timer resets
             "dead":30, #how often dead enemies are checked
-            "atk":100, #how often an enemy will attack 
+            "atk":120, #how often an enemy will attack 
         }
         #more info on grace periods lower down near the difficulty settings
 
@@ -108,22 +108,33 @@ class Formation():
         self.difficulty_rounded = int(self.difficulty//1)
         self.attack={
             #throwdown amount = how many enemies are thrown down in an attack stance #goes up once every 10 levels
-            "amount":((self.difficulty_rounded//3)+1) if (self.difficulty_rounded <= 6) else 3,
+            "amount":((self.difficulty_rounded//3)+1),
             "max":3+(self.difficulty_rounded*2),
         }
         # DIFFICULTY HARD-CODED CALCULATIONS
-        if self.difficulty <= 1.2:
-            self.timer['atk'] = 100 
-        elif self.difficulty <= 3:
-            self.timer['atk'] = 100-(self.difficulty-1.5)*20
-        elif self.difficulty <= 5:
-            self.timer['atk'] = 40-(self.difficulty-3)*10
-        elif self.difficulty <= 8:
-            self.timer['atk'] = 30-(self.difficulty-5)*10
-        elif self.difficulty <= 10:
-            self.timer['atk'] = 10 - (self.difficulty - 8)*1
-        self.timer['atk'] = (100 - (self.difficulty*4)) if self.difficulty < 25 else 1
-        print(self.difficulty,self.timer["atk"])
+    
+        atk_mult = {
+            1.2:120, #if the difficulty is under or equal to [x] the enemies will be thrown down every [x] frames
+            1.4:100,
+            1.6:80,
+            2.0:60,
+            3.0:15,
+            4.0:10,
+            5.0:7,
+            6.0:5,
+            7.0:2,
+            8.0:1,
+        } 
+        #loops through atk_mult to see what the timer is.
+        for k,v in atk_mult.items():
+            if self.difficulty >= k:
+                self.timer['atk'] = v
+                continue
+            else:
+                break
+        self.timer['time'] = 120
+        # debug print
+        # print(self.timer['atk'])
         #timer["atk"] = how often enemies are thrown down to attack #goes down a frame every level
         #max_enemies = how many enemies can be down at a time, goes up by 1 every 5 levels
         
@@ -254,7 +265,7 @@ class Formation():
     
 
     def make_attack(self,idle_count:list):
-        for i in range(random.randint(1,3)):
+        for i in range(self.attack['amount']):
             index = random.randint(0,(len(idle_count)-1))
             choice = idle_count[index]
             if self.spawned_list[choice].info['state'] != 'attack':
@@ -269,8 +280,8 @@ class Formation():
         if self.state != "start":
             add = 0 
         else:
-            add = (self.timer["duration"]*.25)
-        self.pos[1] = 45 + (math.sin(self.timer["duration"] * 0.1) * 15) + (self.timer["duration"]*.25) - add
+            add = (self.timer["duration"]*(.05 * self.difficulty if self.difficulty < 5 else .25))
+        self.pos[1] = 45 + (math.sin(self.timer["duration"] * 0.1) * 15) + (self.timer["duration"]*(.05 * self.difficulty if self.difficulty < 5 else .25)) - add
         for char in self.spawned_list:
             char.formationUpdate(self.pos)
         # if the positioning goes off of the stage, the formation kills itself

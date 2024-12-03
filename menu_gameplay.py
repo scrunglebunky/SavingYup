@@ -2,6 +2,7 @@ import json,pygame,random,text,player,enemies,audio,formation
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
+from backgrounds import PlatformFollow as PF
 from audio import play_sound as psound
 from audio import play_song as psong
 from backgrounds import Floor as Fl
@@ -144,7 +145,8 @@ class GamePlay(pygame.sprite.Sprite):
             group.empty()
         
         #image/rect info
-        self.image = pygame.Surface(pygame.display.play_dimensions).convert_alpha()
+        self.imageraw = pygame.Surface(pygame.display.play_dimensions).convert_alpha()
+        self.image = pygame.Surface(pygame.display.play_dimensions_resize).convert_alpha()
         self.rect = self.image.get_rect()
 
         self.bar = ( #the field the player is able to move along
@@ -160,7 +162,7 @@ class GamePlay(pygame.sprite.Sprite):
 
         # level/difficulty info
         self.level = 1 #the total amount of levels passed, usually used for intensities or score
-        self.difficulty = 1 + self.level / 5
+        self.difficulty = 1 + (self.level-1) / 5
 
 
         # current running game info, which replaces world data
@@ -170,11 +172,13 @@ class GamePlay(pygame.sprite.Sprite):
         self.backgroundlist_unlocked = []
         #unlocking new character/background
         Info.unlock_enemy(gameplay=self)
-        Info.unlock_bg(gameplay=self)
+        Info.unlock_bg(gameplay=self) # this also sets the background
+        self.darkness = Bg('darkness.png',(600,800),speed=(0,0))
         #06/01/2023 - loading the formation
         #the formation handles spawning and management of most enemies, but the state manages drawing them to the window and updating them
         self.new_formation()
         # self.new_bg("bg01") # now set by GPI
+        self.platform = PF(self.player)
 
         #timer for updating new level
         self.leveltimer = 0 
@@ -184,18 +188,23 @@ class GamePlay(pygame.sprite.Sprite):
     
     def update(self):
         #Updating backgrounds - drawing to window
+        self.imageraw.fill("white")
         self.background.update()
-        self.background.draw(self.image)
-        if self.floor is not None:
-            self.floor.update()
-            self.floor.draw(self.image)    
+        self.background.draw(self.imageraw)
+        self.darkness.update()
+        self.darkness.draw(self.imageraw)
+        self.platform.update()
+        self.imageraw.blit(self.platform.image,self.platform.rect)
+        # if self.floor is not None:
+        #     self.floor.update()
+        #     self.floor.draw(self.image)    
         #updating all individual sprites, with the fourth group having special priority.
         GamePlay.sprites[0].update()
         GamePlay.sprites[1].update()
         GamePlay.sprites[2].update()
-        GamePlay.sprites[0].draw(self.image)
-        GamePlay.sprites[1].draw(self.image)
-        GamePlay.sprites[2].draw(self.image)
+        GamePlay.sprites[0].draw(self.imageraw)
+        GamePlay.sprites[1].draw(self.imageraw)
+        GamePlay.sprites[2].draw(self.imageraw)
         #only updating the formation after checking for events, to prevent the level starting beforehand.
         self.formation.update()
         #calling collision
@@ -208,7 +217,10 @@ class GamePlay(pygame.sprite.Sprite):
             self.leveltimer += 1
         #08/21/2023 - Game Over - making the gameover asset appear if dead
         if self.player.health <= 0:
-            self.playstate.gameover.start()
+            self.playstate.add_queue("gameover")
+
+        # making sure the image transformation finishes
+        self.image = pygame.transform.scale(self.imageraw,pygame.display.play_dimensions_resize)
 
     def collision(self):
         #Detecting collision between players and enemies 
@@ -229,7 +241,7 @@ class GamePlay(pygame.sprite.Sprite):
             level=self.level,
             difficulty=self.difficulty,
             sprites=GamePlay.sprites,
-            window=self.image,
+            window=self.imageraw,
             #is_demo = self.is_demo
             )
     
@@ -237,34 +249,50 @@ class GamePlay(pygame.sprite.Sprite):
         #06/03/2023 - Loading in the background
         self.background = Bg(bg, resize = (600,800), speed = (0, 1 if bg not in ("bg02","bg03","bg07","bg08") else 0 ))
         # also loading in the floor if it exists
-        self.floor = Fl(
-            image='floor-default',
-            player=self.player,
-            window=self.image,
-            move=(.25,.25),
-            scale=(800,800)
-            ) 
+        # self.floor = Fl(
+        #     image='floor-default',
+        #     player=self.player,
+        #     window=self.image,
+        #     move=(.25,.25),
+        #     scale=(800,800)
+        #     ) 
     
     def new_zone(self,shop=True,advance=True):
         # new zone code
         Info.unlock_enemy(gameplay=self)
         Info.unlock_bg(gameplay=self)
-        if advance: self.playstate.advance.start()
-        if shop: self.playstate.shop.start()
+        self.playstate.add_queue('advance')
+        self.playstate.add_queue('shop')
+        self.playstate.add_queue('newlevel')
+        self.playstate.add_queue('gameplay')
+        # turning active off because a bunch of graphics are playing
+        self.active = False
 
     
     def new_level(self):
         # new zone info. If there is a new zone, it does this first.
         if self.level in (0,1,2,3):
-            self.new_zone(False,False)
+            Info.unlock_enemy(gameplay=self)
+            Info.unlock_bg(gameplay=self)
+            self.playstate.add_queue('newlevel')
+            self.playstate.add_queue('gameplay')
+            self.active = False
         elif self.level%5 == 0:
             self.new_zone()
+        else:
+            # playing a graphic
+            self.playstate.add_queue('newlevel')
+            self.playstate.add_queue('gameplay')
+            self.active = False
+        
+       
          
             
         # updating level and difficulty info
         self.level += 1
         self.difficulty = 1 + self.level / 5        
         self.formation.empty()
+        
         # TEST FOR DEMO
         # self.new_zone()
             
@@ -277,7 +305,8 @@ class GamePlay(pygame.sprite.Sprite):
         
 
     def start(self):
-        self.active = True
+        self.active = self.playstate.gameplayui.active = True
+        
 
     def event_handler(self,event):
         self.player.controls(event)
@@ -285,8 +314,25 @@ class GamePlay(pygame.sprite.Sprite):
             case pygame.KEYDOWN:
                 match event.key:
                     case pygame.K_ESCAPE:
-                        self.playstate.pause.start()
-
+                        self.playstate.add_queue('pause')
+                        self.active = False
+                    # DEBUG CODE
+                    case pygame.K_3:
+                        self.player.health += 1
+                    case pygame.K_2:
+                        self.player.bullet_dmg = 1
+                        self.player.bullet_list = ["default","tripleshot","rocket","wide"]
+                        self.player.bullet_time = 0
+                        self.player.bullet_max = 1000
+                        self.player.health = 999
+                        self.player.perks['magnet'] = 1
+                        self.player.perks['rocketboots'] = 10
+                        self.player.coins += 1
+                        self.player.coins *= 1000
+                    case pygame.K_0:
+                        self.player.health -= 1
+                    case pygame.K_4:
+                        self.formation.state = 'destroy'
 
 
 
@@ -352,6 +398,8 @@ class GamePlayUI(pygame.sprite.Sprite):
         self.update_gameinfo()
         GamePlayUI.sprites.update()
         GamePlayUI.sprites.draw(self.image)
+        # active code
+        self.active = self.gameplay.active
 
     def event_handler(self,event):
         ...

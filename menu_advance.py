@@ -6,10 +6,10 @@ import gameplay_log as log
 
 class Advance(pygame.sprite.Sprite):
     sprites = pygame.sprite.Group()
-    spr_title = Em("advancetitle",coord=(200,30),isCenter=True,pattern="jagged")
+    spr_title = Em("advancetitle.png",coord=(200,50),isCenter=True,pattern="jagged")
     spr_resultgraphic = TEm(txt="",coord=(0,200),font=text.terminalfont_20)
     sprites.add(spr_title,spr_resultgraphic)
-    bg = Bg("bgADVANCE",resize=(400,400),speed=(10,10))
+    bg = Bg("bgPAUSE",resize=(400,400),speed=(10,10))
 
     def __init__(self,playstate):
         #pygame sprite stuff yada yada yaaaadaaaa
@@ -46,7 +46,11 @@ class Advance(pygame.sprite.Sprite):
                     self.displayed += self.resultsheet[i]
                     Advance.spr_resultgraphic.update_text(self.displayed)
                 else:
+                    # note that since a new level starts
+                    # it will run the newlevel thing itself
+                    # to prevent the sounds from overlapping
                     self.active = False
+
 
 
     def start(self):

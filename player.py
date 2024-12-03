@@ -70,13 +70,9 @@ class Player(pygame.sprite.Sprite):
             "magnet":False,
         }
 
-        # ADDING UPGRADES NOW, HOORAY!
-        # you could shoot manually or hold down the button to autoshoot
-        # autoshooting works every x frames, and goes down as you purchase upgrades
-        # whether you autoshoot or not, there's a maximum of x bullets you can have onscreen at a time, like galaga
-
-
+        # setting the position
         self.rect.center = self.pos
+
 
     def update(self):
 
@@ -137,22 +133,7 @@ class Player(pygame.sprite.Sprite):
 
 
 
-            #AUTOSHOOT
-            if tools.debug:
-                if event.key == pygame.K_3:
-                    self.health += 1
-                if event.key == pygame.K_2:
-                    self.bullet_dmg = 1
-                    self.bullet_list = ["default","tripleshot","rocket","wide"]
-                    self.bullet_time = 0
-                    self.bullet_max = 1000
-                    self.health = 999
-                    self.perks['magnet'] = 1
-                    self.perks['rocketboots'] = 10
-                    self.coins += 1
-                    self.coins *= 1000
-                if event.key == pygame.K_0:
-                    self.health -= 1
+            
                     
 
 
@@ -386,3 +367,5 @@ class PlayerDummy(Player):
     def focus(self,down:bool=True):
         Player.focus(self,down=down)
         self.check['focus'] = True
+
+

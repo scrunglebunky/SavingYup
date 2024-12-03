@@ -39,16 +39,16 @@
 
 I will have **one week to do this** (Tue 19th to Tue 26th)
 
-# WEEK 1 END, STARTING WEEK TWO.
+# WEEK 2
 - Okay so I did get a lot done
     1. Enemies are gradually unlocked as time goes on
     2. The backgrounds and such change as time goes on as well
     3. There is now a shop, and a buttload of upgrades you can use your points to purchase
     4. A lot of the previous code is now unused, and needs to be replaced.
 - So now I am going to be extending this period by another week, because college keeps getting in the way of what I want to do.
-    1. [ ] Difficulty scaling properly
-        - [ ] Enemy attack speed goes up GREATLY during the first 10 or so levels, and then slows down to be more gradual afterwards
-        - [ ] For each difficulty level an enemy class passes, they gain 1 health. Newly introduced enemies always have 1 health.
+    1. [x] Difficulty scaling properly
+        - [x] Enemy attack speed goes up GREATLY during the first 10 or so levels, and then slows down to be more gradual afterwards
+        - [x] For each difficulty level an enemy class passes, they gain 1 health. Newly introduced enemies always have 1 health.
             - [ ] Probably add healthbars to this?
     2. [ ] Bosses
         - This will probably just be one boss with slight changes.
@@ -72,10 +72,26 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
             - Change the images too
             - actually this is just going to become a menu sprite like the other ones
         4. [x] Re-add the advance state back, just as a transition so you know more things are going to be added
-        5. [ ] Add a graphic that plays at the start of each level, just a little thing that says "LEVEL x" or "BOSS LEVEL"
-- However, I will not be doing this right now. The game will stay in this unfinished, technically-playable state for another week or so now
+        5. [x] Add a graphic that plays at the start of each level, just a little thing that says "LEVEL x" or "BOSS LEVEL"
 
-
+# WEEK 3
+- OKAY so college is getting in the way way too much
+- 2 entire days I could have been working on this game were dedicated to studying for finals
+- I have a new checklist
+    1. CHANGE THE FLOOR ASSET  
+        - [ ] There is no longer a floor, just a platform under you that follows you, so you're technically on a ship in space
+        - [ ] This stays at the bottom of the player.bar[1] position, and follows your rect.centerx value to seem like it's always catching you
+    2. UPDATE THE WAY THAT MENU ASSETS BEHAVE
+        - [ ] All of the menu assets behave the same, so I can just iterate through what gets drawn by a list
+            - So reference all the menu assets in a dictionary and iterate [for x in x, if x.active then draw and do inputs]
+        - [ ] make it so playstate has an "activate queue" so multiple items aren't activated simultaneously
+            - playstate.activate_queue = {} 
+            - playstate.activate("gameplay")
+            - then it repeatedly checks to see if said item de-activates, and then activates the next (after .popping)
+        - [ ] give the menu assets a parent class since a lot of them inherit the same values
+        - [ ] give menu assets a .visible bool value, so multiple items can be drawn to the screen at the same time
+        
+        
 # DOCUMENTING WHAT I'VE BEEN DOING
 ## ENEMY/BG UNLOCKING
 - World data no longer exists
@@ -87,3 +103,6 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
 - Doing this, the amount of needed states has been dropped down to just Title and Play.
 - advance, gameover, gameplay, lore, options, pause, and shop are all menu assets, handled entirely through playstate
 ## BOSSES
+- There is only one boss: the NOPE
+- However, it has a list of attacks it could pull from
+- This list of attacks grows per difficulty

@@ -17,6 +17,6 @@
     "./images/ui/":["warning","tutorial","continue","shopkeeper","shoptitle","gameoverplayer","loreimages"],
     "./images/bg/":["bg01","bg02","bg03","bg04","bg05","bg06","bg07","bg08",
                     "bgSHOP","bgGAMEOVER","bgPAUSE","bgOPTIONS","bgBORDER",
-                    "floor-default"],
+                    "platform"],
     "./images/bullets/":["bullet_def","coin"]
 }
