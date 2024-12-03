@@ -3,6 +3,7 @@ import pygame,text,random,audio
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
+from menu import Menu
 # Pause menu class
 # it has a background and a little picture of yup sitting there at a couch
 # it tells you to press esc to unpause
@@ -10,7 +11,7 @@ from backgrounds import Background as Bg
 # or to press c to quit
 
 
-class Pause(pygame.sprite.Sprite):
+class Pause(Menu):
     sprites = pygame.sprite.Group()
     bg = Bg("bgPAUSE",resize=(400,400),speed=(1,1))
     spr_text = TEm("PAUSED\nESC: UNPAUSE\nX: OPTIONS\nC: QUIT",font=text.terminalfont_20,hide=False)
@@ -43,9 +44,9 @@ class Pause(pygame.sprite.Sprite):
                 match event.key:
                     case pygame.K_ESCAPE:
                         self.playstate.add_queue('gameplay')
-                        self.active = False
+                        self.end()
                     case pygame.K_x:
                         self.playstate.add_queue('options')
-                        self.active = False
+                        self.end()
                     case pygame.K_c:
                         self.playstate.end()

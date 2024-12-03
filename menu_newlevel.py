@@ -4,8 +4,9 @@ from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
 import gameplay_log as log
 from audio import play_sound as psound
+from menu import Menu
 
-class NewLevel(pygame.sprite.Sprite):
+class NewLevel(Menu):
     sprites = pygame.sprite.Group()
     spr_level = Em("newlevel_level.png",coord=(0,0),pattern="jagged")
     spr_level_number = TEm("0",coord=(200,0),resize=(100,100))
@@ -32,7 +33,7 @@ class NewLevel(pygame.sprite.Sprite):
         # updating the timer
         self.lifespan += 1
         if self.lifespan >= self.end:
-            self.active = False
+            self.end()
         # basic sprite + draw stuff
         NewLevel.bg.update()
         NewLevel.bg.draw(self.image)

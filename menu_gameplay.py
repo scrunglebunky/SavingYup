@@ -9,7 +9,7 @@ from backgrounds import Floor as Fl
 import gameplay_log as log
 from bullets import LOADED as bulletloaded
 from anim import AutoImage as AImg
-
+from menu import Menu
 
 
 class Info():
@@ -121,7 +121,7 @@ class Info():
 # WHAT IS THIS DOING?
 # I have moved everything that involves gameplay into this one simple sprite
 # This handles everything, and lets playstate know when to open another menu asset
-class GamePlay(pygame.sprite.Sprite):
+class GamePlay(Menu):
     sprites = { #sprites are now state-specific hahaha
             0:pygame.sprite.Group(), #ALL SPRITES
             1:pygame.sprite.Group(), #PLAYER SPRITE, INCLUDING BULLETS ; this is because the player interacts with enemies the same way as bullets
@@ -218,6 +218,7 @@ class GamePlay(pygame.sprite.Sprite):
         #08/21/2023 - Game Over - making the gameover asset appear if dead
         if self.player.health <= 0:
             self.playstate.add_queue("gameover")
+            self.end()
 
         # making sure the image transformation finishes
         self.image = pygame.transform.scale(self.imageraw,pygame.display.play_dimensions_resize)
@@ -266,7 +267,7 @@ class GamePlay(pygame.sprite.Sprite):
         self.playstate.add_queue('newlevel')
         self.playstate.add_queue('gameplay')
         # turning active off because a bunch of graphics are playing
-        self.active = False
+        self.end()
 
     
     def new_level(self):
@@ -276,14 +277,14 @@ class GamePlay(pygame.sprite.Sprite):
             Info.unlock_bg(gameplay=self)
             self.playstate.add_queue('newlevel')
             self.playstate.add_queue('gameplay')
-            self.active = False
+            self.end()
         elif self.level%5 == 0:
             self.new_zone()
         else:
             # playing a graphic
             self.playstate.add_queue('newlevel')
             self.playstate.add_queue('gameplay')
-            self.active = False
+            self.end()
         
        
          
@@ -315,7 +316,7 @@ class GamePlay(pygame.sprite.Sprite):
                 match event.key:
                     case pygame.K_ESCAPE:
                         self.playstate.add_queue('pause')
-                        self.active = False
+                        self.end()
                     # DEBUG CODE
                     case pygame.K_3:
                         self.player.health += 1
@@ -330,7 +331,7 @@ class GamePlay(pygame.sprite.Sprite):
                         self.player.coins += 1
                         self.player.coins *= 1000
                     case pygame.K_0:
-                        self.player.health -= 1
+                        self.player.hurt()
                     case pygame.K_4:
                         self.formation.state = 'destroy'
 
@@ -339,7 +340,7 @@ class GamePlay(pygame.sprite.Sprite):
 # WHAT IS **THIS** DOING?
 # This pretty much does the job of what the UI_Border did, in terms of displaying ui elements like items and such
 # It was genuinely pointless to put those into the window itself, instead of being inside another image like this.
-class GamePlayUI(pygame.sprite.Sprite):
+class GamePlayUI(Menu):
     sprites = pygame.sprite.Group()
     width,height=300,500
 

@@ -1085,6 +1085,9 @@ class Coin(pygame.sprite.Sprite):
             # updating the coins value from player
             collided.coins += self.value
             self.kill()
+            # graphical effects
+            for i in range(5):
+                self.player.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="greenblock"))
 
 
 

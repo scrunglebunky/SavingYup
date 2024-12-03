@@ -3,8 +3,9 @@ from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
 import gameplay_log as log
+from menu import Menu
 
-class Advance(pygame.sprite.Sprite):
+class Advance(Menu):
     sprites = pygame.sprite.Group()
     spr_title = Em("advancetitle.png",coord=(200,50),isCenter=True,pattern="jagged")
     spr_resultgraphic = TEm(txt="",coord=(0,200),font=text.terminalfont_20)

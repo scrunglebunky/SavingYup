@@ -15,9 +15,9 @@ from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
 from audio import play_sound as psound
 from audio import play_song as psong
+from menu import Menu
 
-
-class Shop(pygame.sprite.Sprite):
+class Shop(Menu):
     #loading the items index
     with open("./data/items.json") as raw:
         raw_items_index = json.load(raw)
@@ -161,7 +161,7 @@ class Shop(pygame.sprite.Sprite):
         # match statement
         match itm.lower():
             case "leave":
-                self.active=False
+                self.end()
             # the weapons -- note once you buy these weapons they're removed from the shop forever
             case "rocket":
                 self.player.bullet_list.append("rocket")

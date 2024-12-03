@@ -2,10 +2,10 @@ import options,pygame,anim,text,random
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
+from menu import Menu
 
 
-
-class Options(pygame.sprite.Sprite):
+class Options(Menu):
     # sprite stuff
     sprites = pygame.sprite.Group()
     bg = Bg("bgOPTIONS",resize=(400,400),speed=(0,0))
@@ -94,5 +94,5 @@ class Options(pygame.sprite.Sprite):
                     case pygame.K_x:
                         options.restore_defaults()
                     case pygame.K_ESCAPE:
-                        self.active = False
+                        self.end()
                         self.playstate.add_queue('pause')

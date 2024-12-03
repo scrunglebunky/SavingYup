@@ -2,8 +2,9 @@ import options,pygame,anim,text,random
 from emblems import Emblem as Em
 from emblems import TextEmblem as TEm
 from backgrounds import Background as Bg
+from menu import Menu
 
-class Lore(pygame.sprite.Sprite):
+class Lore(Menu):
     #same sprite group stuff
     sprites = pygame.sprite.Group()
     spr_text = TEm("BASE DIALOG",coord=(0,250))

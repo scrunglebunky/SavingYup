@@ -79,17 +79,17 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
 - 2 entire days I could have been working on this game were dedicated to studying for finals
 - I have a new checklist
     1. CHANGE THE FLOOR ASSET  
-        - [ ] There is no longer a floor, just a platform under you that follows you, so you're technically on a ship in space
-        - [ ] This stays at the bottom of the player.bar[1] position, and follows your rect.centerx value to seem like it's always catching you
+        - [x] There is no longer a floor, just a platform under you that follows you, so you're technically on a ship in space
+        - [x] This stays at the bottom of the player.bar[1] position, and follows your rect.centerx value to seem like it's always catching you
     2. UPDATE THE WAY THAT MENU ASSETS BEHAVE
-        - [ ] All of the menu assets behave the same, so I can just iterate through what gets drawn by a list
+        - [x] All of the menu assets behave the same, so I can just iterate through what gets drawn by a list
             - So reference all the menu assets in a dictionary and iterate [for x in x, if x.active then draw and do inputs]
-        - [ ] make it so playstate has an "activate queue" so multiple items aren't activated simultaneously
+        - [x] make it so playstate has an "activate queue" so multiple items aren't activated simultaneously
             - playstate.activate_queue = {} 
             - playstate.activate("gameplay")
             - then it repeatedly checks to see if said item de-activates, and then activates the next (after .popping)
         - [ ] give the menu assets a parent class since a lot of them inherit the same values
-        - [ ] give menu assets a .visible bool value, so multiple items can be drawn to the screen at the same time
+        - [NEVERMIND] give menu assets a .visible bool value, so multiple items can be drawn to the screen at the same time
         
         
 # DOCUMENTING WHAT I'VE BEEN DOING
