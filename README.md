@@ -90,7 +90,11 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
             - then it repeatedly checks to see if said item de-activates, and then activates the next (after .popping)
         - [ ] give the menu assets a parent class since a lot of them inherit the same values
         - [NEVERMIND] give menu assets a .visible bool value, so multiple items can be drawn to the screen at the same time
-        
+    3. [ ] ADD BOSSES
+        - check bosses.py for pseudocode
+# WEEK 4
+- College is over. I can work on bosses properly now.
+
         
 # DOCUMENTING WHAT I'VE BEEN DOING
 ## ENEMY/BG UNLOCKING

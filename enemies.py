@@ -1,4 +1,4 @@
-import pygame,anim,random,score,bullets,tools,json
+import pygame,anim,random,score,bullets,tools,json,bosses
 from audio import play_sound as ps
 from emblems import Emblem as Em
 from math import sin,cos,atan2,degrees
@@ -9,39 +9,35 @@ import gameplay_log as log
 
 
 
-
+""" JUST A LITTLE TYPE-UP OF LOOKING AT THIS. AS OF 2024/12/08
+I do NOT LIKE the way I did this.
+Why is there a dictionary for everything???
+There's no need for this, this is bad code!!!
+ESPECIALLY info, they should just be NORMAL VARIABLES.
+I NEED to fix this"""
 
 class Template(pygame.sprite.Sprite):
     #default image if unchanged
     image = pygame.Surface((30, 30), pygame.SRCALPHA)
     pygame.draw.circle(image, "red", (15, 15), 15)
 
-    def __init__(self,
-        # offset:tuple=(0,0),
-        # pos:tuple=(0,0),
-        # difficulty:int=0,
-        # entrance_points:dict=None,
-        # entrance_speed:float=1.0,
-        # entrance_shoot:list=[],
-        # sprites:pygame.sprite.Group = None,
-        # player:pygame.sprite.Sprite = None,
-        # trip:list=(999 ,)
-        kwargs:dict):
+    def __init__(self,kwargs:dict):
         pygame.sprite.Sprite.__init__(self)
         self.idle={ #information about the idle state
             "offset":kwargs['offset'],
             "full":[(kwargs['pos'][0]+kwargs['offset'][0]),(kwargs['pos'][1]+kwargs['offset'][1])] # current position in idle
         }
-        # print(kwargs)None
-        self.info = { #basic information on the character
-            "health":kwargs['difficulty']//1,
-            "score":100,
-            "dead":False,
-            "difficulty":kwargs['difficulty'],
-            "state":"enter",
-            "atk":False, #this is important -- it marks if the enemy can attack or not
-            'bullet_texture':kwargs['bullet_texture'] if 'bullet_texture' in kwargs.keys() else "bullet_def"
-        }
+        # setting basic info but it's not a crappy dictionary now
+        self.health = kwargs['difficulty']//1
+        self.difficulty = kwargs['difficulty']
+        self.score = 100
+        self.dead = False
+        self.state = "enter"
+        self.in_atk = False
+        self.bullet_texture = kwargs['bullet_texture'] if 'bullet_texture' in kwargs.keys() else "bullet_def"
+        self.maxhealth = self.health 
+        self.healthbar_pos = "dynamic_bottom"
+
         self.timers = { #counters to use to check how long something is there for
             "exist":0,
             "in_state":0
@@ -53,12 +49,12 @@ class Template(pygame.sprite.Sprite):
             "return":self.state_return,
         }
         self.atk_basic = {
-            "shoot_chance":(10 - self.info['difficulty'] if self.info['difficulty']<=9 else 1),
-            "start_shoot_chance":(5 - self.info['difficulty'] if self.info['difficulty']<4 else 1),
+            "shoot_chance":(10 - self.difficulty if self.difficulty<=9 else 1),
+            "start_shoot_chance":(5 - self.difficulty if self.difficulty<4 else 1),
             "trip":kwargs['trip'],
             }
     
-        # print(self.info['difficulty'])
+        # print(self.difficulty)
         
         
         #image values, including spritesheets
@@ -83,17 +79,13 @@ class Template(pygame.sprite.Sprite):
         # self.is_demo = kwargs['is_demo']
 
     def update(self): #this should be run the same no matter what
-        
-
         self.aimg.update()
-        
-
         #updating timers
         self.timers['exist'] += 1
         self.timers['in_state'] += 1
 
         #updating state
-        self.states[self.info["state"]]()
+        self.states[self.state]()
 
         #checking for utter murder
         self.check_dead()
@@ -102,12 +94,12 @@ class Template(pygame.sprite.Sprite):
     ##########STATE FUNCTIONS################
     def state_enter(self,start=False):
         if self.follow is None:
-            self.info["state"] = 'idle'
+            self.state = 'idle'
         else:
             self.follow.update()
             self.rect.center = self.follow.pos
             if self.follow.finished:
-                self.info['state'] = 'idle'
+                self.state = 'idle'
             #shooting based off the follow values
             if self.follow.trip and self.follow.cur_target in self.atk_basic["trip"]:
                 if random.randint(0,5)>self.atk_basic['start_shoot_chance']:
@@ -118,7 +110,7 @@ class Template(pygame.sprite.Sprite):
             self.change_anim('idle')
         self.rect.center = self.idle["full"]
     def state_attack(self,start=False):
-        self.info["state"] = 'idle'
+        self.state = 'idle'
     def state_return(self,start=False):
         if start:
             #figuring out where to go
@@ -139,13 +131,13 @@ class Template(pygame.sprite.Sprite):
 
     def change_state(self,state):
         self.timers['in_state'] = 0 
-        self.info['state'] = state
-        self.states[self.info['state']](start=True) #the start value initializes a variable that has to be started up first
+        self.state = state
+        self.states[self.state](start=True) #the start value initializes a variable that has to be started up first
 
     def kill(self,reason=None,play_sound = True) -> int:
         if reason == "health":
             #COIN CODE
-            self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1],value=self.info['difficulty'],player=self.player))
+            self.sprites[2].add(Coin(pos=self.rect.center,floor=self.player.bar[1],value=self.difficulty,player=self.player))
             #UPDATING THE KILL COUNT
             log.log_zone['kills'] += 1
             #playing a sound because
@@ -155,13 +147,13 @@ class Template(pygame.sprite.Sprite):
             ...
         #KILLING THE SPRITE ANYWAYS
         pygame.sprite.Sprite.kill(self)
-        self.info['dead'] = True
+        self.dead = True
         return self.timers['exist']
 
     def check_dead(self):
         #checking for death
-        self.info['dead'] = (self.info['health'] <= 0)
-        if self.info['dead']:
+        self.dead = (self.health <= 0)
+        if self.dead:
             self.kill(reason="health")
 
     def on_collide(self,
@@ -170,7 +162,7 @@ class Template(pygame.sprite.Sprite):
                    ):
         #5/26/23 - Updating health shizznit if interaction with "player type" class
         # if collide_type == 1 or collide_type == 3:
-        #     self.info['health'] -= 1
+        #     self.health -= 1
         #if colliding with an enemy, either hurt or bounce based on positioning
         if type(collided) == Player :
             if ((self.rect.centery) > collided.rect.bottom-collided.movement[0]): 
@@ -188,7 +180,7 @@ class Template(pygame.sprite.Sprite):
             collided.hurt()
 
     def hurt(self,damage=1):
-        self.info['health'] -= damage
+        self.health -= damage
         self.change_anim("hurt")
         # self.sprites[0].add(Em(im='die',coord=self.rect.center,isCenter=True,animation_killonloop=True))
 
@@ -203,7 +195,7 @@ class Template(pygame.sprite.Sprite):
     def shoot(self,type:str="point",spd:int=7,info:tuple=((0,0),(100,100)), shoot_if_below:bool=False):
         bullet=None
         if (shoot_if_below) or (type != 'point') or (info[0][1] < info[1][1]-50):
-            bullet = HurtBullet(type=type,spd=spd,info=info,texture=self.info['bullet_texture'])
+            bullet = HurtBullet(type=type,spd=spd,info=info,texture=self.bullet_texture)
             # self.sprites[0].add(bullet)
             self.sprites[2].add(bullet)
         return bullet
@@ -225,16 +217,16 @@ class A(Template): #swooping
         self.atk={
             "x":0, #x-momentum
             "y":5, #y-momentum
-            "terminal":5+(self.info['difficulty'] if self.info['difficulty']<50 else 10), #terminal x-velocity
-            'turn_amt':2+(self.info['difficulty'] if self.info['difficulty']<50 else 15), #how often the enemy will turn
+            "terminal":5+(self.difficulty if self.difficulty<50 else 10), #terminal x-velocity
+            'turn_amt':2+(self.difficulty if self.difficulty<50 else 15), #how often the enemy will turn
             'turn_vals':[], #turns x can be on
             'turn_cur':0, #which x-turn A is on.
             "acc":0.5, #acceleration
             "direct":False, #direction going in - True = Right, False = Left
-            "shoot_chance":(10 - self.info['difficulty'] if self.info['difficulty']<9 else 2)
+            "shoot_chance":(10 - self.difficulty if self.difficulty<9 else 2)
         }
         self.atk['acc'] = self.atk['terminal']/10 #fixed
-        self.info['atk'] = True
+        self.in_atk = True
         #generating first turn to see what direction is started on 
         self.atk['turn_vals'].append(random.randint(100,pygame.display.play_dimensions[0]-100))
         self.atk['direct'] = turn = self.idle['full'][0]<self.atk['turn_vals'][0]
@@ -320,13 +312,13 @@ class B(Template): #jumpy
         kwargs['skin'] = "nope_B" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
 
-        self.info['atk'] = True
+        self.in_atk = True
 
         self.atk = {
-            "speed":10+((self.info['difficulty']) if (self.info['difficulty']<5) else (5+self.info['difficulty']//10) if (self.info['difficulty']<50) else 20 ) , #where the opponent goes 
-            "points":[(random.randint(25,pygame.display.play_dimensions[0]-25),random.randint(25,pygame.display.play_dimensions[1]-50)) for i in range(5+(self.info['difficulty'] if self.info['difficulty']<5 else 5))], #where the opponent moves to
+            "speed":10+((self.difficulty) if (self.difficulty<5) else (5+self.difficulty//10) if (self.difficulty<50) else 20 ) , #where the opponent goes 
+            "points":[(random.randint(25,pygame.display.play_dimensions[0]-25),random.randint(25,pygame.display.play_dimensions[1]-50)) for i in range(5+(self.difficulty if self.difficulty<5 else 5))], #where the opponent moves to
             "index":0, #which point the opponent is going to first
-            "shoot_chance":(10 - self.info['difficulty'] if self.info['difficulty']<6 else 3), #chance of a shot coming out during attack
+            "shoot_chance":(10 - self.difficulty if self.difficulty<6 else 3), #chance of a shot coming out during attack
             "warnings":[] #warning symbols spawned 
         }
         #NOTE - while I would preload the warnings, for some reason that created a bug where they just wouldn't delete. It's not too bad, though. It's just a sprite.
@@ -345,7 +337,7 @@ class B(Template): #jumpy
             #if the warnings already existed, killing them all
             for warning in self.atk['warnings']:warning.kill()
             #creating the warning signs and adding them to le sprite groups
-            if not self.info['dead']:
+            if not self.dead:
                 self.update_warnings()
             
             return
@@ -409,7 +401,7 @@ class B(Template): #jumpy
     #B-SPECIFIC CODE. This will add the next 3 spots as warnings, and make the nearest ones more intensely flash
     def update_warnings(self):
         #adds the current and next 2 warnings to the sprite groups
-        for i in range(self.info['difficulty']//3):
+        for i in range(self.difficulty//3):
             #checking for out of range, and also in range of player
             if self.atk['index']+i < len(self.atk['warnings']) and abs(self.atk['warnings'][self.atk['index'] + i].rect.centery-self.player.rect.centery)<150 :
                 warning = self.atk['warnings'][self.atk['index'] + i]
@@ -434,7 +426,7 @@ class C(Template): #turret
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_C" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
-        self.timer = (480 - (10*self.info['difficulty'])) if (self.info['difficulty']<40) else 80
+        self.timer = (480 - (10*self.difficulty)) if (self.difficulty<40) else 80
         self.time = random.randint(0,self.timer//10)
     def state_idle(self,start=False):
         Template.state_idle(self)
@@ -477,9 +469,9 @@ class Compootr(Template): #special world 3 item
         kwargs['skin'] = "hack_D" # manually setting sprite info now
         kwargs['bullet_texture'] = "bullet_hack" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
-        self.info['atk'] = True
+        self.in_atk = True
         self.atk = {
-           "shots":10+(self.info["difficulty"]*2 if self.info['difficulty'] < 10 else 20),
+           "shots":10+(self.difficulty*2 if self.difficulty < 10 else 20),
            "cur_shot":0,
            "return":False,
         }
@@ -489,7 +481,7 @@ class Compootr(Template): #special world 3 item
 
 
     def state_attack(self,start:bool=False):
-        if start and not self.info['dead']:
+        if start and not self.dead:
             Compootr.atk_count += 1
             if Compootr.atk_count > Compootr.atk_max:
                 self.atk['return'] = True
@@ -517,7 +509,7 @@ class Compootr(Template): #special world 3 item
     #special kill code due to the attack limit
     def kill(self,reason=None) -> int:
         Template.kill(self,reason=reason)
-        if self.info['state'] == 'attack':
+        if self.state == 'attack':
             Compootr.atk_count = Compootr.atk_count - 1 if Compootr.atk_count > 0 else 0 
 
 
@@ -534,7 +526,7 @@ class Jelle(Template): #special jellyfish
         kwargs['skin'] = "aqua_D" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.atk_move = None
-        self.info['atk']=True
+        self.in_atk=True
         self.atk = {'return':False,'y':0,'trip':False}
     def update(self):
         Template.update(self)
@@ -593,7 +585,7 @@ class Sammich(Template):
     def __init__(self,**kwargs):
         kwargs['skin'] = "home_D" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
-        self.info['atk'] = True
+        self.in_atk = True
         self.atk = {
             'side':0,
             0:pygame.display.play_dimensions[0]*0.01, #left position
@@ -603,7 +595,7 @@ class Sammich(Template):
         }
     def state_attack(self,start=False):
         #homes in on you from the sides, and then lunges at you
-        if start and not self.info['dead']:
+        if start and not self.dead:
             self.atk['side'] = random.randint(0,1) #selecting whether COMING FROM the right or left
             self.sprites[0].add(self.atk['warning'])
             # self.sprites[4].add(self.atk['warning'])
@@ -643,7 +635,7 @@ class Chaser(Template):
         Template.__init__(self,kwargs=kwargs) 
         
         self.atk = {}
-        self.info['atk'] = True
+        self.in_atk = True
         self.atk = {
             'vert':0,
             'horiz':0,
@@ -662,7 +654,7 @@ class Chaser(Template):
             self.atk['speed'] = 0 
             self.atk['angle'] = 0
             self.atk['pos'] = list(self.rect.center)
-            if not self.info['dead']:
+            if not self.dead:
                 self.sprites[0].add(self.atk['warning'])
                 # self.sprites[4].add(self.atk['warning'])
                 self.atk['warning'].update_pos(self.player.rect.center)
@@ -734,7 +726,7 @@ class Yippee(Template):
         kwargs['skin'] = "happy_D" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
 
-        self.info['atk'] = True
+        self.in_atk = True
         self.atk = {
             "points":[0,1,2],
             "initial_follow":None,
@@ -743,7 +735,7 @@ class Yippee(Template):
     def state_attack(self,start=False):
         #selecting initial information
         if start:
-            self.atk['points'] = [random.randint(100,400) for i in range((self.info['difficulty'] // 2) if self.info['difficulty']<20 else 10)]
+            self.atk['points'] = [random.randint(100,400) for i in range((self.difficulty // 2) if self.difficulty<20 else 10)]
             self.atk['initial_follow'] = tools.MovingPoint(self.rect.center,(self.rect.centerx,50),check_finished=True,speed=10)
             self.atk['initial_x'] = random.randint(0,75)
             self.atk['y'] = self.idle['full'][1] + 100
@@ -778,7 +770,7 @@ class Lumen(Template):
         kwargs['skin'] = "vapor_D" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         
-        self.info['atk'] = True
+        self.in_atk = True
         self.atk = {
             'angle':0,
             'laser':None,
@@ -786,7 +778,7 @@ class Lumen(Template):
         }
         
     def state_attack(self,start=False):
-        if start and not self.info['dead']:
+        if start and not self.dead:
             if self.atk['warning'] is not None:
                 self.atk['warning'].kill()
                 del self.atk['warning']
@@ -892,7 +884,7 @@ class Confetti(pygame.sprite.Sprite):
                    ):
         #5/26/23 - Updating health shizznit if interaction with "player type" class
         # if collide_type == 1 or collide_type == 3:
-        #     self.info['health'] -= 1
+        #     self.health -= 1
         #if colliding with an enemy, either hurt or bounce based on positioning
         if type(collided) == Player :
             collided.hurt()
@@ -932,7 +924,7 @@ class Laser(pygame.sprite.Sprite):
                    ):
         #5/26/23 - Updating health shizznit if interaction with "player type" class
         # if collide_type == 1 or collide_type == 3:
-        #     self.info['health'] -= 1
+        #     self.health -= 1
         #if colliding with an enemy, either hurt or bounce based on positioning
         if type(collided) == Player :
             collided.hurt()
@@ -1119,6 +1111,64 @@ class HurtHeal(pygame.sprite.Sprite):
                     self.player.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="redblock"))
                 self.player.hurt()
             self.kill()
+
+
+
+def draw_healthbars(group:pygame.sprite.Group,drawto:pygame.Surface):
+    width:int=30
+    height:int=10
+    min_health:int=2
+    empty_color:str="#000000"
+    full_color="#FF0000"
+    
+    for sprite in group:
+        # setting health type
+        if Template in sprite.__class__.__bases__:
+            health = sprite.health
+            maxhealth = sprite.maxhealth
+        elif type(sprite) == bosses.Boss:
+            health = sprite.health
+            maxhealth = sprite.maxhealth
+            width = 300
+            height = 15
+        else:
+            health = 0
+            maxhealth = 1
+        # if there's less than 2 health, no healthbar is drawn
+        if maxhealth < min_health:
+            continue
+        # making rect and surface
+        rect = pygame.Rect(0,0,width,height)
+        surface = pygame.Surface((width,height)).convert_alpha()
+        surface.set_alpha(192)
+        # positioning healthbar
+        match sprite.healthbar_pos:
+            case 'dynamic_bottom':
+                rect.top = sprite.rect.bottom
+                rect.centerx = sprite.rect.centerx
+            case _:
+                rect.center = sprite.healthbar_pos
+        # filling the empty color
+        surface.fill(empty_color)
+        # figuring the width based off the percent
+        percent = health/maxhealth
+        fullwidth = round(width * percent,0)
+        # making a new rect
+        fullrect = pygame.Rect(0,0,fullwidth,height)
+        surface.fill(full_color,fullrect)
+
+        # drawing
+        drawto.blit(surface,rect)
+
+        
+
+
+
+
+
+
+
+
 
 
 class BasicEventItem(Em):

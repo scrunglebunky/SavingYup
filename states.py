@@ -63,7 +63,6 @@ class Play(Template):
                  window:pygame.display,
                  border,
                  level:int = 0,
-                 oldshop:shop.Shop = None,
                  #is_demo:bool=False, #a way to check if the player is simulated or not
                  ):
 
@@ -125,7 +124,7 @@ class Play(Template):
             self.queue.pop(0)  
             if len(self.queue) > 0: 
                 self.menus[self.queue[0]].start()
-            print(self.queue)
+            # print(self.queue)
             
 
         # iterating through each .active and updating them
@@ -155,7 +154,7 @@ class Play(Template):
         if self.queue_started and len(self.queue) == 1:
             self.menus[menu].start()
         
-        print(self.queue)
+        # print(self.queue)
 
 
     def start_queue(self):
@@ -163,7 +162,7 @@ class Play(Template):
         if len(self.queue) > 0:
             self.menus[self.queue[0]].start()
 
-        print(self.queue)
+        # print(self.queue)
 
     def on_start(self,**kwargs):#__init__ v2, pretty much.
         # emptying the bulletmaximum and making sure the player knows which sprite groups to refer to 

@@ -10,7 +10,7 @@ import gameplay_log as log
 from bullets import LOADED as bulletloaded
 from anim import AutoImage as AImg
 from menu import Menu
-
+from enemies import draw_healthbars
 
 class Info():
 
@@ -178,7 +178,7 @@ class GamePlay(Menu):
         self.platform = PF(self.player)
         self.background = Bg(None,(600,800),(0,0))
         # unlocking new character/background, which is done in new_level since new_zone is called
-        self.new_level() #CHAR LIST, BACKGROUND LIST, FORMATION, ALL SPAWNED
+        self.new_level(unlocks=True) #CHAR LIST, BACKGROUND LIST, FORMATION, ALL SPAWNED
         
 
 
@@ -204,6 +204,8 @@ class GamePlay(Menu):
         GamePlay.sprites[0].draw(self.imageraw)
         GamePlay.sprites[1].draw(self.imageraw)
         GamePlay.sprites[2].draw(self.imageraw)
+        draw_healthbars(group=GamePlay.sprites[2],drawto=self.imageraw)
+
         #only updating the formation after checking for events, to prevent the level starting beforehand.
         self.formation.update()
         #calling collision
@@ -233,6 +235,7 @@ class GamePlay(Menu):
 
     def new_formation(self):
         # creating a new formation
+        
         self.formation = formation.Formation(
             player = self.player,
             # world_data = self.world_data,
@@ -242,8 +245,9 @@ class GamePlay(Menu):
             difficulty=self.difficulty,
             sprites=GamePlay.sprites,
             window=self.imageraw,
+            is_boss = True,
             #is_demo = self.is_demo
-            )
+        )   
     
     def new_bg(self,bg="bg01",transition_effect:bool=False):
         #06/03/2023 - Loading in the background
@@ -269,9 +273,9 @@ class GamePlay(Menu):
         self.end()
 
     
-    def new_level(self):
+    def new_level(self,unlocks = False):
         # new zone info. If there is a new zone, it does this first.
-        if self.level in (0,1,2,3):
+        if self.level in (0,1,2,3) or unlocks:
             Info.unlock_enemy(gameplay=self)
             Info.unlock_bg(gameplay=self)
             self.playstate.add_queue('newlevel')

@@ -4,14 +4,15 @@ from anim import all_loaded_images as img
 
 class Formation():
     def __init__(self,
-                level,
                 sprites,
                 player,
                 char_list:list,
                 start_patterns:list,
                 difficulty:float,
+                is_boss:bool=False,
                 # is_demo:bool=False,
-                **kwargs
+                *args,
+                **kwargs,
                 ):
         #basic info
         self.state = "start" 
@@ -19,8 +20,8 @@ class Formation():
         self.start_patterns=start_patterns
         self.sprites = sprites
         self.player = player
-        self.level = level
         self.difficulty = difficulty
+        self.is_boss = is_boss
         self.window = kwargs['window'] if 'window' in kwargs.keys() else None
         # self.is_demo = is_demo #to tell if the game is being used in the title demo -> stops score
         # print(difficulty)png
@@ -55,7 +56,10 @@ class Formation():
         ######SPAWN LIST INFORMATION##############
 
         #the spawn lists needed, which tell the game what enemies to spawn
-        self.spawn_list = Formation.find_spawn_list(level=self.level, difficulty=self.difficulty, char_list=self.char_list)
+        if self.is_boss:
+            self.spawn_list = [["boss"]]
+        else:
+            self.spawn_list = Formation.find_spawn_list(difficulty=self.difficulty, char_list=self.char_list)
         # print(self.spawn_list)
         self.spawned_list = []
 
@@ -65,7 +69,7 @@ class Formation():
         for row in range(len(self.spawn_list)):
             self.spawn_offsets.append([])
             #adding the offset. note it is not labeled because spawn info iterations would work on this one
-            for column in range(len(self.spawn_list[row])):self.spawn_offsets[row].append((column*35,row*35))
+            for column in range(len(self.spawn_list[row])):self.spawn_offsets[row].append((column*45,row*50))
         
         #ORGANIZED SPAWN: taking the indexes of the enemies and organizing them based on type
         self.spawn_organized={}
@@ -101,7 +105,7 @@ class Formation():
 
         #figuring out sizes and positioning based on spawn_list size
         #note the position is topleft
-        self.pos[0] = (pygame.display.play_dimensions[0]/2) - ((len(self.spawn_list[0])*35)/2)
+        self.pos[0] = (pygame.display.play_dimensions[0]/2) - ((len(self.spawn_list[0])*45)/2)
 
         #difficulty calculations
         # self.difficulty = self.level//1
@@ -145,6 +149,7 @@ class Formation():
         #a key used to figure out what enemy is to be spawned during the start state.
         self.enter_key = 0 #what is used for spawning entrance values, yada yada yada
 
+
     def update(self):
         #updating everything
         self.states[self.state]()
@@ -162,27 +167,40 @@ class Formation():
         if self.timer['time'] % self.timer['spawn'] == 0:
             #saving values as to what exactly i'm keeping track of
             type_to_spawn = self.spawning_keys[self.spawning_key]
-            spawned_id = self.spawn_organized[self.spawning_keys[self.spawning_key]][self.spawning_value]
+            spawned_id = self.spawn_organized[type_to_spawn][self.spawning_value]
             offset = self.spawn_offsets[spawned_id[0]][spawned_id[1]]
+            print('ugh2')
 
-            # ENTRANCE POINTS/START PATTERNS -- LIKE GALAGA THINK ABOUT IT WHOOPEEEE :3
-            #fetching entrance points immediately
-            entrance_info = self.start_patterns[type_to_spawn]
-            entrance_points = entrance_info['patterns']
-            
+            match type_to_spawn:
+                case "boss":
+                    # setting entrance information
+                    entrance_info = {"patterns":[[self.pos,0]],"speed":1,"timer":1,"shoot":[0]}
+                    entrance_points = entrance_info['patterns']
+                    # spawning a boss -- hard-coded.
+                    char = enemies.bosses.Boss(
+                        formation = self
+                    )
+                    print('ugh')
+                case _:
+                    # setting entrance information
+                    entrance_info = self.start_patterns[type_to_spawn]
+                    entrance_points = entrance_info['patterns']
 
-            #creating enemy
-            char = enemies.loaded[type_to_spawn](
-                offset=offset,
-                pos=self.pos,difficulty=self.difficulty_rounded,sprites=self.sprites,player=self.player,
-                entrance_points=entrance_points[self.enter_key] if entrance_points is not None else None,
-                entrance_speed=entrance_info['speed'] if entrance_points is not None else None,
-                # skin=spawn_skin, # REMOVED the changing skins, and replacing them with defaults.
-                trip=entrance_info['shoot'] if entrance_points is not None else [999],
-                formation=self,
-                window=self.window,
-                # is_demo=self.is_demo
-            )
+                    #creating enemy
+                    char = enemies.loaded[type_to_spawn](
+                        offset=offset,
+                        pos=self.pos,
+                        difficulty=self.difficulty_rounded,
+                        sprites=self.sprites,
+                        player=self.player,
+                        entrance_points=entrance_points[self.enter_key] if entrance_points is not None else None,
+                        entrance_speed=entrance_info['speed'] if entrance_points is not None else None,
+                        # skin=spawn_skin, # REMOVED the changing skins, and replacing them with defaults.
+                        trip=entrance_info['shoot'] if entrance_points is not None else [999],
+                        formation=self,
+                        window=self.window,
+                        # is_demo=self.is_demo
+                    )
             # print("FORMATION",self.difficulty)
             #adding enemy to groups
             self.spawned_list.append(char)
@@ -257,9 +275,9 @@ class Formation():
             trip = False #a trip to see if the enemies are still entering - WILL NOT ATTACK
             idle_count = []
             for _ in enumerate(self.spawned_list):
-                if _[1].info['state'] == 'attack': atk_count += 1
-                if _[1].info['state'] == 'enter': trip=True
-                elif _[1].info['state'] == 'idle' and _[1].info['atk']: idle_count.append(_[0])
+                if _[1].state == 'attack': atk_count += 1
+                if _[1].state == 'enter': trip=True
+                elif _[1].state == 'idle' and _[1].in_atk: idle_count.append(_[0])
             if (atk_count <= self.attack["max"] and len(idle_count) > 0) and not trip:
                 self.make_attack(idle_count)
     
@@ -268,8 +286,9 @@ class Formation():
         for i in range(self.attack['amount']):
             index = random.randint(0,(len(idle_count)-1))
             choice = idle_count[index]
-            if self.spawned_list[choice].info['state'] != 'attack':
-                self.spawned_list[choice].change_state('attack')
+            char = self.spawned_list[choice]
+            if char.state != 'attack':
+                char.change_state('attack')
             idle_count.pop(index)
             if len(idle_count) < 1: 
                 break
@@ -289,16 +308,16 @@ class Formation():
             self.state = "destroy"
 
 
-    def find_spawn_list(level,difficulty,char_list) -> list:
+    @staticmethod
+    def find_spawn_list(difficulty,char_list) -> list:
         ## THIS IS OVERCOMPLICATED
         ## I AM NOT GOING TO KEEP THIS
         ## IT WILL RANDOMLY GENERATE A LIST OF ENEMIES TO SPAWN
         ## IT NO LONGER PICKS PRE-MADE FORMATIONS
-
         spawn_list = []
         row_min = int(3 if difficulty <= 2 else 5)
         row_max = int(5+difficulty//1 if difficulty < 5 else 10)
-        rows,columns = random.randint(row_min,row_max),random.randint(10,12)
+        rows,columns = random.randint(row_min,row_max),random.randint(6,10)
         #trip to see if an entire form should be random
         for row in range(rows):
             spawn_list.append([])
@@ -308,8 +327,8 @@ class Formation():
 
 
     def empty(self):
-        for enemy in self.spawned_list:
-            enemy.kill()
+        for char in self.spawned_list:
+            char.kill()
         self.sprites[2].empty()
 
 
@@ -317,9 +336,9 @@ class Formation():
         #06/06/2023 - removing dead enemies
         # The formation copies the list (1), enumerates through the list (2), and deletes all dead items (3)
         if self.timer['time'] % self.timer['dead'] == 0:
-            copy=[item for item in self.spawned_list] #(1)
+            copy=[char for char in self.spawned_list] #(1)
             for _ in enumerate(self.spawned_list,0): #(2)
-                if _[1].info['dead']: 
+                if _[1].dead: 
                     self.spawned_list.pop(_[0]) #(3)
                     # print('removed',str(_[0]))
             copy = []
@@ -333,5 +352,17 @@ class Formation():
         ...
         
 
-
-
+class FormationBoss(Formation):
+    def __init__(self,
+                sprites,
+                player,
+                difficulty:float,
+                *args,
+                **kwargs,
+                ):
+        # the boss formation is a simplified version of the normal formation
+        # it doesn't have to worry about anything regarding spawns, or whatever
+        self.sprites = sprites
+        self.player = player
+        self.difficulty = difficulty
+        ...
