@@ -175,7 +175,8 @@ class GamePlay(Menu):
         # unlocking new character/background, which is done in new_level since new_zone is called
         self.new_level(unlocks=True) #CHAR LIST, BACKGROUND LIST, FORMATION, ALL SPAWNED
         
-
+        #so menu items aren't started
+        self.firstrun = True # This is marked true on an init__(), and is marked false after a start()
 
     
 
@@ -212,12 +213,14 @@ class GamePlay(Menu):
         elif self.formation.cleared:
             self.leveltimer += 1
         #08/21/2023 - Game Over - making the gameover asset appear if dead
-        if self.player.health <= 0:
+        if self.player.health <= 0 and self.active:
             self.playstate.add_queue("gameover")
             self.end()
 
         # making sure the image transformation finishes
         self.image = pygame.transform.scale(self.imageraw,pygame.display.play_dimensions_resize)
+
+    
 
     def collision(self):
         #Detecting collision between players and enemies 
@@ -260,12 +263,13 @@ class GamePlay(Menu):
         # new zone code
         Info.unlock_enemy(gameplay=self)
         Info.unlock_bg(gameplay=self)
-        self.playstate.add_queue('advance')
-        self.playstate.add_queue('shop')
-        self.playstate.add_queue('newlevel')
-        self.playstate.add_queue('gameplay')
-        # turning active off because a bunch of graphics are playing
-        self.end()
+        if self.active:
+            self.playstate.add_queue('advance')
+            self.playstate.add_queue('shop')
+            self.playstate.add_queue('newlevel')
+            self.playstate.add_queue('gameplay')
+            # turning active off because a bunch of graphics are playing
+            self.end()
 
     
     def new_level(self,unlocks = False):
@@ -273,16 +277,22 @@ class GamePlay(Menu):
         if self.level in (0,1,2,3) or unlocks:
             Info.unlock_enemy(gameplay=self)
             Info.unlock_bg(gameplay=self)
-            self.playstate.add_queue('newlevel')
-            self.playstate.add_queue('gameplay')
-            self.end()
+            if self.active:
+                self.playstate.add_queue('newlevel')
+                self.playstate.add_queue('gameplay')
+                self.end()
+            else:
+                ...
         elif self.level%5 == 0:
             self.new_zone()
         else:
-            # playing a graphic
-            self.playstate.add_queue('newlevel')
-            self.playstate.add_queue('gameplay')
-            self.end()
+            if self.active:
+                # playing a graphic
+                self.playstate.add_queue('newlevel')
+                self.playstate.add_queue('gameplay')
+                self.end()
+            else:
+                ...
         
        
          
@@ -305,7 +315,14 @@ class GamePlay(Menu):
 
     def start(self):
         self.active = self.playstate.gameplayui.active = True
+        if self.firstrun:
+            # running the graphics it meant to add since the start
+            self.playstate.add_queue('newlevel')
+            self.playstate.add_queue('gameplay')
+            self.end()
+            self.firstrun = False
         
+
 
     def event_handler(self,event):
         self.player.controls(event)
@@ -339,7 +356,7 @@ class GamePlay(Menu):
 # WHAT IS **THIS** DOING?
 # This pretty much does the job of what the UI_Border did, in terms of displaying ui elements like items and such
 # It was genuinely pointless to put those into the window itself, instead of being inside another image like this.
-class GamePlayUI(Menu):
+class GamePlayUI(Menu):#
     sprites = pygame.sprite.Group()
     width,height=300,500
 

@@ -114,4 +114,6 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
 - All of the attacks and states are performed within classes thhat handle all of the values themselves without pestering the boss's attributes too much.
 ## TOUCH-UPS/TESTING
 - While the Menu Queue was a smart idea, it seemed to introduce some new bugs that relate to the GamePlay state's __init__ starting a game sesh.
-- I need to figure out how to fix that, because currently the gameplay state and it's creations will start immediately when the game begins.
+    - I need to figure out how to fix that, because currently the gameplay state and it's creations will start immediately when the game begins.
+    - I figured it out. I just made it so the gameplay state can't make windows when it's not active.
+- I moved the title state to a menu now, so everything is in Play State. Lol.
