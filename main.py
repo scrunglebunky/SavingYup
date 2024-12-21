@@ -32,7 +32,7 @@ tools.debug = True
 states = {}
 state = "play"
 states["play"] = all_states.Play(window=window,border=border)
-states["title"] = all_states.Title(window=window,border=border)
+# states["title"] = all_states.Title(window=window,border=border)
 
 #07/23/2023 - SWITCHING STATES
 # States have an issue now where, since they are all initialized at startup, some things that should only be run when the state *actually* starts still appears.

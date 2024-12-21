@@ -3,6 +3,61 @@ HERE I POST A LOT OF OLDER PIECES OF CODE WITH A LITTLE DESCRIPTION ON TOP OF WH
 SADLY I REMOVED MOST OF THE OLD CODE SO THIS IS RATHER EMPTY."""
 
 
+""" THE TITLE STATE
+the last of the states to be removed... rip.
+#title screen
+# THIS ALSO HAS TO BE UPDATED
+# USE THE EMBLEMS I GAVE YOU DAMNIT
+class Title(Template):
+    sprites = pygame.sprite.Group()
+    em_titlescreen = Em(im="title_image.jpg",coord=(pygame.display.rect.center),isCenter=True,resize=(400,400))
+    em_start = TEm(txt="PRESS ANY KEY TO CONTINUE\nARROW KEYS TO MOVE \nZ TO SHOOT \nX CHANGES WEAPON \nESC TO QUIT",
+        coord=(em_titlescreen.rect.left,em_titlescreen.rect.bottom),
+        isCenter=False,
+        resize=(400,pygame.display.rect.height-em_titlescreen.rect.bottom),font=text.terminalfont_20)
+    em_highscores = Em(im=None,force_surf = score.generate_scoreboard(),coord=(pygame.display.rect.center),resize=(400,400),isCenter=True,hide=True)
+    sprites.add(em_titlescreen,em_highscores,em_start)
+
+    def __init__(self,window:pygame.Surface,border): #Remember init is run only once, ever.
+        self.window=window
+        # self.border=border
+        self.next_state = None
+        self.lifespan = 0
+   
+    
+    def on_start(self):
+        #self.demo_state.__init__(window = self.window, world = 1, level = random.randint(0,50), is_demo = True)
+        # self.border.spr_logo.change_pos(pos = (winrect.centerx,winrect.height*0.1),isCenter=True)
+        # self.border.change_vis(True,self.border.spr_logo)
+        # self.border.spr_logo.hide = False
+        ...
+
+    def on_end(self):
+        #this doesn't change the positioning of the icons or anything. It lets the other state, Play, handle it.
+        # self.border.spr_logo.add_tween_pos(cur_pos = self.border.spr_logo.rect.topleft , target_pos = self.border.spr_logo.orig_coord  ,speed=5,started=True,isCenter=False)
+        # self.border.change_vis(False)
+        ...
+
+    def update(self):
+        Title.sprites.update()
+        Title.sprites.draw(self.window)
+        #switching between title image and high scores
+        self.lifespan += 1
+        if self.lifespan % 120 == 0:
+            Title.em_titlescreen.hide = not Title.em_titlescreen.hide
+            Title.em_highscores.hide = not Title.em_highscores.hide
+        
+
+    def event_handler(self,event):
+        if event.type == pygame.KEYDOWN:
+            match event.key:
+                case pygame.K_ESCAPE:
+                    self.next_state = "quit"
+                case _:
+                    self.next_state = "play"
+
+
+"""
 """
 THE ADVANCE STATE : "when a world is completed"
 this was originally some huge stylistic fanfare whenever you completed a world

@@ -47,6 +47,7 @@ class Pause(Menu):
                         self.end()
                     case pygame.K_x:
                         self.playstate.add_queue('options')
+                        self.playstate.add_queue('pause')
                         self.end()
                     case pygame.K_c:
                         self.playstate.end()

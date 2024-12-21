@@ -95,4 +95,4 @@ class Options(Menu):
                         options.restore_defaults()
                     case pygame.K_ESCAPE:
                         self.end()
-                        self.playstate.add_queue('pause')
+                        # self.playstate.add_queue('pause') # it doesn't do this anymore since title can also create this. the outside menu will handle this.

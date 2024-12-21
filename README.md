@@ -113,4 +113,5 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
 - This is to add artificial content to the game to make it feel like there's more than there really is. 
 - All of the attacks and states are performed within classes thhat handle all of the values themselves without pestering the boss's attributes too much.
 ## TOUCH-UPS/TESTING
-- 
+- While the Menu Queue was a smart idea, it seemed to introduce some new bugs that relate to the GamePlay state's __init__ starting a game sesh.
+- I need to figure out how to fix that, because currently the gameplay state and it's creations will start immediately when the game begins.
