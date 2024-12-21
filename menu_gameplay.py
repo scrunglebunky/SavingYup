@@ -137,9 +137,6 @@ class GamePlay(Menu):
         # info about what's going on with the game itself
         self.active = False
         self.over = False
-        
-    def start_game(self):
-        
         # resetting gameplay log
         log.log_reset()
 
