@@ -15,11 +15,17 @@ class Player(pygame.sprite.Sprite):
     image = pygame.Surface((30, 30), pygame.SRCALPHA)
     pygame.draw.rect(image,"white",pygame.Rect(0,0,30,30))
 
-    def __init__(self,bar,sprite_groups, demo=False): #again, the demo here is different from tools.demo
+    def __init__(self,sprite_groups, demo=False): #again, the demo here is different from tools.demo
         pygame.sprite.Sprite.__init__(self)
 
         #ARGUMENTATIVE 
-        self.bar=bar
+        self.bar = ( #the field the player is able to move along
+            "h", #if the bar is horizontal or vertical.
+            pygame.display.play_dimensions[1]*0.90, #x position if vertical, y position if horizontal.
+            (20,pygame.display.play_dimensions[0]-20), #the limits on both sides for the player to move on, y positions if vertical, x positions if horizontal
+            1, #gravity. 
+            10, # the ceiling.
+        )
         self.sprite_groups = sprite_groups
         self.demo = demo
         
@@ -190,6 +196,10 @@ class Player(pygame.sprite.Sprite):
             if pygame.key.get_pressed()[pygame.K_DOWN]:
                 #crouching
                 self.crouch()   
+        #hitting the ceiling code, you bounce back down.
+        if self.pos[1]<self.bar[4] and self.movement[0] < 0:
+            self.movement[0]*=-1
+
 
 
         #updating position
@@ -236,6 +246,7 @@ class Player(pygame.sprite.Sprite):
     def bounce(self):
         #make the player bounce
         self.movement[0] = self.movement[0] - 7.5 if self.movement[0] <= 0 else -7.5
+        if self.movement[0] > 15: self.movement[0] = 15 # makes it so you don't fly off anymore.
         self.aimg.change_anim("jump")
         audio.play_sound("boing" + str(random.randint(0,4)) + ".wav")
         for i in range(5):self.sprite_groups[0].add(bullets.BulletParticle((self.pos[0],self.rect.bottom)))
@@ -375,3 +386,5 @@ class PlayerDummy(Player):
         self.check['focus'] = True
 
 
+# a last-minute hack-in so the enemy bullets work since they used to be in enemies
+bullets.Player = Player

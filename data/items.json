@@ -2,7 +2,7 @@
     "health_up": {
         "icon":"icon_healthup.png",
         "type":"base_up",
-        "price_base":100,
+        "price_base":25,
         "price_mult_bought": 2,
         "price_mult_level": 0,
         "description": "HEALTH UP\nRUNNING OUT OF LIVES?\nHERE!"
@@ -10,7 +10,7 @@
     "shootrate_up": {
         "icon":"icon_shootrateup.png",
         "type":"base_up",
-        "price_base":50,
+        "price_base":5,
         "price_mult_bought": 2,
         "price_mult_level": 0,
         "description": "SHOOTRATE UP\nSHOOT AN EXTRA \n   FRAME FASTER!\n(don't buy more than 16 times)"
@@ -18,7 +18,7 @@
     "maxbullet_up": {
         "icon":"icon_maxbulletup.png",
         "type":"base_up",
-        "price_base":50,
+        "price_base":5,
         "price_mult_bought": 3,
         "price_mult_level": 0,
         "description": "MAX BULLETS UP\nUPGRADES MAXIMUM AMOUNT\nOF BULLETS ONSCREEN!"
@@ -26,7 +26,7 @@
     "tripleshot": {
         "icon":"icon_tripleshot.png",
         "type":"weapon",
-        "price_base":1000,
+        "price_base":500,
         "price_mult_bought": 2,
         "price_mult_level": 0,
         "description": "TRIPLE SHOT\nWANNA LAG OUT THE GAME\n WITH MORE SPRITES?\nHERE YOU GO!"
@@ -34,7 +34,7 @@
     "rocket": {
         "icon":"icon_rocketshot.png",
         "type":"weapon",
-        "price_base":500,
+        "price_base":300,
         "price_mult_bought": 2,
         "price_mult_level": 0,
         "description": "HOMING ROCKET\nWANNA LAG OUT THE GAME\n WITH POOR ENEMY INDEXING?\nHERE YOU GO!!!"
@@ -42,7 +42,7 @@
     "wide": {
         "icon":"icon_wideshot.png",
         "type":"weapon",
-        "price_base":250,
+        "price_base":200,
         "price_mult_bought": 2,
         "price_mult_level": 0,
         "description": "WIDE SHOT\nA SLOW-MOVING BULLET\nYOU CAN USE AS A FORCEFIELD!"

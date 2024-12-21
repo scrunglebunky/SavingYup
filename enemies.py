@@ -4,6 +4,7 @@ from emblems import Emblem as Em
 from math import sin,cos,atan2,degrees
 from anim import AutoImage as AImg
 from player import Player
+from bullets import Coin,Confetti,HurtBullet,WarningSign,Laser
 # from tools import world_log as wl
 import gameplay_log as log
 
@@ -207,7 +208,6 @@ class Template(pygame.sprite.Sprite):
 
 
 
-
 class A(Template): #swooping
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_A" # manually setting sprite info now
@@ -323,7 +323,7 @@ class B(Template): #jumpy
         }
         #NOTE - while I would preload the warnings, for some reason that created a bug where they just wouldn't delete. It's not too bad, though. It's just a sprite.
         for point in self.atk['points']:
-            warning=Warning(point)
+            warning=WarningSign(point)
             self.atk['warnings'].append(warning)
 
     def state_attack(self,start=False):
@@ -591,7 +591,7 @@ class Sammich(Template):
             0:pygame.display.play_dimensions[0]*0.01, #left position
             1:pygame.display.play_dimensions[0]*0.99, #right position
             'momentum':0,
-            'warning':Warning((0,0)),
+            'warning':WarningSign((0,0)),
         }
     def state_attack(self,start=False):
         #homes in on you from the sides, and then lunges at you
@@ -644,7 +644,7 @@ class Chaser(Template):
             'speed':0,
             'angle':0,
             'pos':list(self.rect.center),
-            'warning':Warning((0,0)),}
+            'warning':WarningSign((0,0)),}
     def state_attack(self,start=False):
         if start:
             self.atk['vert'] = 0
@@ -782,7 +782,7 @@ class Lumen(Template):
             if self.atk['warning'] is not None:
                 self.atk['warning'].kill()
                 del self.atk['warning']
-            self.atk['warning'] = Warning(self.player.rect.center)
+            self.atk['warning'] = WarningSign(self.player.rect.center)
             self.sprites[0].add(self.atk['warning'])
             # self.sprites[4].add(self.atk['warning'])
         elif self.timers['in_state'] < 120:
@@ -804,7 +804,7 @@ class Lumen(Template):
         self.rect.center = self.idle['full']
     
     def kill(self,reason=None):
-        if type(self.atk['warning']) == Warning: self.atk['warning'].kill()
+        if type(self.atk['warning']) == WarningSign: self.atk['warning'].kill()
         Template.kill(self,reason=reason)
         
 
@@ -837,280 +837,6 @@ bullets.DefaultBullet.enemy_parent_class = Template
 
 
 
-#EXTRA ASSETS -- SPECIAL YIPPEE CONFETTI
-class Confetti(pygame.sprite.Sprite):
-    #all potential images to be used
-    images = []
-    for color in ["red","green","blue","purple","orange","pink"]:
-        surf = pygame.Surface((10,10))
-        pygame.draw.rect(surf,color=color,rect=pygame.Rect(0,0,10,10))
-        images.append(surf)
-    mask = pygame.mask.from_surface(images[0])
-    def __init__(self,pos=(0,0)):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = random.choice(Confetti.images)
-        self.mask = Confetti.mask
-        self.rect = self.image.get_rect()
-        self.rect.center = pos
-        self.mask = pygame.mask.from_surface(self.image)
-        self.gravity_info = [
-            random.randint(-10,10), #x movement
-            random.randint(-15,-5), #y gravity
-        ]
-        self.duration = 0 
-
-    def update(self):
-        #moving x
-        self.rect.x += self.gravity_info[0]
-        #moving y
-        self.rect.y += self.gravity_info[1]
-
-        #changing x gravity
-        self.gravity_info[0] = round(self.gravity_info[0]*0.98,5) if abs(self.gravity_info[0]) > 0.001 else 0
-        #changing y gravity
-        self.gravity_info[1] = self.gravity_info[1]+0.5 if self.gravity_info[1] < 7 else 7
-
-
-        #updating duration information
-        self.duration += 1
-        #autokill
-        if self.duration > 240 or self.rect.top>800:
-            self.kill()
-        
-        
-    def on_collide(self,
-                   collide_type:int, #the collide_type refers to the sprite group numbers. 0 for universal (not used), 1 for other player elements, 2 for enemies
-                   collided:pygame.sprite.Sprite,
-                   ):
-        #5/26/23 - Updating health shizznit if interaction with "player type" class
-        # if collide_type == 1 or collide_type == 3:
-        #     self.health -= 1
-        #if colliding with an enemy, either hurt or bounce based on positioning
-        if type(collided) == Player :
-            collided.hurt()
-            #damaging the enemy either way
-            self.kill()
-        elif collide_type == 1:
-            #I SAID damaging the enemy either way
-            self.kill()
-            collided.hurt()
-            
-
-
-#EXTRA ASSETS -- SPECIAL LUMEN LASER
-class Laser(pygame.sprite.Sprite):
-    def __init__(self,start_pos=(0,0),angle=45,length=1000):
-        pygame.sprite.Sprite.__init__(self)
-        #laser image code
-        self.image = pygame.Surface(pygame.display.play_dimensions,pygame.SRCALPHA).convert_alpha() #a rect that spans the ENTIRE SCREEN, as only the mask is used for collision
-        
-        #CODE FROM kadir014 on github.io, will change around myself later
-        start = pygame.Vector2(start_pos[0],start_pos[1])
-        end = start + pygame.Vector2(length,0).rotate(angle)
-        pygame.draw.line(self.image,'red',start,end,15)
-
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
-        #duration
-        self.duration = 0 
-    def update(self):
-        #it just sits there for a quarter of a second,lol
-        self.duration += 1
-        if self.duration > 15:
-            self.kill()
-    def on_collide(self,
-                   collide_type:int, #the collide_type refers to the sprite group numbers. 0 for universal (not used), 1 for other player elements, 2 for enemies
-                   collided:pygame.sprite.Sprite,
-                   ):
-        #5/26/23 - Updating health shizznit if interaction with "player type" class
-        # if collide_type == 1 or collide_type == 3:
-        #     self.health -= 1
-        #if colliding with an enemy, either hurt or bounce based on positioning
-        if type(collided) == Player :
-            collided.hurt()
-        elif collide_type == 1:
-            collided.hurt()
-
-
-#EXTRA ASSETS -- WARNING SIGN
-class Warning(pygame.sprite.Sprite):
-    arrow = anim.all_loaded_images['arrow.png']
-    def __init__(self,pos,resize=None,arrow_pos=None,time:int=-1):
-        pygame.sprite.Sprite.__init__(self)
-        #spritesheet info
-        self.aimg = AImg(host=self,name='warning',current_anim='idle')
-        self.aimg.spritesheet.all_anim['idle'] = self.aimg.spritesheet.all_anim['idle'].copy()
-        self.arrow = Warning.arrow.copy()
-        self.rect.center = pos 
-
-        self.time = time
-        self.timer = 0
-
-        self.arrow_rect = self.arrow.get_rect()
-        self.arrow_rect.center = self.rect.center
-
-    def update(self):
-        self.aimg.update()
-        #timer code
-        self.timer += 1
-        if self.time > -1 and self.timer > self.time:
-            self.kill()
-
-    def update_pos(self,pos):
-        self.rect.center = pos
-    def update_intensity(self,fps:int):
-        self.aimg.spritesheet.all_anim['idle']['FPS'] = 60/fps
-        self.update()
-        # print('after',fps,self.spriteshet.all_anim['idle']['FPS'])
-
-
-#EXTRA ASSETS -- HURTBULLET
-class HurtBullet(pygame.sprite.Sprite):
-    #DEFAULT IMAGE - rendered by pygame draw function
-    image = pygame.Surface((10, 10), pygame.SRCALPHA)
-    pygame.draw.circle(image, "#AA0000", (5, 5), 5)
-    pygame.draw.circle(image, "red", (5, 5), 4)
-    screen_rect = pygame.Rect(0, 0, 450, 600)
-
-    #limits so the game doesnt lag
-    count = 0
-    max = 1000
-
-    def __init__(self,type:str="point",spd:int=2,info:tuple=((0,0),(100,100)),texture:str=None):
-        #FOR AN ANGLE, the info is (pointa,angle)
-        pygame.sprite.Sprite.__init__(self)
-        
-        #checking for max bullet count
-        HurtBullet.count += 1
-        self.killonstart = True if HurtBullet.count > HurtBullet.max else False
-
-        #setting number values
-        if type == "point":
-            self.move = tools.MovingPoint(pointA=info[0],pointB=info[1],speed=spd)
-        elif type == "angle":
-            self.move = tools.AnglePoint(pointA=info[0],angle=info[1],speed=spd)
-        self.health = 1
-        
-        #setting image
-        self.aimg = AImg(host=self,name=texture,current_anim='idle',force_surf = HurtBullet.image ,resize=(20,20))
-        self.rect.center = self.move.position
-        self.dead = False
-        
-    def update(self):
-        self.move.update()
-        self.rect.center = self.move.position
-        self.aimg.update()
-        if not bullets.BulletRAW.on_screen(self) or self.health <= 0 or self.killonstart: 
-            self.kill()
-            HurtBullet.count = HurtBullet.count - 1 if HurtBullet.count > 0 else 0 
-    
-    def on_collide(self,collide_type,collided):
-        #5/26/23 - This is usually explained elsewhere
-        #collision with enemy types
-        if type(collided) == Player:
-            self.hurt()
-            collided.hurt()
-    
-    def hurt(self):
-        self.health -= 1
-
-    def kill(self):
-        pygame.sprite.Sprite.kill(self)
-        self.dead=True
- 
-
-#EXTRA ASSETS -- COIN
-class Coin(pygame.sprite.Sprite):
-    #The coin is an item spawned when an enemy dies. There are chances that an enemy drops items, but for the most part they drop coins.
-    #These coins wager your score, meaning you sacrifice your score for upgrades in the item shop. 
-    val_list = (1,5,10,25,50,100)
-    def __init__(self,pos:tuple,floor:int,value:int=1,player:Player = None):
-        pygame.sprite.Sprite.__init__(self)
-        img="1"
-        for val in Coin.val_list:
-            if value <= val:
-                break
-            else:
-                continue
-        else:
-            img = str(val)
-
-        # print(img)
-        self.aimg = AImg(host=self,name="coin",current_anim=img,resize=(20,20))
-        self.value = value
-
-        self.floor = floor
-        self.original_v = [random.randint(-2,2),random.randint(-7,-2)]
-        self.v = self.original_v.copy()
-        self.rect.center = pos
-        self.lifespan = 1
-        self.bounce = 0 
-
-        self.player = player
-
-    def update(self):
-        #image
-        self.aimg.update()
-        #lifespan
-        self.lifespan += 1
-        if self.lifespan > 240:
-            self.kill()
-        #moving
-        self.rect.x += self.v[0]
-        self.rect.y += self.v[1]
-        #updating velocities
-        if abs(self.v[0]) > 0.1: self.v[0] *= 0.95
-        else: self.v[0] = 0 
-        self.v[1] += 0.25
-        #bouncing
-        if self.rect.y > self.floor:
-            if self.v[1] > 0: 
-                self.v[1] *= -.25
-                self.bounce += 1
-
-        # player magnet code
-        if self.player is not None and self.player.perks['magnet']:
-            self.rect.x +=( (self.player.rect.centerx-self.rect.centerx) / 25)
-
-    def on_collide(self,collide_type,collided):
-        if type(collided) == Player:
-            # updating the coins value from player
-            collided.coins += self.value
-            self.kill()
-            # graphical effects
-            for i in range(5):
-                self.player.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="greenblock"))
-
-
-
-#EXTRA ASSETS -- TUTORIAL HURT
-class HurtHeal(pygame.sprite.Sprite):
-    def __init__(self,player,type:bool=True):
-        pygame.sprite.Sprite.__init__(self)
-        self.type = type
-        self.aimg = AImg(host=self,name="tutorial",current_anim = ("good" if self.type else "bad"),generate_rect=True)
-        self.player = player
-        self.rect.center = self.player.rect.centerx,0
-        self.v = 0
-        self.y = 0
-    def update(self):
-        self.aimg.update()
-        self.v += 0.25
-        self.y += self.v
-        self.rect.centery = self.y
-        if self.rect.top > pygame.display.rect.height:
-            self.kill()
-    def on_collide(self,collide_type,collided):
-        if type(collided) == type(self.player):
-            if self.type:
-                for i in range(25):
-                    self.player.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="greenblock"))
-                self.player.health += 1
-            else:
-                for i in range(25):
-                    self.player.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="redblock"))
-                self.player.hurt()
-            self.kill()
 
 
 

@@ -81,9 +81,9 @@ class Play(Template):
         self.queue_started = False # the queue doesn't do anything if this isn't true
         # adding items to queue
         # self.add_queue('shop')
-        self.add_queue('lore')
-        # self.add_queue('gameplay')
-
+        # self.add_queue('lore')
+        self.add_queue('gameplay')
+        # TEST -- CHANGE BACK TO LORE LATER
 
         #Creating a GAMEPLAY ASSET, which holds all GAMEPLAY INFO in a SPRITE
         self.gameplay = GP(self)

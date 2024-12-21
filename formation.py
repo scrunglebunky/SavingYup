@@ -169,7 +169,7 @@ class Formation():
             type_to_spawn = self.spawning_keys[self.spawning_key]
             spawned_id = self.spawn_organized[type_to_spawn][self.spawning_value]
             offset = self.spawn_offsets[spawned_id[0]][spawned_id[1]]
-            print('ugh2')
+            # print('ugh2')
 
             match type_to_spawn:
                 case "boss":
@@ -180,7 +180,7 @@ class Formation():
                     char = enemies.bosses.Boss(
                         formation = self
                     )
-                    print('ugh')
+                    # print('ugh')
                 case _:
                     # setting entrance information
                     entrance_info = self.start_patterns[type_to_spawn]

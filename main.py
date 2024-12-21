@@ -30,7 +30,7 @@ tools.debug = True
 # However, there is no need to have several state classes open at once
 # Because of this, it's just gonna s up every state as an object instead of a class
 states = {}
-state = "title"
+state = "play"
 states["play"] = all_states.Play(window=window,border=border)
 states["title"] = all_states.Title(window=window,border=border)
 

@@ -149,15 +149,10 @@ class GamePlay(Menu):
         self.image = pygame.Surface(pygame.display.play_dimensions_resize).convert_alpha()
         self.rect = self.image.get_rect()
 
-        self.bar = ( #the field the player is able to move along
-            "h", #if the bar is horizontal or vertical.
-            pygame.display.play_dimensions[1]*0.90, #x position if vertical, y position if horizontal.
-            (20,pygame.display.play_dimensions[0]-20), #the limits on both sides for the player to move on, y positions if vertical, x positions if horizontal
-            1, #gravity. 
-        )
+        
 
         #spawning the player in
-        self.player = player.Player(bar=self.bar,sprite_groups=GamePlay.sprites)
+        self.player = player.Player(sprite_groups=GamePlay.sprites)
         GamePlay.sprites[1].add(self.player)
 
         # level/difficulty info
@@ -324,11 +319,12 @@ class GamePlay(Menu):
                     case pygame.K_3:
                         self.player.health += 1
                     case pygame.K_2:
-                        self.player.bullet_dmg = 1
+                        # makes a realistic late-game upgrade kit
+                        self.player.bullet_dmg = 5
                         self.player.bullet_list = ["default","tripleshot","rocket","wide"]
-                        self.player.bullet_time = 0
-                        self.player.bullet_max = 1000
-                        self.player.health = 999
+                        self.player.bullet_time = 5
+                        self.player.bullet_max = 12
+                        self.player.health = 10
                         self.player.perks['magnet'] = 1
                         self.player.perks['rocketboots'] = 10
                         self.player.coins += 1

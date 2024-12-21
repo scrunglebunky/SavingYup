@@ -18,5 +18,5 @@
     "./images/bg/":["bg01","bg02","bg03","bg04","bg05","bg06","bg07","bg08",
                     "bgSHOP","bgGAMEOVER","bgPAUSE","bgOPTIONS","bgBORDER",
                     "platform"],
-    "./images/bullets/":["bullet_def","coin"]
+    "./images/bullets/":["bullet_def","bullet_big","coin"]
 }

@@ -90,12 +90,13 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
             - then it repeatedly checks to see if said item de-activates, and then activates the next (after .popping)
         - [ ] give the menu assets a parent class since a lot of them inherit the same values
         - [NEVERMIND] give menu assets a .visible bool value, so multiple items can be drawn to the screen at the same time
-    3. [ ] ADD BOSSES
+    3. [x] ADD BOSSES
         - check bosses.py for pseudocode
 # WEEK 4
 - College is over. I can work on bosses properly now.
+- Bosses have been added.
+- Making the title screen into a menu so multiple things can be added and worked with.
 
-        
 # DOCUMENTING WHAT I'VE BEEN DOING
 ## ENEMY/BG UNLOCKING
 - World data no longer exists
@@ -107,6 +108,9 @@ I will have **one week to do this** (Tue 19th to Tue 26th)
 - Doing this, the amount of needed states has been dropped down to just Title and Play.
 - advance, gameover, gameplay, lore, options, pause, and shop are all menu assets, handled entirely through playstate
 ## BOSSES
-- There is only one boss: the NOPE
-- However, it has a list of attacks it could pull from
-- This list of attacks grows per difficulty
+- There are multiple bosses, but they all pull from one Boss class
+- They all behave the same, but pull different attacks from a greater pool of global attacks
+- This is to add artificial content to the game to make it feel like there's more than there really is. 
+- All of the attacks and states are performed within classes thhat handle all of the values themselves without pestering the boss's attributes too much.
+## TOUCH-UPS/TESTING
+- 
