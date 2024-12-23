@@ -34,10 +34,9 @@ state = "play"
 states["play"] = all_states.Play(window=window,border=border)
 # states["title"] = all_states.Title(window=window,border=border)
 
-#07/23/2023 - SWITCHING STATES
-# States have an issue now where, since they are all initialized at startup, some things that should only be run when the state *actually* starts still appears.
-# States now have a method called "on_start" that will remedy this, which will be called in a function here
-# All states need to have a value called "next state", too, which will make it able to tell if the state is finished or not
+#States -- an addendum
+# The concept of a State in this game is dead, as everything is handled through switching windows
+# I believe it fit the aesthetic of the game better to look more ameteur.
 def state_switch(
     cur_state,state #the current state used
     ) -> tuple:
@@ -61,7 +60,7 @@ cur_state = states[state] ; cur_state.on_start()
 freeze = False
 
 # tools.demo = True #DELETE AFTERWARDS
-# img = anim.generate_enemy_log({"skins":{"A":"aqua_A","B":"aqua_B","C":"aqua_C","D":"aqua_D"}})
+# img = anim.generate_enemy_log({"skins"zz:{"A":"aqua_A","B":"aqua_B","C":"aqua_C","D":"aqua_D"}})
 
 
 while run:

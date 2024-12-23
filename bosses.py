@@ -15,7 +15,7 @@ It shares other attributes with other sprites: health, state, states, aimg, etc.
 When the boss is initialized, it sets its values and decides its health, idle state, and available attacks based off difficulty
 The boss will be in its Idle state, and after enough time decide an attack to go through based off its attack pool
 
-just listing off the available states
+just listing off the available states -- NOT ALL OF THESE MADE IT IN OR WORK THE SAME AS STATED.
 #####
 idle_0 # the enemy just sits there not moving, maybe shaking a little bit
 idle_1 # it moves back and forth in a sine pattern like atk_sine, scales in speed based off difficulty
@@ -41,6 +41,114 @@ The classes take the host boss as an argument.
 """
 
 
+""" BOSS SUB-CLASS ATTACKS
+I asked an AI to give me groups of attacks I could use to give to the boss subclasses. Here is what it gave me.
+For organizing the attacks into sub-classes, you can group them by common behavior or theme. I’ve divided the attacks into 20 groups of 3, where each group corresponds to a distinct sub-class with a unique flavor of movement and attack pattern. Each group features similar dynamics to give the boss subclasses distinct personalities and patterns. Here's the suggested organization:
+
+    Bounce-Based Attacks:
+        atkbounce (bouncing with bullet bursts)
+        atkthrow (sine pattern with bullet throw)
+        atkfall (falling with position adjustment)
+
+    Teleportation-Based Attacks:
+        atkteleport (random teleportation with bullet circle)
+        atkchase (moves towards the player while attacking)
+        atkspiral (spiraling motion while shooting)
+
+    Patterned Sine-Based Attacks:
+        atksine (sine movement with radial bullets)
+        atkslide (jumping sine pattern with falling bullets)
+        atkfall (falling with patterns that mimic sine behavior)
+
+    Beam Attacks:
+        atkbeam (stationary 4-direction beam rotation)
+        atkswing (group of bullets thrown at you with a swinging arc)
+        atkcurve (bullets in a circular pattern with angle variation)
+
+    Bullet Wall Attacks:
+        atkwall (walls of bullets with gaps)
+        atkblast (huge bullet wall forcing directional movement)
+        atkbirth (spawns mini enemies that keep attacking)
+
+    Position-Based Attacks:
+        atkperimeter (moves along stage walls)
+        atkjump (throws sideways bullets forcing player to jump)
+        atkhoriz (sideways bullet throw forcing jump/fall)
+
+    Complex Bullet Spasms:
+        atkspasm (random tweening with downward shooting)
+        atksine (sine wave motion while shooting in all directions)
+        atkthrow (sine with bullet variation)
+
+    Chase and Close-Range Attacks:
+        atkchase (boss moves toward player gradually)
+        atkslam (boss locks in and slams down)
+        atkfall (boss falls to player’s position)
+
+    Horizontal Bullet Attacks:
+        atkhoriz (sideward bullets forcing movement)
+        atkjump (sideways bullet throw)
+        atkwall (falling walls with small gaps)
+
+    Evasive and Teleporting Attacks:
+        atkteleport (teleporting with bullet circle)
+        atkperimeter (movement along the edges of the stage)
+        atkspiral (spiraling movement pattern)
+
+    Wave-like Attacks:
+        atkspasm (random tweening with shooting bursts)
+        atkfall (falling bullet wave from above)
+        atksine (sine-based wave motion with shooting)
+
+    Clever Dodge/Chase Attacks:
+        atkchase (boss moves toward you)
+        atkthrow (sine with bullet throws)
+        atkbeam (shoots 4-direction beams)
+
+    Wall Formation Attacks:
+        atkwall (walls with bullet gaps)
+        atkblast (big bullet wall forcing side movement)
+        atkcurve (bullets in unpredictable circular paths)
+
+    Evasive Attacks with Homing:
+        atkswing (bullets fly at varying angles before homing)
+        atkcurve (bullets in chaotic circular paths)
+        atkbounce (bouncing with bullet circles)
+
+    Melee and Close Combat Attacks:
+        atkslam (boss slams down after moving towards player)
+        atkfall (boss falls while adjusting position)
+        atkspasm (tweens randomly while attacking)
+
+    Repetitive Fire Attacks:
+        atkbeam (stationary 4-direction beams)
+        atkspasm (tweens with continual shooting)
+        atkswing (regular throwing of homing bullets)
+
+    Difficult Evasion Attacks:
+        atkcurve (bullets with random directional changes)
+        atkperimeter (moves along walls with unpredictable attacks)
+        atkthrow (sine movement with bullet throws)
+
+    Explosive Formation Attacks:
+        atkblast (wall of bullets forcing movement)
+        atkbirth (mini enemies spawn to attack)
+        atkslam (sine pattern with a final slam)
+
+    Dynamic Stage Control Attacks:
+        atkwall (falling walls with gaps to jump through)
+        atkbounce (bouncing bullets creating multiple paths)
+        atkspiral (spiraling motion forcing jumps)
+
+    High-Intensity Multi-Move Attacks:
+        atkspasm (random tweens with frequent attacks)
+        atkchase (boss chases the player down)
+        atkbeam (beam shooting in multiple directions)
+
+Wow, isn't Artificial Intelligence a wonder to behold? At least I'm not some lazy numnut using it to make the code for me.
+Or to make the art.
+What am I? Lazy? Well yeah but not THAT lazy.
+"""
 
 
 """ THE BOSS STATE
@@ -75,6 +183,7 @@ All this really does is make the parent class do an attack after finishing."""
 class IdleState(BossState):  
     def __init__(self,host,*args,**kwargs):
         BossState.__init__(self,host,lifespan_force = (360 - host.difficulty*20) if host.difficulty < 12 else 120)
+        self.host.aimg.change_anim('idle')
     def end(self):
         self.host.make_attack()
 
@@ -86,26 +195,56 @@ and it also has a pre-set attack length
 class AtkState(BossState):  
     def __init__(self,host,*args,**kwargs):
         BossState.__init__(self,host,lifespan_force = (480-(host.difficulty*20)) if host.difficulty < 12 else 240)
+        self.host.aimg.change_anim('attack')
     def end(self):
         self.host.make_idle()
+
+
+"""THE DIE BOSS STATE
+the simplest of the three
+it just has a pre-set lifespan window
+and it moves around"""
+class DieState(BossState):
+    def __init__(self,host,*args,**kwargs):
+        BossState.__init__(self,host=host,lifespan_force=(180))
+        self.host.aimg.change_anim('die')
+    def end(self):
+        # telling the boss to tell the formation to move to the next level
+        self.host.dead = True
+        self.host.kill()
 
 
 ##########   BASIC STATES
 
 # enter -- lowering down
 class Enter(BossState):
+    spr_introtext = TEm(txt="THIS\nIS AN ERROR\nAND SHOULD NOT\nSHOW UP",coord=(0,0))
     def __init__(self,host,*args,**kwargs):
         BossState.__init__(self,host,lifespan_force = 240)
         # the boss flies down rapidly, and then the speed gradually goes down until it stops
         self.mp = tools.MovingPoint(pointA = (host.window.get_width()/2,-10), pointB = (host.window.get_width()/2,host.window.get_height()*.5),speed = 10, ignore_speed = True, check_finished = False)
+        self.host.aimg.change_anim('idle')
+        # updating the intro text
+        self.textfull:str = self.host.introtext.split('\n')
+        self.textcurrent = ""
+        self.linecounter = 0 
+        self.texttimer = 60
+        self.texttime = 60
+        # adding introtext
+        Enter.spr_introtext.update_text("")
+        Enter.spr_introtext.kill()
+        self.host.sprites[0].add(Enter.spr_introtext)
+        # the host is intangible
+        self.host.intangible =True
 
     def update(self):
         # updating the speed
         if self.mp.finished:
-            # when it's done moving, the boss goes into idle
-            self.end()
-            self.host.make_idle()
-            return
+            # # when it's done moving, the boss goes into idle
+            # self.end()
+            # self.host.make_idle()
+            # return
+            ...
         else:
             self.mp.update()
             if self.mp.speed < 0.01: 
@@ -113,21 +252,50 @@ class Enter(BossState):
                 self.mp.finished = True
             else: 
                 self.mp.speed *= 0.95
+        
+        # updating the text
+        self.texttime += 1
+        if self.texttime > self.texttimer:
+            self.texttime = 0
+            self.update_introtext()
+            # print('done')
 
         # just note that the rest of the finishing code for this state is handled by the default stuff
         self.host.pos = self.mp.position
 
+    def update_introtext(self):
+        # this function adds a line, and updates the text
+        self.textcurrent = ""
 
+        # making sure no overflow
+        if self.linecounter >= len(self.textfull):
+            self.linecounter = len(self.textfull) - 1
+            self.end()
+        else:
+            self.linecounter += 1
+
+
+
+        #reassembling the text into a string
+        for i in range(self.linecounter):
+            self.textcurrent += self.textfull[i] + "\n"    
+        
+        # updating the textemblem
+        Enter.spr_introtext.update_text(self.textcurrent)
+
+    def end(self):
+        BossState.end(self)
+        Enter.spr_introtext.kill()
+        self.host.make_idle()
+        self.host.intangible = False
 
 ########## DIE STATES -- (simple)
-class DieState(BossState):
-    def end(self):
-        # telling the boss to tell the formation to move to the next level
-        self.host.dead = True
+
+
 # die -- flying off
 class Die1(DieState):
     def __init__(self,host,*args,**kwargs):
-        BossState.__init__(self,host=host,lifespan_force=180)
+        DieState.__init__(self,host=host)
         # positioning and intangibility
         self.pos = self.host.pos
         self.velocity = 10
@@ -142,7 +310,7 @@ class Die1(DieState):
 # die -- falling down
 class Die2(DieState):
     def __init__(self,host,*args,**kwargs):
-        BossState.__init__(self,host=host,lifespan_force=180)
+        DieState.__init__(self,host=host)
         # positioning and intangibility
         self.pos = self.host.pos
         self.velocity = -10
@@ -157,7 +325,7 @@ class Die2(DieState):
 # die3 -- bouncing everywhere
 class Die3(DieState):
     def __init__(self,host,*args,**kwargs):
-        BossState.__init__(self,host=host,lifespan_force=180)
+        DieState.__init__(self,host=host)
         # positioning and intangibility
         self.angle = random.randint(0,360)
         self.move_vals = list(tools.AnglePoint.calc_move_vals(math.radians(self.angle),speed=100,static_speed=True))
@@ -177,7 +345,7 @@ class Die3(DieState):
 # die -- spazzing out
 class Die4(DieState):
     def __init__(self,host,*args,**kwargs):
-        BossState.__init__(self,host=host,lifespan_force=180)
+        DieState.__init__(self,host=host)
         # positioning and intangibility
         self.pos = self.host.pos
         
@@ -190,7 +358,7 @@ class Die4(DieState):
 # die -- inching off
 class Die5(DieState):
     def __init__(self,host,*args,**kwargs):
-        BossState.__init__(self,host=host,lifespan_force=180)
+        DieState.__init__(self,host=host)
         # positioning and intangibility
         self.pos = self.host.pos
         self.mp = tools.AnglePoint(pointA = self.pos,angle = random.randint(0,360),speed=1)
@@ -202,6 +370,14 @@ class Die5(DieState):
         self.pos = self.mp.position
         self.host.pos = self.pos
 
+# die -- doing nothing
+class Die6(DieState):
+    def __init__(self,host,*args,**kwargs):
+        DieState.__init__(self,host=host)
+        self.pos = self.host.pos
+        self.host.intangible = True
+    def update(self):
+        BossState.update(self)
 
 
 
@@ -1078,31 +1254,31 @@ class Boss(pygame.sprite.Sprite):
     # idles
     allidle = [
         "idle1",
-        # "idle2",
-        # "idle3",
-        # "idle4",
+        "idle2",
+        "idle3",
+        "idle4",
     ]
     # attacks
     allatk = [
-        "atkbounce",
-        "atkspasm",
-        "atksine",
-        "atkteleport",
-        "atkthrow",
-        "atkbeam",
-        "atkjump",
-        "atkslide",
-        "atkwall",
-        "atkswing",
-        "atkcurve",
-        "atkhoriz",
-        "atkbirth",
-        "atkblast",
-        "atkchase",
-        "atkslam",
-        "atkfall",
-        "atkspiral",
-        "atkperimeter"
+        "atkbounce", # picks an angle and moves across the stage at the angle, shooting a circle of bullets each time it bounces
+        "atkspasm", # starts slowly tweening to different parts of the stage, shooting downwards the entire time and shooting at you every time it picks a new spot to tween to
+        "atksine", # moves back and forth in a sine pattern, up and down in a sine pattern, shooting bullets all 360 degrees one at a time every x frames
+        "atkteleport", # teleports to random positions and shoots bullets in a circle (all 360 degrees at once) per teleportation
+        "atkthrow", # moves back and forth in a sine pattern, and shoots bullets down (with variation of 20 degrees) every so and so frames
+        "atkbeam", # stands in one spot, shooting in 4 directions while rotating the angles by (sin) degrees
+        "atkjump", # shoots bullets sideways towards the player, forcing them to jump
+        "atkslide", # jumping from side to side, making bullets fall from the ceiling with each jump
+        "atkwall", # making walls of bullets fall from the ceiling, leaving tiny gaps for you to run through
+        "atkswing", # throws a group of bullets at you every x frames. however, the bullets fly out at different angles at first before homing at you.
+        "atkcurve", # shoots in a circle, but randomly changes the angle to a random value so you have to adjust very fast
+        "atkhoriz", # throwing bullets at you from the side so you have to jump or fastfall. like atkjump but simpler
+        "atkbirth", # creates miniature versions of the previous enemies that attack you. will stay on screen even into the next attack
+        "atkblast", # creates a huge wall of bullets that force you to move to one side of the stage or another
+        "atkchase", # the boss moves towards the player gradually. run.
+        "atkslam", # the boss moves back and forth in a sine pattern and throws its body down when it locks in with you
+        "atkfall", # the boss falls from top to bottom of the screen, and reappears back at the top at your current x position
+        "atkspiral", # the boss moves in a spiral pattern, leaving you to time your jump to escape
+        "atkperimeter" # the boss moves along the 4 walls of the stage, leaving you to jump.
     ]
     # deaths
     alldie = [
@@ -1111,6 +1287,26 @@ class Boss(pygame.sprite.Sprite):
         'die3',
         'die4',
         'die5'
+    ]
+
+    # spritesheets
+    allsprites = [
+        "boss_baby",
+        "boss_bald",
+        "boss_bfdi",
+        "boss_big",
+        "boss_blue",
+        "boss_eww",
+        "boss_exe",
+        "boss_fruity",
+        "boss_greasy",
+        "boss_green",
+        "boss_hairy",
+        "boss_hatter",
+        "boss_king_upsidedown",
+        "boss_king1",
+        "boss_king2",
+        "boss_larry",
     ]
     
 
@@ -1124,7 +1320,8 @@ class Boss(pygame.sprite.Sprite):
         # self.difficulty = 15
         self.window = self.formation.window
         # image/rect
-        self.aimg = AImg(host=self,name="nope_D")
+        self.spritename = self.generate_sprite()
+        self.aimg = AImg(host=self,name=self.spritename)
         # just note that pos is changed a whole bunch, and THEN changed into rect.center
         self.pos = formation.pos[:]
         self.rect.center = self.pos
@@ -1137,17 +1334,22 @@ class Boss(pygame.sprite.Sprite):
         self.in_atk = False
         self.maxhealth = self.health 
         self.intangible = False # if this is true, the player cannot be touched by him
+        # intro text -- what the game says during the enter state :3
+        self.introtext = self.generate_introtext()
 
         # state info
         self.cur_state = "enter" # the name of the next state
         self.state = None
         self.change_state(self.cur_state) # the actual state classrunning 
-        self.idlelist = self.generate_idlelist(self.difficulty)
-        self.atklist = self.generate_atklist(self.difficulty)
-        self.dielist = self.generate_dielist(self.difficulty)
+        self.idlelist = self.generate_idlelist()
+        self.atklist = self.generate_atklist()
+        self.dielist = self.generate_dielist()
 
         # healthbar info
         self.healthbar_pos = (self.window.get_width()/2,15)
+
+
+        
 
         # TEEEST 
         # self.health = -1000
@@ -1163,22 +1365,30 @@ class Boss(pygame.sprite.Sprite):
         self.rect.center = self.pos
 
     @staticmethod
-    def generate_atklist(difficulty) -> list:
+    def generate_atklist() -> list:
         output = []
         # 3 attacks are unlocked at a base
         # and then a new attack is unlocked per difficulty
         return Boss.allatk[:] # this is a test, just so when idle attacks you can see something is being done
 
     @staticmethod
-    def generate_idlelist(difficulty) -> list:
+    def generate_idlelist() -> list:
         output = []
         # one random idle is picked per bossfight
         return [random.choice(Boss.allidle)]
 
     @staticmethod
-    def generate_dielist(difficulty) -> list:
+    def generate_dielist() -> list:
         output = []
         return Boss.alldie[:] #test, or not, idk.
+
+    @staticmethod
+    def generate_sprite() -> str:
+        return random.choice(Boss.allsprites)
+
+    @staticmethod
+    def generate_introtext() -> str:
+        return "RAA I AM\nTHE DEFAULT BOSS\nFEAR ME."
 
     def make_attack(self):
         self.in_atk = True
@@ -1191,6 +1401,7 @@ class Boss(pygame.sprite.Sprite):
     def make_die(self):
         self.isdead = True
         self.intangible = True
+        self.in_atk = False
         self.change_state(random.choice(self.dielist))
         
 
@@ -1222,6 +1433,8 @@ class Boss(pygame.sprite.Sprite):
                 #damaging the enemy either way
                 self.hurt()
         elif collide_type == 1:
+            if self.intangible:
+                return
             #I SAID damaging the enemy either way
             self.hurt(collided.dmg)
             collided.hurt()
@@ -1233,6 +1446,12 @@ class Boss(pygame.sprite.Sprite):
         self.player.coins += damage*self.score
         # self.change_anim("hurt")
         # self.sprites[0].add(Em(im='die',coord=self.rect.center,isCenter=True,animation_killonloop=True))
+        # spritesheet code
+        if self.health % 5 == 0:
+            if self.in_atk:
+                self.aimg.change_anim("hurt_attack")
+            else:
+                self.aimg.change_anim("hurt_idle")
         
     def change_state(self,newstate:str):
         self.cur_state = newstate
@@ -1252,27 +1471,172 @@ class Boss(pygame.sprite.Sprite):
 
 
 ########### BOSS DERIVATIVES
+"""
+speaking of, here they are in list form
+# ["atkbounce", "atkthrow", "atkfall"]  # Bounce-Based Attacks
+# ["atkteleport", "atkchase", "atkspiral"]  # Teleportation-Based Attacks
+# ["atksine", "atkslide", "atkfall"]  # Patterned Sine-Based Attacks
+# ["atkbeam", "atkswing", "atkcurve"]  # Beam Attacks
+# ["atkwall", "atkblast", "atkbirth"]  # Bullet Wall Attacks
+# ["atkperimeter", "atkjump", "atkhoriz"] # Position-Based Attacks
+["atkspasm", "atksine", "atkthrow"]  # Complex Bullet Spasms
+# ["atkchase", "atkslam", "atkfall"] # Chase and Close-Range Attacks
+# ["atkhoriz", "atkjump", "atkwall"] # Horizontal Bullet Attacks
+# ["atkteleport", "atkperimeter", "atkspiral"] # Evasive and Teleporting Attacks
+["atkspasm", "atkfall", "atksine"]  # Wave-like Attacks
+# ["atkchase", "atkthrow", "atkbeam"]  # Clever Dodge/Chase Attacks
+["atkwall", "atkblast", "atkcurve"]  # Wall Formation Attacks
+["atkswing", "atkcurve", "atkbounce"] # Evasive Attacks with Homing
+# ["atkslam", "atkfall", "atkspasm"] # Melee and Close Combat Attacks
+["atkbeam", "atkspasm", "atkswing"] # Repetitive Fire Attacks
+["atkcurve", "atkperimeter", "atkthrow"] # Difficult Evasion Attacks
+# ["atkblast", "atkbirth", "atkslam"] # Explosive Formation Attacks
+# ["atkwall", "atkbounce", "atkspiral"]  # Dynamic Stage Control Attacks
+["atkspasm", "atkchase", "atkbeam"] # High-Intensity Multi-Move Attacks
+"""
+
 #### THESE ARE BOSS ASSETS THAT DO EVERYTHING IDENTICALLY, BUT HAVE THEIR OWN PRESET ATTACK PATTERNS (modifies fetch_Xlist)
-class BigNope(Boss):...
-class KingNope1(Boss):...
-class KingNope2(Boss):...
-class KingNope3(Boss):...
-class KingNope4(Boss):...
-class BabyNope(Boss):...
-class HairyNope(Boss):...
-class GreasyNope(Boss):...
-class BlueNope(Boss):...
-class GreenNope(Boss):...
-class EwwNope(Boss):...
-class FruityNope(Boss):...
-class FakerYup(Boss):...
-class UpsideDownNope(Boss):...
-class BFDINope(Boss):...
-class BaldNope(Boss):...
-class HatYup(Boss):...
-class Larry(Boss):...
-class EXENope(Boss):...
-class SPREADJOY(Boss):...
+class bossBig(Boss):
+    def generate_atklist(self): return ["atkbounce", "atkthrow", "atkfall"]  # Bounce-Based Attacks
+    def generate_idlelist(self): return ["idle1"]
+    def generate_introtext(self): return "BIG NOPE\nI'M DA GIANT\nNOPE THAT MAKES\nALL OF DA RULES\n"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_big"
+class bossKing1(Boss):
+    def generate_atklist(self): return ["atkteleport", "atkchase", "atkspiral"]  # Teleportation-Based Attacks
+    def generate_idlelist(self): return ["idle3"]
+    def generate_introtext(self): return "KING NOPE\n   THE 1ST\nHE DOESN'T LIKE YOU"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_king1"
+class bossKing2(Boss):
+    def generate_atklist(self): return ["atksine", "atkslide", "atkfall"]  # Patterned Sine-Based Attacks
+    def generate_idlelist(self): return ["idle2"]
+    def generate_introtext(self): return "KING NOPE\n   THE 2ST\nHE STILL DOESN'T LIKE YOU"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_king2"
+class bossBaby(Boss):
+    def generate_atklist(self): return ["atkchase", "atkthrow", "atkbeam"]  # Clever Dodge/Chase Attacks
+    def generate_idlelist(self): return ["idle1"]
+    def generate_introtext(self): return "KING NOPE\n   THE BABYst\nSHOOT THE BABY"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_baby"
+class bossHairy(Boss):
+    def generate_atklist(self): return ["atkblast", "atkbirth", "atkslam"] # Explosive Formation Attacks
+    def generate_idlelist(self): return ["idle3"]
+    def generate_introtext(self): return "PRINCE NOPE\n   THE HAIRY\nHE LOST HIS BRUSH"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_hairy"
+class bossGreasy(Boss):
+    def generate_atklist(self): return ["atkwall", "atkblast", "atkbirth"]  # Bullet Wall Attacks
+    def generate_idlelist(self): return ["idle1"]
+    def generate_introtext(self): return "PRINCE NOPE\n   THE GREASY\nHE'S GETTING ZITTY"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_greasy"
+class bossBlue(Boss):
+    def generate_atklist(self): return ["atkbeam", "atkswing", "atkcurve"]  # Beam Attacks
+    def generate_idlelist(self): return ["idle2"]
+    def generate_introtext(self): return "KING NOPE\n   THE BLUEST\nWHAT A STIBBITY!"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_blue"
+class bossGreen(Boss):
+    def generate_atklist(self): return  ["atkhoriz", "atkjump", "atkwall"] # Horizontal Bullet Attacks
+    def generate_idlelist(self): return ["idle1"]
+    def generate_introtext(self): return "KING NOPE\n   THE GREENTH\nTHOSE WHO KNOW"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_green"
+class bossEww(Boss):
+    def generate_atklist(self): return ["atkteleport", "atkperimeter", "atkspiral"] # Evasive and Teleporting Attacks
+    def generate_idlelist(self): return ["idle4"]
+    def generate_introtext(self): return "KING...\nEW...\n....EUGH...\nWHAT...\nGROSS.."
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_eww"
+class bossFruity(Boss):
+    def generate_atklist(self): return ["atkwall", "atkbounce", "atkspiral"]  # Dynamic Stage Control Attacks
+    def generate_idlelist(self): return ["idle3"]
+    def generate_introtext(self): return "KING NOPE\n   THE FRUITY\nKNIFE TO BEEF YOU."
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_fruity"
+class bossUpsideDown(Boss):
+    def generate_atklist(self): return ["atkchase", "atkslam", "atkfall"] # Chase and Close-Range Attacks
+    def generate_idlelist(self): return ["idle1","idle2"]
+    def generate_introtext(self): return "KING NOPE\n   THE UPSIDE DOWNST\nSTEEFRABBLEN"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_king_upsidedown"
+class bossBFDI(Boss):
+    def generate_atklist(self): return ["atkperimeter", "atkjump", "atkhoriz"] # Position-Based Attacks
+    def generate_idlelist(self): return ["idle1","idle3"]
+    def generate_introtext(self): return "PRINCE NOPE\n   THE DEFORMED\nHE'S KINDA HOT THO...\n..."
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_bfdi"
+class bossBald(Boss):
+    def generate_atklist(self): return ["atkspasm", "atksine", "atkthrow"]  # Complex Bullet Spasms
+    def generate_idlelist(self): return ["idle1","idle2"]
+    def generate_introtext(self): return "KING NOPE\n   THE BALDTH\nOH.... OH.... OH... OH...\nOH.... OH... OH... OH...."
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_bald"
+class bossHatter(Boss):
+    def generate_atklist(self): return ["atkbeam", "atkspasm", "atkswing"] # Repetitive Fire Attacks
+    def generate_idlelist(self): return ["idle1","idle2","idle3","idle4"]
+    def generate_introtext(self): return "HATTER\nTHEY TOOK\n   EVERYTHING FROM ME.\nREDUCED TO A SIMPLE\n   USELESS BOSS\nHELP ME."
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_hatter"
+class bossLarry(Boss):
+    def generate_atklist(self): return ["atkspasm", "atkfall", "atksine"]  # Wave-like Attacks
+    def generate_idlelist(self): return ["idle2"]
+    def generate_introtext(self): return "TRY NOT TO GET SCARED\nSCARIEST STORIES\nGOD DOES NOT LIVE IN FEAR\nOF WHAT HE CREATED\nHE HIDES IN FEAR OF\n...\n...\nLARRY"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_larry"
+class bossEXE(Boss):
+    def generate_atklist(self): return ["atkslam", "atkfall", "atkspasm"] # Melee and Close Combat Attacks
+    def generate_idlelist(self): return ["idle4"]
+    def generate_introtext(self): return "SO MANY SOULS TO....\nSOULS TO\nUH...\nSHAMMALAMMA\nDING DONG\n HEEEEEEHEEEEEEEEEEEE\nWAHOO YABBABFJSADHKFJASHDFKIASJ"
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_exe"
+# class SPREADJOY(Boss):... # SPREAD JOY SPREAD JOY SPREAD JOY KNOW YOUR WORTH YOUR MASS IS WORTH IT IS WORTH IS WORTH IS WORTH PLEASE JOIN ME
+class INeedYou(Boss):
+    def generate_atklist(self): return Boss.allatk[:] # Melee and Close Combat Attacks
+    def generate_idlelist(self): return Boss.allidle[:]
+    def generate_introtext(self): 
+        return random.choice([
+            "I need you.",
+            "You make me\nSo Happy\nSo So Happy\nPlease come here."
+            "Do you remember\nAll the time\nWe spent Together?",
+            "I still love you.",
+            "Please come back to me\nDon't you love me?",
+            "You can't just\nLeave your own\nkind Like this",
+    ])
+    def generate_dielist(self):return Boss.generate_dielist()
+    def generate_sprite(self): return "boss_you"
+
+
+
+
+loaded = {
+    "bossbig":bossBig,
+    "bossking1":bossKing1,
+    "bossking2": bossKing2 ,
+    "bossbaby": bossBaby ,
+    "bosshairy": bossHairy ,
+    "bossgreasy": bossGreasy ,
+    "bossblue": bossBlue ,
+    "bossgreen": bossGreen ,
+    "bosseww": bossEww ,
+    "bossfruity": bossFruity ,
+    "bossupsidedown": bossUpsideDown ,
+    "bossbfdi": bossBFDI ,
+    "bossbald": bossBald ,
+    "bosshatter": bossHatter ,
+    "bosslarry": bossLarry ,
+    "bossexe": bossEXE ,
+    "bossineedyou":INeedYou,
+}
+
+
+
+
+
+
+
 
 
 

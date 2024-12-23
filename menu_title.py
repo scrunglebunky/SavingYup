@@ -92,3 +92,11 @@ class Title(Menu):
                         self.payload()
                     case pygame.K_ESCAPE:
                         self.end()
+
+
+
+# HIGH SCORE SCREEEN SUBMENU
+class HighScoreScreen(Menu):...
+# ABOUT SCREEN SUBMENU
+class AboutScreen(Menu):...
+

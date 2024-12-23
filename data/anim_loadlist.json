@@ -9,9 +9,7 @@
         "home_A","home_B","home_C","home_D",
         "aqua_A","aqua_B","aqua_C","aqua_D",
         "YUP",
-        "boss_nope","boss_ufo","boss_ufo_succ",
-		"boss_crt_ctrl","boss_crt_arm","boss_crt_armFLIP",
-		"tentacle","crust_fish","boss_sun","boss_sun_arm","boss_sun_flash",
+        "boss_baby","boss_bald","boss_bfdi","boss_big","boss_blue","boss_eww","boss_exe","boss_fruity","boss_greasy","boss_green","boss_hairy","boss_hatter","boss_king_upsidedown","boss_king1","boss_king2","boss_larry",
         "kaboom","die"
     ],
     "./images/ui/":["warning","tutorial","continue","shopkeeper","shoptitle","gameoverplayer","loreimages"],

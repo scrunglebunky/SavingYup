@@ -82,9 +82,13 @@ with open("./data/default-spritesheet.json") as raw:
 for directory,filelist in anim_loadlist.items():
     #There is no longer a break if there's no json, as the list contains all the json files needed without any scraping
     for filename in filelist:
-        with open(directory+filename+".json") as raw:
-            current_file = default.copy()
-            current_file.update(json.load(raw))
+        try:
+            with open(directory+filename+".json") as raw:
+                current_file = default.copy()
+                current_file.update(json.load(raw))
+        except FileNotFoundError:
+            print(str(directory+filename),"Not Found")
+
 
         #generating spritesheet
         spritesheet = generate_sprite(current_file)

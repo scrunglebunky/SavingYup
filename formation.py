@@ -7,6 +7,7 @@ class Formation():
                 sprites,
                 player,
                 char_list:list,
+                boss_list:list,
                 start_patterns:list,
                 difficulty:float,
                 is_boss:bool=False,
@@ -17,6 +18,7 @@ class Formation():
         #basic info
         self.state = "start" 
         self.char_list = char_list
+        self.boss_list = boss_list
         self.start_patterns=start_patterns
         self.sprites = sprites
         self.player = player
@@ -57,7 +59,7 @@ class Formation():
 
         #the spawn lists needed, which tell the game what enemies to spawn
         if self.is_boss:
-            self.spawn_list = [["boss"]]
+            self.spawn_list = Formation.find_boss_spawn_list(difficulty=self.difficulty, boss_list = self.boss_list)
         else:
             self.spawn_list = Formation.find_spawn_list(difficulty=self.difficulty, char_list=self.char_list)
         # print(self.spawn_list)
@@ -171,36 +173,35 @@ class Formation():
             offset = self.spawn_offsets[spawned_id[0]][spawned_id[1]]
             # print('ugh2')
 
-            match type_to_spawn:
-                case "boss":
-                    # setting entrance information
-                    entrance_info = {"patterns":[[self.pos,0]],"speed":1,"timer":1,"shoot":[0]}
-                    entrance_points = entrance_info['patterns']
-                    # spawning a boss -- hard-coded.
-                    char = enemies.bosses.Boss(
-                        formation = self
-                    )
-                    # print('ugh')
-                case _:
-                    # setting entrance information
-                    entrance_info = self.start_patterns[type_to_spawn]
-                    entrance_points = entrance_info['patterns']
+            if type_to_spawn in enemies.bosses.loaded.keys():
+                # setting entrance information
+                entrance_info = {"patterns":[[self.pos,0]],"speed":1,"timer":1,"shoot":[0]}
+                entrance_points = entrance_info['patterns']
+                # spawning a boss -- hard-coded.
+                char = enemies.bosses.loaded[type_to_spawn](
+                    formation = self
+                )
+               
+            elif type_to_spawn in enemies.loaded.keys():
+                # setting entrance information
+                entrance_info = self.start_patterns[type_to_spawn]
+                entrance_points = entrance_info['patterns']
 
-                    #creating enemy
-                    char = enemies.loaded[type_to_spawn](
-                        offset=offset,
-                        pos=self.pos,
-                        difficulty=self.difficulty_rounded,
-                        sprites=self.sprites,
-                        player=self.player,
-                        entrance_points=entrance_points[self.enter_key] if entrance_points is not None else None,
-                        entrance_speed=entrance_info['speed'] if entrance_points is not None else None,
-                        # skin=spawn_skin, # REMOVED the changing skins, and replacing them with defaults.
-                        trip=entrance_info['shoot'] if entrance_points is not None else [999],
-                        formation=self,
-                        window=self.window,
-                        # is_demo=self.is_demo
-                    )
+                #creating enemy
+                char = enemies.loaded[type_to_spawn](
+                    offset=offset,
+                    pos=self.pos,
+                    difficulty=self.difficulty_rounded,
+                    sprites=self.sprites,
+                    player=self.player,
+                    entrance_points=entrance_points[self.enter_key] if entrance_points is not None else None,
+                    entrance_speed=entrance_info['speed'] if entrance_points is not None else None,
+                    # skin=spawn_skin, # REMOVED the changing skins, and replacing them with defaults.
+                    trip=entrance_info['shoot'] if entrance_points is not None else [999],
+                    formation=self,
+                    window=self.window,
+                    # is_demo=self.is_demo
+                )
             # print("FORMATION",self.difficulty)
             #adding enemy to groups
             self.spawned_list.append(char)
@@ -309,7 +310,7 @@ class Formation():
 
 
     @staticmethod
-    def find_spawn_list(difficulty,char_list) -> list:
+    def find_spawn_list(difficulty:float,char_list:list) -> list:
         ## THIS IS OVERCOMPLICATED
         ## I AM NOT GOING TO KEEP THIS
         ## IT WILL RANDOMLY GENERATE A LIST OF ENEMIES TO SPAWN
@@ -324,6 +325,21 @@ class Formation():
             for column in range(columns):
                 spawn_list[row].append(random.choice(char_list))
         return spawn_list
+
+    @staticmethod
+    def find_boss_spawn_list(difficulty:float,boss_list:list,spawn_enemies:bool=False) -> list:
+        ## this is identical to the spawn lists before, however this time it
+        spawn_list = []
+        row_min = int(3 if difficulty <= 2 else 5)
+        row_max = int(5+difficulty//1 if difficulty < 5 else 10)
+        rows,columns = random.randint(row_min,row_max),random.randint(6,10)
+        #trip to see if an entire form should be random
+        for row in range(rows):
+            spawn_list.append([])
+            for column in range(columns):
+                spawn_list[row].append(random.choice(char_list))
+        return spawn_list
+
 
 
     def empty(self):

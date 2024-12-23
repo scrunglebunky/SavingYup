@@ -166,6 +166,7 @@ class GamePlay(Menu):
         # current running game info, which replaces world data
         # this isn't a dictionary anymore because they're annoying to write
         self.char_list = [] 
+        self.boss_list = []
         self.char_start_patterns = {}
         self.backgroundlist_unlocked = []
         # more graphical stuff
@@ -238,6 +239,7 @@ class GamePlay(Menu):
             player = self.player,
             # world_data = self.world_data,
             char_list=self.char_list,
+            boss_list=self.boss_list,
             start_patterns=self.char_start_patterns,
             level=self.level,
             difficulty=self.difficulty,
@@ -274,18 +276,13 @@ class GamePlay(Menu):
     
     def new_level(self,unlocks = False):
         # new zone info. If there is a new zone, it does this first.
-        if self.level in (0,1,2,3) or unlocks:
-            Info.unlock_enemy(gameplay=self)
-            Info.unlock_bg(gameplay=self)
-            if self.active:
-                self.playstate.add_queue('newlevel')
-                self.playstate.add_queue('gameplay')
-                self.end()
-            else:
-                ...
-        elif self.level%5 == 0:
+        if self.level%5 == 0:
             self.new_zone()
         else:
+            if self.level in (0,1,2,3) or unlocks:
+                Info.unlock_enemy(gameplay=self)
+                if unlocks:
+                    Info.unlock_bg(gameplay=self)
             if self.active:
                 # playing a graphic
                 self.playstate.add_queue('newlevel')
