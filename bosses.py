@@ -1216,6 +1216,15 @@ class AtkPerimeter(AtkState):
         self.host.pos = self.pos
 
 
+
+
+
+
+
+
+
+
+
 ########### THE boss class, which holds all the assets and everything of that matter.
 class Boss(pygame.sprite.Sprite):
     # all states
@@ -1470,6 +1479,14 @@ class Boss(pygame.sprite.Sprite):
 
 
 
+
+
+
+
+
+
+
+
 ########### BOSS DERIVATIVES
 """
 speaking of, here they are in list form
@@ -1592,7 +1609,6 @@ class bossEXE(Boss):
     def generate_introtext(self): return "SO MANY SOULS TO....\nSOULS TO\nUH...\nSHAMMALAMMA\nDING DONG\n HEEEEEEHEEEEEEEEEEEE\nWAHOO YABBABFJSADHKFJASHDFKIASJ"
     def generate_dielist(self):return Boss.generate_dielist()
     def generate_sprite(self): return "boss_exe"
-# class SPREADJOY(Boss):... # SPREAD JOY SPREAD JOY SPREAD JOY KNOW YOUR WORTH YOUR MASS IS WORTH IT IS WORTH IS WORTH IS WORTH PLEASE JOIN ME
 class INeedYou(Boss):
     def generate_atklist(self): return Boss.allatk[:] # Melee and Close Combat Attacks
     def generate_idlelist(self): return Boss.allidle[:]

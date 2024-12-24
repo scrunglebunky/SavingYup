@@ -62,6 +62,11 @@ class GameOver(pygame.sprite.Sprite):
                 if i < len(self.resultsheet):
                     self.displayed += self.resultsheet[i]
                     GameOver.spr_resultgraphic.update_text(self.displayed)
+                else:
+                        # note that since a new level starts
+                        # it will run the newlevel thing itself
+                        # to prevent the sounds from overlapping
+                        self.active = False
 
 
     def generate_resultsheet(self) -> list:
@@ -81,6 +86,6 @@ class GameOver(pygame.sprite.Sprite):
     def event_handler(self,event):
         match event.type:
             case pygame.KEYDOWN:
-                if self.lifespan > 60:
-                    self.playstate.end("title")
+                self.lifespan += 60 - (self.lifespan % 60) - 1
+                self.update()
   

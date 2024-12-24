@@ -104,19 +104,34 @@ class Info():
     
     @staticmethod
     def unlock_bg(gameplay):
+        print("#####NEW BG UNLOCKED AT LEVEL",gameplay.level)
         #generating unlockable, pickpool, and selected background
         bgpick = Info.generate_unlockable(xlist=Info.backgroundlist,unlockchart=Info.backgroundlist_unlockchart,unlockindex=gameplay.level)
+        print("UNLOCKABLE LIST:",bgpick)
         bgpick = Info.generate_pickpool(unlockable=bgpick, unlocked=gameplay.backgroundlist_unlocked)
+        print("UNLOCKED LIST:",gameplay.backgroundlist_unlocked)
+        print("PICKPOOL LIST:",bgpick)
+        
         #sets a new background if there is one to set
         if len(bgpick) > 0:
             bgpick = Info.pick_from_pool(bgpick)
             gameplay.new_bg(bgpick)
+            gameplay.backgroundlist_unlocked.append(bgpick)
+            print("UNLOCKED BG PICKED:",bgpick)
         #however, if there are no unique backgrounds left to pick, it just picks an older one
         else:
             bgpick = Info.pick_from_pool(gameplay.backgroundlist_unlocked)
             gameplay.new_bg(bgpick)
+            print("PREVIOUS BG PICKED:",bgpick)
+
 
     
+    @staticmethod
+    def generate_boss(gameplay,amount=1):
+        loaded = list(enemies.bosses.loaded.keys())
+        return [random.choice(loaded) for i in range(amount)]
+        
+
 
 # WHAT IS THIS DOING?
 # I have moved everything that involves gameplay into this one simple sprite
@@ -166,9 +181,10 @@ class GamePlay(Menu):
         # current running game info, which replaces world data
         # this isn't a dictionary anymore because they're annoying to write
         self.char_list = [] 
-        self.boss_list = []
         self.char_start_patterns = {}
         self.backgroundlist_unlocked = []
+        self.boss_chances = {}
+
         # more graphical stuff
         self.darkness = Bg('darkness.png',(600,800),speed=(0,0)) # setting
         self.platform = PF(self.player)
@@ -216,6 +232,7 @@ class GamePlay(Menu):
         #08/21/2023 - Game Over - making the gameover asset appear if dead
         if self.player.health <= 0 and self.active:
             self.playstate.add_queue("gameover")
+            self.playstate.add_queue("title")
             self.end()
 
         # making sure the image transformation finishes
@@ -239,13 +256,13 @@ class GamePlay(Menu):
             player = self.player,
             # world_data = self.world_data,
             char_list=self.char_list,
-            boss_list=self.boss_list,
+            boss_list=Info.generate_boss(self),
             start_patterns=self.char_start_patterns,
             level=self.level,
             difficulty=self.difficulty,
             sprites=GamePlay.sprites,
             window=self.imageraw,
-            is_boss = True,
+            is_boss = self.level%5==0,
             #is_demo = self.is_demo
         )   
     
@@ -276,7 +293,7 @@ class GamePlay(Menu):
     
     def new_level(self,unlocks = False):
         # new zone info. If there is a new zone, it does this first.
-        if self.level%5 == 0:
+        if (self.level)%5 == 0:
             self.new_zone()
         else:
             if self.level in (0,1,2,3) or unlocks:

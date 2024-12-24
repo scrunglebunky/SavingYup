@@ -208,6 +208,7 @@ class Template(pygame.sprite.Sprite):
 
 
 
+
 class A(Template): #swooping
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_A" # manually setting sprite info now
@@ -418,10 +419,6 @@ class B(Template): #jumpy
 
 
 
-
-
-
-
 class C(Template): #turret
     def __init__(self,**kwargs):
         kwargs['skin'] = "nope_C" # manually setting sprite info now
@@ -467,7 +464,7 @@ class Compootr(Template): #special world 3 item
     atk_max = 2
     def __init__(self,**kwargs):
         kwargs['skin'] = "hack_D" # manually setting sprite info now
-        kwargs['bullet_texture'] = "bullet_hack" # manually setting sprite info now
+        # kwargs['bullet_texture'] = "bullet_hack" # manually setting sprite info now
         Template.__init__(self,kwargs=kwargs) 
         self.in_atk = True
         self.atk = {
@@ -715,8 +712,6 @@ class Chaser(Template):
         Template.kill(self,reason)
         self.atk['warning'].kill()
         
-
-
 
 
 

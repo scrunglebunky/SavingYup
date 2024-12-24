@@ -1,5 +1,6 @@
 #Code by Andrew Church
-import pygame,anim,math,bullets,audio,tools,random
+import pygame,anim,math,bullets,tools,random
+from audio import play_sound as psound
 import gameplay_log as log
 # "bar":(
 #         "h", #if the bar is horizontal or vertical.
@@ -237,7 +238,7 @@ class Player(pygame.sprite.Sprite):
             # graphical / audio stuff
             self.aimg.change_anim("hurt")
             for i in range(20): self.sprite_groups[0].add(bullets.BulletParticle(pos=self.rect.center,texture="redblock"))
-            audio.play_sound("ouch.mp3" if self.health > 0 else "scream.mp3")
+            psound("ouch.mp3" if self.health > 0 else "scream.mp3")
             
             
 
@@ -248,7 +249,7 @@ class Player(pygame.sprite.Sprite):
         self.movement[0] = self.movement[0] - 7.5 if self.movement[0] <= 0 else -7.5
         if self.movement[0] > 15: self.movement[0] = 15 # makes it so you don't fly off anymore.
         self.aimg.change_anim("jump")
-        audio.play_sound("boing" + str(random.randint(0,4)) + ".wav")
+        psound("boing" + str(random.randint(0,4)) + ".wav")
         for i in range(5):self.sprite_groups[0].add(bullets.BulletParticle((self.pos[0],self.rect.bottom)))
 
         
@@ -275,7 +276,7 @@ class Player(pygame.sprite.Sprite):
         did_shoot = bullets.LOADED[self.current_bullet].shoot(sprite_groups=self.sprite_groups,player=self)
         if not self.movement[4] and did_shoot: 
             self.aimg.change_anim("shoot")
-            audio.play_sound("bap1.wav")
+            psound("bap1.wav")
 
     def move(self,dir:bool=True,release:bool=False):
         if not release: 
@@ -308,14 +309,14 @@ class Player(pygame.sprite.Sprite):
                 #crouching
                 self.aimg.change_anim("crouch")
                 self.movement[4] = True
-                audio.play_sound("boo.wav")
+                psound("boo.wav")
             else:
                 self.movement[0] = 25
         else:
             if self.movement[0] == 0:
                 self.movement[4] = False
                 self.aimg.change_anim('idle')
-                audio.play_sound("womp.wav")
+                psound("womp.wav")
             
     def focus(self,down:bool=True):
         if down:

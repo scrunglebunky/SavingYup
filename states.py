@@ -1,4 +1,4 @@
-import pygame,os,player,text,random,formation,anim,audio,tools,events,score,enemies
+import pygame,os,player,text,random,formation,anim,audio,tools,score,enemies
 import menu_shop as shop
 from anim import all_loaded_images as img
 from anim import WhiteFlash

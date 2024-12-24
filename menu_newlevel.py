@@ -51,7 +51,7 @@ class NewLevel(Menu):
         # updates the level number
         NewLevel.spr_level_number.update_text(str(self.playstate.gameplay.level))
         # plays a sound
-        psound("tada.mp3")
+        # psound("tada.mp3")
         # positioning
         self.rect.center = (pygame.display.rect.centerx + random.randint(-60,60), pygame.display.rect.centery + random.randint(-60,60))
 

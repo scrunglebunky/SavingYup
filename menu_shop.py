@@ -120,7 +120,7 @@ class Shop(Menu):
         #updating the description and icon
         self.set_info()
         # playing a sound
-        psound("bap1.wav")
+        # psound("bap1.wav")
         Shop.sprite_shopkeep.aimg.change_anim("think")
 
 
@@ -131,13 +131,13 @@ class Shop(Menu):
         if Shop.sprites_items[self.index].text not in self.items_index.keys(): return True
         # this handles anything relating to buying, including modifying the "bought" section of the items index
         elif self.player.coins >= self.price:
-            psound("cha-ching.wav")
+            # psound("cha-ching.wav")
             self.player.coins -= self.price
             self.items_index[Shop.sprites_items[self.index].text]["bought"] += 1
             Shop.sprite_shopkeep.aimg.change_anim("happy")
             return True
         else:
-            psound("denied.wav")
+            # psound("denied.wav")
             Shop.sprite_shopkeep.aimg.change_anim("angry")
             return False
 

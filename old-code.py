@@ -2,6 +2,54 @@
 HERE I POST A LOT OF OLDER PIECES OF CODE WITH A LITTLE DESCRIPTION ON TOP OF WHAT IT DID
 SADLY I REMOVED MOST OF THE OLD CODE SO THIS IS RATHER EMPTY."""
 
+""" EVENTS.PY
+Not needed anymore!
+I have no need to have something interrupt gameplay since the menu boxes already do it.
+import pygame,text,audio,enemies,json, random
+from emblems import Emblem as Em
+
+## WHAT IS EVENTS
+# EVENTS is a hard-coded list of events that occur during gameplay
+# this could be score bonuses, end-world graphics, transitions, and more!
+# they are able to freeze the game, or not
+# they can also be skipped to just add the payload at the end
+# they can be stacked
+class Event():
+    sprites = pygame.sprite.Group()
+    def __init__(self,kwargs:dict):
+        Event.sprites.empty()
+        self.playing = True
+        self.event = 0
+        self.duration = 0 
+    def update(self):
+        self.duration += 1
+        self.update_event(self.event)
+    def update_event(self,event=0):
+        ...
+
+
+class NewLevelEvent(Event):
+    #HARD CODED - what happens when a new level occurs
+    def __init__(self,**kwargs):
+        Event.__init__(self,kwargs=kwargs)
+        self.level_em = Em( im=None,coord=(100,100),isCenter=True,force_surf = text.load_text(text=('LEVEL ' + str(kwargs['level']) + "!!!"),size=30,add_to_loaded=False) )
+        self.window = kwargs['window']
+        Event.sprites.add(self.level_em)
+    def update_event(self,event=0):
+        if self.duration == 1:
+            # audio.play_sound("tada.mp3")
+            ...
+        if self.event == 0:
+            if self.duration > 80:
+                self.event += 1
+        else:
+            Event.sprites.empty()
+            self.playing = False
+    
+        Event.sprites.draw(self.window)
+    
+
+"""
 
 """ THE TITLE STATE
 the last of the states to be removed... rip.

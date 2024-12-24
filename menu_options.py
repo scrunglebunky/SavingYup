@@ -69,7 +69,7 @@ class Options(Menu):
                     case pygame.K_UP:  
                         self.index -= 1
                         if self.index < 0:
-                            self.index = len(Options.options_list)
+                            self.index = len(Options.options_list)-1
                     case pygame.K_DOWN:
                         self.index += 1
                         if self.index >= len(Options.options_list):

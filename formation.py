@@ -15,6 +15,8 @@ class Formation():
                 *args,
                 **kwargs,
                 ):
+
+                
         #basic info
         self.state = "start" 
         self.char_list = char_list
@@ -59,7 +61,7 @@ class Formation():
 
         #the spawn lists needed, which tell the game what enemies to spawn
         if self.is_boss:
-            self.spawn_list = Formation.find_boss_spawn_list(difficulty=self.difficulty, boss_list = self.boss_list)
+            self.spawn_list = Formation.find_boss_spawn_list(difficulty=self.difficulty, char_list=self.char_list, boss_list = self.boss_list)
         else:
             self.spawn_list = Formation.find_spawn_list(difficulty=self.difficulty, char_list=self.char_list)
         # print(self.spawn_list)
@@ -72,7 +74,7 @@ class Formation():
             self.spawn_offsets.append([])
             #adding the offset. note it is not labeled because spawn info iterations would work on this one
             for column in range(len(self.spawn_list[row])):self.spawn_offsets[row].append((column*45,row*50))
-        
+
         #ORGANIZED SPAWN: taking the indexes of the enemies and organizing them based on type
         self.spawn_organized={}
         for row in range(len(self.spawn_list)):
@@ -202,6 +204,8 @@ class Formation():
                     window=self.window,
                     # is_demo=self.is_demo
                 )
+            else:
+                print(type_to_spawn,enemies.loaded.keys(),enemies.bosses.loaded.keys())
             # print("FORMATION",self.difficulty)
             #adding enemy to groups
             self.spawned_list.append(char)
@@ -240,7 +244,6 @@ class Formation():
         self.update_movement()
 
 
-
     def state_leave(self): #leaving but animated
         #moving
         self.leave_y_momentum -= 0.25
@@ -268,6 +271,7 @@ class Formation():
         self.state_idle()
 
 
+
     def check_for_atk(self): #throwing down an enemy to attack the player
         #only runs if the timer is ok
         if (self.timer["time"] % self.timer["atk"] == 0): #and (self.timer["grace"] < self.timer["grace_start"]):
@@ -293,6 +297,7 @@ class Formation():
             idle_count.pop(index)
             if len(idle_count) < 1: 
                 break
+
         return
 
 
@@ -307,6 +312,8 @@ class Formation():
         # if the positioning goes off of the stage, the formation kills itself
         if self.pos[1] > self.player.bar[1]+64:
             self.state = "destroy"
+
+
 
 
     @staticmethod
@@ -326,18 +333,21 @@ class Formation():
                 spawn_list[row].append(random.choice(char_list))
         return spawn_list
 
+
     @staticmethod
-    def find_boss_spawn_list(difficulty:float,boss_list:list,spawn_enemies:bool=False) -> list:
-        ## this is identical to the spawn lists before, however this time it
+    def find_boss_spawn_list(difficulty:float,char_list:list,boss_list:list,spawn_enemies:bool=False) -> list:
         spawn_list = []
-        row_min = int(3 if difficulty <= 2 else 5)
-        row_max = int(5+difficulty//1 if difficulty < 5 else 10)
-        rows,columns = random.randint(row_min,row_max),random.randint(6,10)
-        #trip to see if an entire form should be random
-        for row in range(rows):
-            spawn_list.append([])
-            for column in range(columns):
-                spawn_list[row].append(random.choice(char_list))
+        spawn_list.append(boss_list) # the boss list only has 1 boss in it lol
+        if spawn_enemies:
+            ## this is identical to the spawn lists before, however this time it
+            row_min = int(3 if difficulty <= 2 else 5)
+            row_max = int(5+difficulty//1 if difficulty < 5 else 10)
+            rows,columns = random.randint(row_min,row_max),random.randint(6,10)
+            #trip to see if an entire form should be random
+            for row in range(rows):
+                spawn_list.append([])
+                for column in range(columns):
+                    spawn_list[row].append(random.choice(char_list))
         return spawn_list
 
 
@@ -367,18 +377,3 @@ class Formation():
         # window.blit(self.image,(self.pos[0]-25,self.pos[1]-75))
         ...
         
-
-class FormationBoss(Formation):
-    def __init__(self,
-                sprites,
-                player,
-                difficulty:float,
-                *args,
-                **kwargs,
-                ):
-        # the boss formation is a simplified version of the normal formation
-        # it doesn't have to worry about anything regarding spawns, or whatever
-        self.sprites = sprites
-        self.player = player
-        self.difficulty = difficulty
-        ...
